@@ -15,7 +15,7 @@ export const customConfig = {
     forwardRepliesTo: "nurgasab@gmail.com",
   },
   documentTitle: "PregnantMeal - Pregnancy dinner recipes first trimester",
-  domainWithHttps: "https://pregnantmeal.com",
+  domainWithHttps: "https://redditscheduler.com",
   seo: {
     keywords:
       "first trimester recipes, 7 day meal plan for pregnant woman, pregnancy dinner recipes first trimester, dinner ideas for first trimester, meal plans for pregnant moms, pregnantmeal, pregnant meal",
@@ -25,20 +25,20 @@ export const customConfig = {
     applicationName: "pregnantmeal",
     og: {
       title: "PregnantMeal - pregnancy dinner recipes first trimester!",
-      url: "https://pregnantmeal.com",
-      image: "https://pregnantmeal.com/company_related/og-image.webp",
+      url: "https://redditscheduler.com",
+      image: "https://redditscheduler.com/company_related/og-image.webp",
       imageAlt:
         "PregnantMeal - pregnancy dinner recipes first trimester! Get personalized daily, weekly, and monthly meal plans for a healthy pregnancy.",
       content: "https://x.com/tech_nurgaliyev",
       twitterSite: "@tech_nurgaliyev",
-      twitterImage: "https://pregnantmeal.com/company_related/og-image.webp",
+      twitterImage: "https://redditscheduler.com/company_related/og-image.webp",
     },
   },
   blog: {
     title: "PregnantMeal Blog",
     description:
       "Foods to avoid during pregnancy, first trimester recipes, 7 day meal plan for pregnant woman, pregnancy food aversions, pregnancy dinner recipes first trimester, dinner ideas for first trimester, meal plans for pregnant moms",
-    canonical: "https://pregnantmeal.com/blog",
+    canonical: "https://redditscheduler.com/blog",
     author: {
       name: "Sabyr Nurgaliyev",
       description:

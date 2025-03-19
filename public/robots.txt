@@ -7,8 +7,8 @@ User-agent: *
 Allow: /
 
 # Host
-Host: https://pregnantmeal.com
+Host: https://redditscheduler.com
 
 # Sitemaps
-Sitemap: https://pregnantmeal.com/sitemap.xml
-Sitemap: https://pregnantmeal.com/sitemap-pregnancy.xml
+Sitemap: https://redditscheduler.com/sitemap.xml
+Sitemap: https://redditscheduler.com/sitemap-pregnancy.xml

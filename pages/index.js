@@ -1,75 +1,295 @@
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
-import { customConfig } from "@/project.custom.config";
-import { Noto_Sans } from "next/font/google";
+import Link from "next/link";
+import Image from "next/image";
 import Head from "next/head";
-import Hero from "@/components/Hero";
-import Benefits from "@/components/Benefits";
-import HowItWorks from "@/components/HowItWorks";
-import SampleMeals from "@/components/SampleMeals";
-import PricingPlans from "@/components/PricingPlans";
-import FAQ from "@/components/FAQ";
-import FinalCTA from "@/components/FinalCTA";
-
-const lato = Noto_Sans({
-  subsets: ["latin"],
-  weight: ["400"],
-});
 
 export default function Home() {
   return (
     <>
       <Head>
-        <title>{customConfig.documentTitle}</title>
+        <title>RedditScheduler - Automate Your Reddit Marketing</title>
         <meta
           name="description"
-          content={customConfig.seo.description}
+          content="Automate your Reddit posts and drive traffic to your website. Schedule posts, analyze subreddits, and track performance - all in one platform."
           key="description"
         />
         <meta
           name="keywords"
-          content={customConfig.seo.keywords}
+          content="reddit scheduler, reddit automation, reddit marketing, social media automation, reddit posts"
           key="keywords"
         />
-        <link rel="canonical" href={customConfig.domainWithHttps} key="canonical" />
-        
-        {/* Open Graph / Social Media Meta Tags */}
-        <meta property="og:title" content={customConfig.seo.og.title} key="og:title" />
-        <meta property="og:description" content={customConfig.seo.description} key="og:description" />
-        <meta property="og:url" content={customConfig.domainWithHttps} key="og:url" />
+        <meta
+          property="og:title"
+          content="RedditScheduler - Automate Your Reddit Marketing"
+          key="og:title"
+        />
+        <meta
+          property="og:description"
+          content="Automate your Reddit posts and drive traffic to your website. Schedule posts, analyze subreddits, and track performance - all in one platform."
+          key="og:description"
+        />
         <meta property="og:type" content="website" key="og:type" />
-        <meta property="og:site_name" content={customConfig.seo.applicationName} />
+        <meta property="og:site_name" content="RedditScheduler" />
         <meta property="og:locale" content="en_US" />
-        <meta property="og:image" content={customConfig.seo.og.image} key="og:image" />
-        <meta property="og:image:alt" content={customConfig.seo.og.imageAlt} />
-        <meta property="og:image:type" content="image/png" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="article:author" content={customConfig.seo.og.articleAuthor} />
-        
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" key="twitter:card" />
-        <meta name="twitter:site" content={customConfig.seo.og.twitterSite} key="twitter:site" />
-        <meta name="twitter:creator" content="@tech_nurgaliyev" />
-        <meta name="twitter:title" content={customConfig.seo.og.title} key="twitter:title" />
-        <meta name="twitter:description" content={customConfig.seo.description} key="twitter:description" />
-        <meta name="twitter:image" content={customConfig.seo.og.twitterImage} key="twitter:image" />
       </Head>
-      <header className={lato.className}>
-        <Header />
-      </header>
-      <main className={`flex flex-col min-h-screen mx-auto ${lato.className}`}>
-        <Hero />
-        <Benefits />
-        <HowItWorks />
-        <SampleMeals />
-        <PricingPlans />
-        <FAQ />
-        <FinalCTA />
-      </main>
-      <footer className={lato.className}>
-        <Footer />
-      </footer>
+      <div className="min-h-screen bg-base-100">
+        {/* Navigation */}
+        <nav className="flex justify-between items-center p-4 max-w-7xl mx-auto">
+          <div className="flex items-center gap-2">
+            <Image
+              src="/logo.svg"
+              alt="Logo"
+              width={32}
+              height={32}
+              className="rounded-lg"
+            />
+            <span className="font-bold text-xl">RedditScheduler</span>
+          </div>
+          <div className="flex gap-4">
+            <Link href="/product" className="link link-hover">
+              Product
+            </Link>
+            <Link href="/pricing" className="link link-hover">
+              Pricing
+            </Link>
+          </div>
+        </nav>
+
+        {/* Hero Section */}
+        <main className="text-center px-4 py-16 max-w-4xl mx-auto">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            Schedule Reddit posts that drive
+            <br />
+            traffic to your website
+          </h1>
+          <p className="text-lg text-gray-600 mb-8">
+            Turn Reddit into your traffic machine without the headache
+          </p>
+          <div className="flex justify-center gap-4">
+            <Link href="/dashboard" className="btn btn-primary">
+              Dashboard →
+            </Link>
+            <Link href="/demo" className="btn btn-ghost">
+              ▶ Demo
+            </Link>
+          </div>
+
+          {/* Example Posts Grid */}
+          <div className="grid grid-cols-3 md:grid-cols-5 gap-4 mt-16 max-w-3xl mx-auto">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div
+                key={i}
+                className="relative aspect-[3/4] rounded-xl bg-gray-200 overflow-hidden transform hover:scale-105 transition-transform"
+              >
+                <Image
+                  src={`/reddit-post-${i}.svg`}
+                  alt={`Reddit Post ${i}`}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        </main>
+
+        {/* Alternatives Section */}
+        <section className="py-16 px-4">
+          <h2 className="text-3xl font-bold text-center mb-8">
+            Alternatives are expensive.
+          </h2>
+          <div className="grid md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+            <div className="p-6 rounded-xl border border-red-200 bg-red-50">
+              <div className="flex justify-between mb-2">
+                <span className="font-semibold">Marketing Agencies</span>
+                <span className="text-red-500">✕</span>
+              </div>
+              <p className="text-sm text-gray-600">
+                Expensive, $50-200 per post, burning through $4500 to $6500 a
+                month.
+              </p>
+            </div>
+            <div className="p-6 rounded-xl border border-red-200 bg-red-50">
+              <div className="flex justify-between mb-2">
+                <span className="font-semibold">Doing it yourself</span>
+                <span className="text-red-500">✕</span>
+              </div>
+              <p className="text-sm text-gray-600">
+                Hours lost on researching, planning, writing, posting,
+                monitoring, re-purposing
+              </p>
+            </div>
+            <div className="p-6 rounded-xl border border-green-200 bg-green-50">
+              <div className="flex justify-between mb-2">
+                <span className="font-semibold">RedditScheduler</span>
+                <span className="text-green-500">✓</span>
+              </div>
+              <p className="text-sm text-gray-600">
+                Automatically scheduling & publishing posts to subreddits, for a
+                monthly subscription
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="py-16 px-4 bg-base-200">
+          <h2 className="text-3xl font-bold text-center mb-12">Features</h2>
+          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <div className="card bg-base-100">
+              <div className="card-body">
+                <div className="text-primary text-2xl mb-2">📊</div>
+                <h3 className="card-title">Scheduling</h3>
+                <p className="text-sm text-gray-600">
+                  Publish when your target audience is most active
+                </p>
+              </div>
+            </div>
+            <div className="card bg-base-100">
+              <div className="card-body">
+                <div className="text-primary text-2xl mb-2">🎯</div>
+                <h3 className="card-title">Cross-Posting</h3>
+                <p className="text-sm text-gray-600">
+                  Post to multiple subreddits with one click
+                </p>
+              </div>
+            </div>
+            <div className="card bg-base-100">
+              <div className="card-body">
+                <div className="text-primary text-2xl mb-2">📈</div>
+                <h3 className="card-title">Hook Generator</h3>
+                <p className="text-sm text-gray-600">
+                  Viral templates for your posts
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Pricing Section */}
+        <section className="py-16 px-4">
+          <h2 className="text-3xl font-bold text-center mb-12">
+            Change your plan
+          </h2>
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {/* Starter Plan */}
+            <div className="card bg-base-100 border">
+              <div className="card-body">
+                <h3 className="card-title">Starter</h3>
+                <div className="text-3xl font-bold mb-4">
+                  $9<span className="text-sm text-gray-500">/month</span>
+                </div>
+                <ul className="space-y-2">
+                  <li className="flex items-center gap-2">
+                    <span>✓</span> 10 scheduled posts per month
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span>✓</span> Viral hooks
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span>✓</span> Unlimited subreddits
+                  </li>
+                </ul>
+                <button className="btn btn-outline mt-4 w-full">Buy Now</button>
+              </div>
+            </div>
+
+            {/* Growth Plan */}
+            <div className="card bg-base-100 border border-primary">
+              <div className="card-body relative">
+                <h3 className="card-title">Growth</h3>
+                <div className="text-3xl font-bold mb-4">
+                  $18<span className="text-sm text-gray-500">/month</span>
+                </div>
+                <ul className="space-y-2">
+                  <li className="flex items-center gap-2">
+                    <span>✓</span> 50 scheduled posts per month
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span>✓</span> Viral hooks
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span>✓</span> Unlimited subreddits
+                  </li>
+                </ul>
+                <button className="btn btn-primary mt-4 w-full">Buy Now</button>
+              </div>
+            </div>
+
+            {/* Scale Plan */}
+            <div className="card bg-base-100 border">
+              <div className="card-body">
+                <h3 className="card-title">Scale</h3>
+                <div className="text-3xl font-bold mb-4">
+                  $27<span className="text-sm text-gray-500">/month</span>
+                </div>
+                <ul className="space-y-2">
+                  <li className="flex items-center gap-2">
+                    <span>✓</span> 150 scheduled posts per month
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span>✓</span> Viral hooks
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span>✓</span> Unlimited subreddits
+                  </li>
+                </ul>
+                <button className="btn btn-outline mt-4 w-full">
+                  Buy Plan
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="footer p-10 bg-base-200 text-base-content">
+          <div>
+            <Image
+              src="/logo.svg"
+              alt="Logo"
+              width={32}
+              height={32}
+              className="rounded-lg"
+            />
+            <p>
+              RedditScheduler
+              <br />
+              Automating your Reddit presence
+            </p>
+          </div>
+          <div>
+            <span className="footer-title">Product</span>
+            <Link href="/features" className="link link-hover">
+              Features
+            </Link>
+            <Link href="/pricing" className="link link-hover">
+              Pricing
+            </Link>
+          </div>
+          <div>
+            <span className="footer-title">Company</span>
+            <Link href="/about" className="link link-hover">
+              About
+            </Link>
+            <Link href="/contact" className="link link-hover">
+              Contact
+            </Link>
+          </div>
+          <div>
+            <span className="footer-title">Legal</span>
+            <Link href="/privacy-policy" className="link link-hover">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="link link-hover">
+              Terms of Service
+            </Link>
+          </div>
+        </footer>
+        <footer className="footer px-10 py-4 border-t bg-base-200 text-base-content border-base-300">
+          <div className="text-sm">
+            © 2024 RedditScheduler. All rights reserved.
+          </div>
+        </footer>
+      </div>
     </>
   );
 }

@@ -6,7 +6,7 @@ This guide explains how to manage and submit the pregnancy week pages (1-42 week
 
 The pregnancy week pages follow this URL pattern:
 ```
-https://pregnantmeal.com/pregnancy/[number]-weeks-pregnant-in-months
+https://redditscheduler.com/pregnancy/[number]-weeks-pregnant-in-months
 ```
 
 Where `[number]` ranges from 1 to 42.
@@ -36,15 +36,15 @@ We have created the following sitemap files:
 1. Go to [Bing Webmaster Tools](https://www.bing.com/webmasters)
 2. Select your site
 3. Navigate to "Sitemaps" in the left sidebar
-4. Enter `https://pregnantmeal.com/sitemap.xml` in the "Submit a sitemap" field
+4. Enter `https://redditscheduler.com/sitemap.xml` in the "Submit a sitemap" field
 5. Click "Submit"
 
 ### Method 3: Direct URL Ping
 
 You can directly ping search engines with your sitemap URL:
 
-- Google: https://www.google.com/ping?sitemap=https://pregnantmeal.com/sitemap.xml
-- Bing: https://www.bing.com/ping?sitemap=https://pregnantmeal.com/sitemap.xml
+- Google: https://www.google.com/ping?sitemap=https://redditscheduler.com/sitemap.xml
+- Bing: https://www.bing.com/ping?sitemap=https://redditscheduler.com/sitemap.xml
 
 ## Verification
 

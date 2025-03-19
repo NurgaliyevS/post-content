@@ -13,17 +13,17 @@ export const customConfig = {
     supportEmail: "support@redditscheduler.com",
     forwardRepliesTo: "nurgasab@gmail.com",
   },
-  documentTitle: "RedditScheduler - Automate Your Reddit Marketing",
+  documentTitle: "RedditScheduler - Schedule Reddit posts that drive traffic to your website",
   domainWithHttps: "https://redditscheduler.com",
   seo: {
     keywords:
       "reddit scheduler, reddit automation, reddit marketing, social media automation, reddit posts, schedule reddit posts, reddit traffic, subreddit targeting",
     description:
-      "RedditScheduler - Automate your Reddit posts and drive traffic to your website. Schedule posts, analyze subreddits, and track performance - all in one platform.",
+      "RedditScheduler - Schedule Reddit posts that drive traffic to your website",
     themeColor: "#ffffff",
     applicationName: "redditscheduler",
     og: {
-      title: "RedditScheduler - Automate Your Reddit Marketing",
+      title: "RedditScheduler - Schedule Reddit posts that drive traffic to your website",
       url: "https://redditscheduler.com",
       image: "https://redditscheduler.com/company_related/og-image.webp",
       imageAlt:

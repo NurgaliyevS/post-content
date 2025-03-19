@@ -1,9 +1,5 @@
 # *
 User-agent: *
-Disallow: /meal/
-
-# *
-User-agent: *
 Allow: /
 
 # Host

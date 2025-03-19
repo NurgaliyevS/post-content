@@ -6,30 +6,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>RedditScheduler - Automate Your Reddit Marketing</title>
-        <meta
-          name="description"
-          content="Automate your Reddit posts and drive traffic to your website. Schedule posts, analyze subreddits, and track performance - all in one platform."
-          key="description"
-        />
-        <meta
-          name="keywords"
-          content="reddit scheduler, reddit automation, reddit marketing, social media automation, reddit posts"
-          key="keywords"
-        />
-        <meta
-          property="og:title"
-          content="RedditScheduler - Automate Your Reddit Marketing"
-          key="og:title"
-        />
-        <meta
-          property="og:description"
-          content="Automate your Reddit posts and drive traffic to your website. Schedule posts, analyze subreddits, and track performance - all in one platform."
-          key="og:description"
-        />
-        <meta property="og:type" content="website" key="og:type" />
-        <meta property="og:site_name" content="RedditScheduler" />
-        <meta property="og:locale" content="en_US" />
+        
       </Head>
       <div className="min-h-screen bg-base-100">
         {/* Navigation */}

@@ -10,7 +10,7 @@ export const customConfig = {
     subdomain: "mg",
     fromNoReply: `RedditScheduler <noreply@mg.redditscheduler.com>`,
     fromAdmin: `RedditScheduler <admin@mg.redditscheduler.com>`,
-    supportEmail: "support@redditscheduler.com",
+    supportEmail: "nurgasab@gmail.com",
     forwardRepliesTo: "nurgasab@gmail.com",
   },
   documentTitle: "RedditScheduler - Schedule Reddit posts that drive traffic to your website",

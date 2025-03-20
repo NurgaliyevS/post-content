@@ -44,10 +44,10 @@ export default function Home() {
             <span className="font-bold text-xl">RedditScheduler</span>
           </div>
           <div className="flex gap-4">
-            <Link href="/product" className="link link-hover">
-              Product
+            <Link href="#features" className="link link-hover">
+              Features
             </Link>
-            <Link href="/pricing" className="link link-hover">
+            <Link href="#pricing" className="link link-hover">
               Pricing
             </Link>
           </div>
@@ -166,7 +166,7 @@ export default function Home() {
         {/* Pricing Section */}
         <section id="pricing" className="py-16 px-4">
           <h2 className="text-3xl font-bold text-center mb-12">
-            Change your plan
+            Pricing
           </h2>
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {/* Starter Plan */}
@@ -269,9 +269,6 @@ export default function Home() {
             <Link href="/about" className="link link-hover">
               About
             </Link>
-            <Link href="/contact" className="link link-hover">
-              Contact
-            </Link>
           </div>
           <div>
             <span className="footer-title">Legal</span>
@@ -285,7 +282,7 @@ export default function Home() {
         </footer>
         <footer className="footer px-10 py-4 border-t bg-base-200 text-base-content border-base-300">
           <div className="text-sm">
-            © 2024 RedditScheduler. All rights reserved.
+            © 2025 RedditScheduler. All rights reserved.
           </div>
         </footer>
       </div>

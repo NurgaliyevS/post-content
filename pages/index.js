@@ -130,7 +130,7 @@ export default function Home() {
         </section>
 
         {/* Features Section */}
-        <section className="py-16 px-4 bg-base-200">
+        <section id="features" className="py-16 px-4 bg-base-200">
           <h2 className="text-3xl font-bold text-center mb-12">Features</h2>
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <div className="card bg-base-100">
@@ -164,7 +164,7 @@ export default function Home() {
         </section>
 
         {/* Pricing Section */}
-        <section className="py-16 px-4">
+        <section id="pricing" className="py-16 px-4">
           <h2 className="text-3xl font-bold text-center mb-12">
             Change your plan
           </h2>
@@ -257,10 +257,10 @@ export default function Home() {
           </div>
           <div>
             <span className="footer-title">Product</span>
-            <Link href="/features" className="link link-hover">
+            <Link href="#features" className="link link-hover">
               Features
             </Link>
-            <Link href="/pricing" className="link link-hover">
+            <Link href="#pricing" className="link link-hover">
               Pricing
             </Link>
           </div>

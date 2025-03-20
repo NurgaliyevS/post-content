@@ -24,9 +24,11 @@ export default function Document() {
           name="application-name"
           content={customConfig.seo.applicationName}
         />
+
+        <link rel="icon" href="/logo.svg" />
         
         {/* Favicon links */}
-        <link
+        {/* <link
           rel="icon"
           type="image/png"
           sizes="32x32"
@@ -59,7 +61,7 @@ export default function Document() {
           rel="apple-touch-icon"
           sizes="60x60"
           href="/company_related/apple-icon-60x60.png"
-        />
+        /> */}
       </Head>
       <body>
         <Main />

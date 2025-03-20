@@ -13,7 +13,7 @@ export default function HeroSection() {
         Turn Reddit into your traffic machine without the headache
       </p>
       <div className="flex justify-center gap-4">
-        <Link href="/dashboard" className="btn btn-primary">
+        <Link href="/api/auth/signin/reddit" className="btn btn-primary">
           Dashboard →
         </Link>
         <Link href="/demo" className="btn btn-ghost">

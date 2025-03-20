@@ -84,9 +84,9 @@ export default function Home() {
                 </div>
                 <div className="p-6">
                   <Image
-                    src="/redditpost1.png"
+                    src="/redditpost1.webp"
                     alt="Reddit Post Statistics"
-                    className="w-full object-contain rounded-lg border border-gray-100"
+                    className="w-full object-contain rounded-lg"
                     width={750}
                     height={570}
                     quality={90}
@@ -115,9 +115,9 @@ export default function Home() {
                 </div>
                 <div className="p-6">
                   <Image
-                    src="/redditpost2.png"
+                    src="/redditpost2.webp"
                     alt="Reddit Post Statistics"
-                    className="w-full object-contain rounded-lg border border-gray-100"
+                    className="w-full object-contain rounded-lg"
                     width={750}
                     height={570}
                     quality={90}
@@ -146,9 +146,9 @@ export default function Home() {
                 </div>
                 <div className="p-6">
                   <Image
-                    src="/redditpost3.png"
+                    src="/redditpost3.webp"
                     alt="Reddit Post Statistics"
-                    className="w-full object-contain rounded-lg border border-gray-100"
+                    className="w-full object-contain rounded-lg"
                     width={750}
                     height={570}
                     quality={90}
@@ -177,9 +177,9 @@ export default function Home() {
                 </div>
                 <div className="p-6">
                   <Image
-                    src="/redditpost4.png"
+                    src="/redditpost4.webp"
                     alt="Reddit Post Statistics"
-                    className="w-full object-contain rounded-lg border border-gray-100"
+                    className="w-full object-contain rounded-lg"
                     width={750}
                     height={570}
                     quality={90}

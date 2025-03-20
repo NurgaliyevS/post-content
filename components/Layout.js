@@ -33,9 +33,9 @@ export default function Layout({ children }) {
                 About
               </Link>
               <Link 
-                href="/privacy" 
+                href="/privacy-policy" 
                 className={`px-3 py-2 rounded-md text-sm font-medium ${
-                  isActive('/privacy') ? 'bg-primary text-primary-content' : 'hover:bg-base-200'
+                  isActive('/privacy-policy') ? 'bg-primary text-primary-content' : 'hover:bg-base-200'
                 }`}
               >
                 Privacy
@@ -81,9 +81,9 @@ export default function Layout({ children }) {
               About
             </Link>
             <Link 
-              href="/privacy" 
+              href="/privacy-policy" 
               className={`block px-3 py-2 rounded-md text-base font-medium ${
-                isActive('/privacy') ? 'bg-primary text-primary-content' : 'hover:bg-base-200'
+                isActive('/privacy-policy') ? 'bg-primary text-primary-content' : 'hover:bg-base-200'
               }`}
             >
               Privacy
@@ -120,7 +120,7 @@ export default function Layout({ children }) {
                   <Link href="/about" className="text-sm hover:text-primary">About Us</Link>
                 </li>
                 <li>
-                  <Link href="/privacy" className="text-sm hover:text-primary">Privacy Policy</Link>
+                  <Link href="/privacy-policy" className="text-sm hover:text-primary">Privacy Policy</Link>
                 </li>
                 <li>
                   <Link href="/terms" className="text-sm hover:text-primary">Terms of Service</Link>

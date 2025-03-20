@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import Image from 'next/image'
 
 export default function Layout({ children }) {
   const router = useRouter()
@@ -11,8 +12,9 @@ export default function Layout({ children }) {
       <nav className="bg-base-100 shadow-lg">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center h-16">
-            <Link href="/" className="text-xl font-bold">
-              Reddit Scheduler
+            <Link href="/" className="text-xl font-bold flex items-center gap-2">
+              <Image src="/logo.svg" alt="Reddit Scheduler Logo" width={32} height={32} />
+              RedditScheduler
             </Link>
             
             <div className="hidden md:flex space-x-4">

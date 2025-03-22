@@ -7,18 +7,9 @@ import { BiPoll } from "react-icons/bi";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
 import TimeSelector from "@/components/ui/TimeSelector";
 
-const timeOptions = Array.from({ length: 96 }, (_, i) => {
-  const hour = Math.floor(i / 4);
-  const minute = (i % 4) * 15;
-  const ampm = hour >= 12 ? "PM" : "AM";
-  const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
-  return `${displayHour}:${minute.toString().padStart(2, "0")} ${ampm}`;
-});
-
 export default function Scheduling() {
   const { data: session, status } = useSession();
   const [loading, setLoading] = useState(true);
-  const [selectedTime, setSelectedTime] = useState(null);
 
   useEffect(() => {
     if (status !== "loading") {

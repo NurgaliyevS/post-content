@@ -7,6 +7,8 @@ import { RiMickeyLine } from "react-icons/ri";
 import { FiSettings } from "react-icons/fi";
 import { AiOutlineCreditCard } from "react-icons/ai";
 import Image from "next/image";
+import Link from "next/link";
+
 export default function Sidebar() {
   const navItems = [
     { name: "AI UGC avatars", icon: FaUserAlt },
@@ -29,7 +31,9 @@ export default function Sidebar() {
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center space-x-2">
           <Image src="/logo.svg" alt="Logo" width={32} height={32} />
-          <span className="font-semibold text-gray-800">RedditScheduler</span>
+          <Link href="/">
+            <span className="font-semibold text-gray-800">RedditScheduler</span>
+          </Link>
         </div>
       </div>
 

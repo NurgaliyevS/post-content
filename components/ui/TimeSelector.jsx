@@ -1,8 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const TimeSelector = () => {
   const [selectedTime, setSelectedTime] = useState(null);
   const [selectedPeriod, setPeriod] = useState("AM");
+
+  useEffect(() => {
+    // Set current time on initial load
+    const now = new Date();
+    let hours = now.getHours();
+    const minutes = now.getMinutes();
+    const period = hours >= 12 ? "PM" : "AM";
+    
+    // Convert 24h to 12h format
+    hours = hours % 12;
+    hours = hours ? hours : 12; // Convert 0 to 12
+    
+    // Round minutes to nearest 15
+    const roundedMinutes = Math.round(minutes / 15) * 15;
+    const minuteStr = roundedMinutes === 0 ? "00" : roundedMinutes.toString();
+    
+    setPeriod(period);
+    setSelectedTime(`${hours}:${minuteStr} ${period}`);
+  }, []);
 
   // Generate hours (1-12)
   const hours = Array.from({ length: 12 }, (_, i) => (i + 1).toString());

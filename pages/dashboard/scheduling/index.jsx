@@ -19,6 +19,7 @@ export default function Scheduling() {
   const [text, setText] = useState("");
   const [currentDate, setCurrentDate] = useState(new Date());
   const [userTimezone, setUserTimezone] = useState("");
+  const [selectedDate, setSelectedDate] = useState(new Date()); // Initialize with today's date
 
   useEffect(() => {
     if (status !== "loading") {
@@ -85,8 +86,16 @@ export default function Scheduling() {
     setCurrentDate(newDate);
   };
 
+  const handleDateSelection = (day) => {
+    const selected = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+    setSelectedDate(selected);
+  };
+
   const renderCalendar = () => {
     const today = new Date();
+    // Reset the time part to ensure accurate date comparison
+    today.setHours(0, 0, 0, 0);
+    
     const daysInMonth = getDaysInMonth(currentDate);
     const firstDayOfMonth = getFirstDayOfMonth(currentDate);
     const days = [];
@@ -99,16 +108,20 @@ export default function Scheduling() {
     // Add days of the month
     for (let i = 1; i <= daysInMonth; i++) {
       const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), i);
-      const isToday = today.getDate() === i && 
-                      today.getMonth() === currentDate.getMonth() && 
-                      today.getFullYear() === currentDate.getFullYear();
-      const isPast = dayDate < new Date(today.setHours(0, 0, 0, 0));
+      dayDate.setHours(0, 0, 0, 0); // Reset time for accurate comparison
+      
+      const isToday = today.getTime() === dayDate.getTime();
+      const isPast = dayDate.getTime() < today.getTime();
+      const isSelected = selectedDate && selectedDate.getTime() === dayDate.getTime();
 
       days.push(
         <button 
           key={i} 
+          onClick={() => !isPast && handleDateSelection(i)}
           className={`p-2 rounded ${
-            isToday ? "bg-blue-100 font-semibold" : "hover:bg-gray-100"
+            isToday ? "bg-blue-100 font-semibold" : ""
+          } ${isSelected ? "bg-blue-500 text-white" : ""} ${
+            !isToday && !isSelected && !isPast ? "hover:bg-gray-100" : ""
           } ${isPast ? "text-gray-400 cursor-not-allowed" : ""}`}
           disabled={isPast}
         >
@@ -227,8 +240,7 @@ export default function Scheduling() {
             </div>
 
             <div className="flex justify-end gap-4 mt-6">
-              <button className="btn btn-ghost">Save Draft</button>
-              <button className="btn btn-primary">Schedule Post</button>
+              <button className="btn btn-primary" disabled={!selectedDate}>Schedule Post</button>
             </div>
           </div>
         </div>

@@ -10,6 +10,7 @@ import { BsGraphUp } from 'react-icons/bs';
 import Sidebar from '@/components/layout/Sidebar';
 import FeatureCard from '@/components/ui/FeatureCard';
 import Image from 'next/image';
+import OnboardingChecklist from '@/components/ui/OnboardingChecklist';
 
 export default function Onboarding() {
   const { data: session, status } = useSession();
@@ -95,59 +96,8 @@ export default function Onboarding() {
             ))}
           </section>
 
-          {/* Onboarding Steps */}
-          <section className="bg-white rounded-xl shadow-sm overflow-hidden space-y-2">
-            <div className="p-4 border-b border-gray-100 flex items-center">
-              <div className="flex items-center justify-center w-8 h-8 bg-purple-100 text-purple-500 rounded-full mr-3">
-                S
-              </div>
-              <div className="flex-1">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium text-gray-800">Subscription required</span>
-                  <span className="text-green-500">✓</span>
-                </div>
-                <span className="text-xs text-gray-400">Estimated 2-3 minutes</span>
-              </div>
-            </div>
-
-            <div className="p-4 border-b border-gray-100 flex items-center">
-              <div className="flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-500 rounded-full mr-3">
-                <FaRegUserCircle className="w-4 h-4" />
-              </div>
-              <div className="flex-1">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium text-gray-800">Connect Reddit account</span>
-                  <span className="text-green-500">✓</span>
-                </div>
-                <span className="text-xs text-gray-400">Estimated 30 seconds</span>
-              </div>
-            </div>
-
-            <div className="p-4 border-b border-gray-100 flex items-center">
-              <div className="flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-500 rounded-full mr-3">
-                <FaRegCalendarAlt className="w-4 h-4" />
-              </div>
-              <div className="flex-1">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium text-gray-800">Schedule your first post</span>
-                  <span className="text-gray-400">Pending</span>
-                </div>
-                <span className="text-xs text-gray-400">Estimated 2 minutes</span>
-              </div>
-            </div>
-
-            <div className="p-4 flex items-center">
-              <div className="flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-500 rounded-full mr-3">
-                <MdOutlineCampaign className="w-4 h-4" />
-              </div>
-              <div className="flex-1">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium text-gray-800">Create your first campaign</span>
-                  <span className="text-gray-400">Pending</span>
-                </div>
-                <span className="text-xs text-gray-400">Estimated 5 minutes</span>
-              </div>
-            </div>
+          <section className="max-w-2xl mx-auto">
+            <OnboardingChecklist />
           </section>
         </div>
       </main>

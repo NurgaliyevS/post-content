@@ -16,10 +16,17 @@ const FORMATTING_BUTTONS = [
 export default function Scheduling() {
   const { data: session, status } = useSession();
   const [loading, setLoading] = useState(true);
-  const [text, setText] = useState("");
+  const [formData, setFormData] = useState({
+    community: "",
+    title: "",
+    text: "",
+    selectedDate: new Date(),
+    selectedTime: "",
+    type: "text" // Default post type
+  });
   const [currentDate, setCurrentDate] = useState(new Date());
   const [userTimezone, setUserTimezone] = useState("");
-  const [selectedDate, setSelectedDate] = useState(new Date()); // Initialize with today's date
+  const [saveStatus, setSaveStatus] = useState(""); // For displaying save notifications
 
   useEffect(() => {
     if (status !== "loading") {
@@ -31,36 +38,47 @@ export default function Scheduling() {
     setUserTimezone(timezone);
   }, [status]);
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   const handleFormatting = (formatType) => {
     const textarea = document.querySelector("textarea");
     if (!textarea) return;
 
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
-    const selectedText = text.substring(start, end);
+    const selectedText = formData.text.substring(start, end);
     
     let formattedText = "";
     let newCursorPosition = end;
 
     if (formatType === "bold") {
-      formattedText = text.substring(0, start) + `**${selectedText}**` + text.substring(end);
+      formattedText = formData.text.substring(0, start) + `**${selectedText}**` + formData.text.substring(end);
       newCursorPosition = selectedText.length ? end + 4 : start + 2;
     } else if (formatType === "italic") {
-      formattedText = text.substring(0, start) + `*${selectedText}*` + text.substring(end);
+      formattedText = formData.text.substring(0, start) + `*${selectedText}*` + formData.text.substring(end);
       newCursorPosition = selectedText.length ? end + 2 : start + 1;
     } else if (formatType === "link") {
       if (selectedText) {
         // If text is selected, format it as a link with placeholder URL
-        formattedText = text.substring(0, start) + `[${selectedText}](url)` + text.substring(end);
+        formattedText = formData.text.substring(0, start) + `[${selectedText}](url)` + formData.text.substring(end);
         newCursorPosition = start + selectedText.length + 2; // Position cursor at the start of 'url'
       } else {
         // If no text is selected, insert a link template
-        formattedText = text.substring(0, start) + "[Link text](url)" + text.substring(end);
+        formattedText = formData.text.substring(0, start) + "[Link text](url)" + formData.text.substring(end);
         newCursorPosition = start + 1; // Position cursor after the opening bracket to edit link text
       }
     }
 
-    setText(formattedText);
+    setFormData(prev => ({
+      ...prev,
+      text: formattedText
+    }));
   };
 
   // Calendar functions
@@ -88,7 +106,17 @@ export default function Scheduling() {
 
   const handleDateSelection = (day) => {
     const selected = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-    setSelectedDate(selected);
+    setFormData(prev => ({
+      ...prev,
+      selectedDate: selected
+    }));
+  };
+
+  const handleTimeSelection = (time) => {
+    setFormData(prev => ({
+      ...prev,
+      selectedTime: time
+    }));
   };
 
   const renderCalendar = () => {
@@ -112,7 +140,10 @@ export default function Scheduling() {
       
       const isToday = today.getTime() === dayDate.getTime();
       const isPast = dayDate.getTime() < today.getTime();
-      const isSelected = selectedDate && selectedDate.getTime() === dayDate.getTime();
+      const isSelected = formData.selectedDate && 
+                          formData.selectedDate.getFullYear() === dayDate.getFullYear() &&
+                          formData.selectedDate.getMonth() === dayDate.getMonth() &&
+                          formData.selectedDate.getDate() === dayDate.getDate();
 
       days.push(
         <button 
@@ -129,6 +160,41 @@ export default function Scheduling() {
     return days;
   };
 
+  const schedulePost = async () => {
+    // Check required fields
+    if (!formData.community || !formData.title || !formData.selectedDate || !formData.selectedTime) {
+      setSaveStatus("Please fill in all required fields");
+      setTimeout(() => setSaveStatus(""), 3000);
+      return;
+    }
+
+    try {
+      // Here you would make an API call to save the scheduled post
+      // For example:
+      // await fetch('/api/schedule-post', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(formData)
+      // });
+      
+      // Reset form
+      setFormData({
+        community: "",
+        title: "",
+        text: "",
+        selectedDate: new Date(),
+        selectedTime: "",
+        type: "text"
+      });
+      
+      setSaveStatus("Post scheduled successfully!");
+      setTimeout(() => setSaveStatus(""), 3000);
+    } catch (error) {
+      setSaveStatus("Error scheduling post. Please try again.");
+      setTimeout(() => setSaveStatus(""), 3000);
+    }
+  };
+
   return (
     <DashboardLayout loading={loading}>
       <div className="max-w-4xl mx-auto">
@@ -136,20 +202,34 @@ export default function Scheduling() {
           Schedule Your Reddit Posts
         </h1>
 
+        {saveStatus && (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-800">
+            {saveStatus}
+          </div>
+        )}
+
         <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
           <div className="mb-4">
-            <select className="select select-bordered w-full max-w-xs">
-              <option disabled selected>
+            <select 
+              className="select select-bordered w-full max-w-xs"
+              name="community"
+              value={formData.community}
+              onChange={handleInputChange}
+            >
+              <option value="" disabled>
                 Choose a community
               </option>
-              <option>r/programming</option>
-              <option>r/webdev</option>
-              <option>r/reactjs</option>
+              <option value="r/programming">r/programming</option>
+              <option value="r/webdev">r/webdev</option>
+              <option value="r/reactjs">r/reactjs</option>
             </select>
           </div>
 
           <div className="tabs mb-4">
-            <button className="tab tab-bordered tab-active flex items-center gap-2">
+            <button 
+              className={`tab tab-bordered ${formData.type === 'text' ? 'tab-active' : ''} flex items-center gap-2`}
+              onClick={() => setFormData(prev => ({...prev, type: 'text'}))}
+            >
               <RiFileTextLine /> Text
             </button>
             <button
@@ -176,6 +256,9 @@ export default function Scheduling() {
             <input
               type="text"
               placeholder="Title"
+              name="title"
+              value={formData.title}
+              onChange={handleInputChange}
               className="input input-bordered w-full"
             />
 
@@ -194,8 +277,9 @@ export default function Scheduling() {
             <textarea
               className="textarea textarea-bordered w-full h-32"
               placeholder="Text"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
+              name="text"
+              value={formData.text}
+              onChange={handleInputChange}
             ></textarea>
 
             <div className="flex gap-8 flex-col md:flex-row">
@@ -231,12 +315,21 @@ export default function Scheduling() {
               </div>
 
               <div className="flex-1">
-                <TimeSelector />
+                <TimeSelector 
+                  selectedTime={formData.selectedTime} 
+                  onTimeSelect={handleTimeSelection} 
+                />
               </div>
             </div>
 
-            <div className="flex justify-end gap-4 mt-6">
-              <button className="btn btn-primary" disabled={!selectedDate}>Schedule Post</button>
+            <div className="flex justify-end mt-6">
+              <button 
+                className="btn btn-primary" 
+                disabled={!formData.selectedDate || !formData.selectedTime || !formData.title || !formData.community}
+                onClick={schedulePost}
+              >
+                Schedule Post
+              </button>
             </div>
           </div>
         </div>

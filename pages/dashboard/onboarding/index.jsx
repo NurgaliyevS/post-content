@@ -48,7 +48,7 @@ export default function Onboarding() {
     {
       icon: FiTarget,
       title: "Cross-Posting",
-      description: "Post to multiple subreddits with one click",
+      description: "Post to multiple subreddits with one click to get more impressions",
       iconColor: "text-green-500",
       iconBgColor: "bg-green-100",
       href: "/dashboard/cross-posting",
@@ -56,7 +56,7 @@ export default function Onboarding() {
     {
       icon: AiOutlineLineChart,
       title: "Hook Generator",
-      description: "Viral templates for your Reddit posts",
+      description: "Viral templates to maximize engagement on your posts",
       iconColor: "text-purple-500",
       iconBgColor: "bg-purple-100",
       href: "/dashboard/hook-generator",
@@ -65,7 +65,7 @@ export default function Onboarding() {
       icon: BsGraphUp,
       title: "Analytics",
       description:
-        "Track views, engagement rates, and comments across all your posts",
+        "Track views, engagement rates, and comments across your posts (coming soon)",
       iconColor: "text-orange-500",
       iconBgColor: "bg-orange-100",
       href: "/dashboard/analytics",

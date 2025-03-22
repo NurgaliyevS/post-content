@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { RiMickeyLine } from 'react-icons/ri';
 import { MdOutlineOndemandVideo, MdOutlineCampaign } from 'react-icons/md';
-import { FaUserAlt, FaRegUserCircle } from 'react-icons/fa';
+import { FaUserAlt, FaRegUserCircle, FaRegCalendarAlt } from 'react-icons/fa';
+import { BiCalendarCheck } from 'react-icons/bi';
+import { FiTarget } from 'react-icons/fi';
+import { AiOutlineLineChart } from 'react-icons/ai';
+import { BsGraphUp } from 'react-icons/bs';
 import Sidebar from '@/components/layout/Sidebar';
 import FeatureCard from '@/components/ui/FeatureCard';
 import Image from 'next/image';
@@ -32,30 +36,30 @@ export default function Onboarding() {
 
   const featureCards = [
     {
-      icon: MdOutlineOndemandVideo,
-      title: "Create UGC videos",
-      description: "Create & publish UGC videos promoting your product demo",
+      icon: BiCalendarCheck,
+      title: "Scheduling",
+      description: "Publish when your target audience is most active",
       iconColor: "text-blue-500",
       iconBgColor: "bg-blue-100"
     },
     {
-      icon: RiMickeyLine,
-      title: "Create Greenscreen Meme videos",
-      description: "Create relatable meme videos about your product / business",
+      icon: FiTarget,
+      title: "Cross-Posting",
+      description: "Post to multiple subreddits with one click",
       iconColor: "text-green-500",
       iconBgColor: "bg-green-100"
     },
     {
-      icon: FaUserAlt,
-      title: "UGC Avatar Generator",
-      description: "Create custom AI avatars for the UGC \"hook + demo\" video format",
+      icon: AiOutlineLineChart,
+      title: "Hook Generator",
+      description: "Viral templates for your Reddit posts",
       iconColor: "text-purple-500",
       iconBgColor: "bg-purple-100"
     },
     {
-      icon: MdOutlineCampaign,
-      title: "Hook Generator",
-      description: "Auto-magically generate and save viral hooks for your videos",
+      icon: BsGraphUp,
+      title: "Analytics",
+      description: "Track views, engagement rates, and comments across all your posts",
       iconColor: "text-orange-500",
       iconBgColor: "bg-orange-100"
     }
@@ -63,21 +67,22 @@ export default function Onboarding() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
+      <aside>
+        <Sidebar />
+      </aside>
 
-      {/* Main Content */}
-      <div className="flex-1 p-10">
-        <div className="max-w-5xl mx-auto">
+      <main className="flex-1 p-10 ml-64">
+        <div className="max-w-2xl mx-auto">
           {/* Welcome Section */}
-          <div className="text-center mb-12">
+          <section className="text-center mb-12">
             <div className="inline-block rounded-xl">
               <Image src="/logo.svg" alt="Logo" width={32} height={32} />
             </div>
-            <h1 className="text-2xl font-bold">Welcome to RedditScheduler</h1>
-          </div>
+            <h1 className="text-lg md:text-xl font-bold text-center">Welcome to RedditScheduler</h1>
+          </section>
 
           {/* Feature Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
             {featureCards.map((card, index) => (
               <FeatureCard 
                 key={index}
@@ -88,50 +93,64 @@ export default function Onboarding() {
                 iconBgColor={card.iconBgColor}
               />
             ))}
-          </div>
+          </section>
 
           {/* Onboarding Steps */}
-          <div className="bg-white rounded-xl p-6 border border-gray-200">
-            <div className="flex items-center mb-4">
-              <div className="flex items-center justify-center w-8 h-8 bg-purple-100 text-purple-500 rounded-full mr-2">
+          <section className="bg-white rounded-xl shadow-sm overflow-hidden space-y-2">
+            <div className="p-4 border-b border-gray-100 flex items-center">
+              <div className="flex items-center justify-center w-8 h-8 bg-purple-100 text-purple-500 rounded-full mr-3">
                 S
               </div>
               <div className="flex-1">
-                <div className="flex justify-between">
-                  <span className="font-medium">Subscription required</span>
+                <div className="flex justify-between items-center">
+                  <span className="font-medium text-gray-800">Subscription required</span>
                   <span className="text-green-500">✓</span>
                 </div>
-                <span className="text-sm text-gray-500">Estimated 2-3 minutes</span>
+                <span className="text-xs text-gray-400">Estimated 2-3 minutes</span>
               </div>
             </div>
 
-            <div className="flex items-center mb-4">
-              <div className="flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-500 rounded-full mr-2">
-                <MdOutlineOndemandVideo className="w-5 h-5" />
+            <div className="p-4 border-b border-gray-100 flex items-center">
+              <div className="flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-500 rounded-full mr-3">
+                <FaRegUserCircle className="w-4 h-4" />
               </div>
               <div className="flex-1">
-                <div className="flex justify-between">
-                  <span className="font-medium">Connect TikTok account</span>
+                <div className="flex justify-between items-center">
+                  <span className="font-medium text-gray-800">Connect Reddit account</span>
                   <span className="text-green-500">✓</span>
                 </div>
-                <span className="text-sm text-gray-500">Estimated 30 seconds</span>
+                <span className="text-xs text-gray-400">Estimated 30 seconds</span>
               </div>
             </div>
 
-            <div className="flex items-center">
-              <div className="flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-500 rounded-full mr-2">
-                <FaRegUserCircle className="w-5 h-5" />
+            <div className="p-4 border-b border-gray-100 flex items-center">
+              <div className="flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-500 rounded-full mr-3">
+                <FaRegCalendarAlt className="w-4 h-4" />
               </div>
               <div className="flex-1">
-                <div className="flex justify-between">
-                  <span className="font-medium">Add your first product</span>
-                  <span className="text-green-500">✓</span>
+                <div className="flex justify-between items-center">
+                  <span className="font-medium text-gray-800">Schedule your first post</span>
+                  <span className="text-gray-400">Pending</span>
                 </div>
+                <span className="text-xs text-gray-400">Estimated 2 minutes</span>
               </div>
             </div>
-          </div>
+
+            <div className="p-4 flex items-center">
+              <div className="flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-500 rounded-full mr-3">
+                <MdOutlineCampaign className="w-4 h-4" />
+              </div>
+              <div className="flex-1">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium text-gray-800">Create your first campaign</span>
+                  <span className="text-gray-400">Pending</span>
+                </div>
+                <span className="text-xs text-gray-400">Estimated 5 minutes</span>
+              </div>
+            </div>
+          </section>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

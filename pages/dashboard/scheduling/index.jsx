@@ -16,12 +16,45 @@ const FORMATTING_BUTTONS = [
 export default function Scheduling() {
   const { data: session, status } = useSession();
   const [loading, setLoading] = useState(true);
+  const [text, setText] = useState("");
 
   useEffect(() => {
     if (status !== "loading") {
       setLoading(false);
     }
   }, [status]);
+
+  const handleFormatting = (formatType) => {
+    const textarea = document.querySelector("textarea");
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = text.substring(start, end);
+    
+    let formattedText = "";
+    let newCursorPosition = end;
+
+    if (formatType === "bold") {
+      formattedText = text.substring(0, start) + `**${selectedText}**` + text.substring(end);
+      newCursorPosition = selectedText.length ? end + 4 : start + 2;
+    } else if (formatType === "italic") {
+      formattedText = text.substring(0, start) + `*${selectedText}*` + text.substring(end);
+      newCursorPosition = selectedText.length ? end + 2 : start + 1;
+    } else if (formatType === "link") {
+      if (selectedText) {
+        // If text is selected, format it as a link with placeholder URL
+        formattedText = text.substring(0, start) + `[${selectedText}](url)` + text.substring(end);
+        newCursorPosition = start + selectedText.length + 2; // Position cursor at the start of 'url'
+      } else {
+        // If no text is selected, insert a link template
+        formattedText = text.substring(0, start) + "[Link text](url)" + text.substring(end);
+        newCursorPosition = start + 1; // Position cursor after the opening bracket to edit link text
+      }
+    }
+
+    setText(formattedText);
+  };
 
   return (
     <DashboardLayout loading={loading}>
@@ -75,13 +108,21 @@ export default function Scheduling() {
 
             <div className="flex flex-wrap gap-2 mb-2">
               {FORMATTING_BUTTONS.map(button => (
-                <button key={button.value} className="btn btn-sm">{button.label}</button>
+                <button 
+                  key={button.value} 
+                  className="btn btn-sm"
+                  onClick={() => handleFormatting(button.value)}
+                >
+                  {button.label}
+                </button>
               ))}
             </div>
 
             <textarea
               className="textarea textarea-bordered w-full h-32"
               placeholder="Text"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
             ></textarea>
 
             <div className="flex gap-8">

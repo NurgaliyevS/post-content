@@ -12,16 +12,16 @@ import Link from "next/link";
 
 export default function Sidebar({ showSidebar, setShowSidebar }) {
   const navItems = [
-    { name: "Scheduling", icon: BiCalendarCheck },
-    { name: "Cross-Posting", icon: FiTarget },
-    { name: "Hook Generator", icon: AiOutlineLineChart },
-    { name: "Analytics", icon: BsGraphUp },
+    { name: "Scheduling", icon: BiCalendarCheck, href: "/dashboard/scheduling" },
+    { name: "Cross-Posting", icon: FiTarget, href: "/dashboard/cross-posting" },
+    { name: "Hook Generator", icon: AiOutlineLineChart, href: "/dashboard/hook-generator" },
+    { name: "Analytics", icon: BsGraphUp, href: "/dashboard/analytics" },
   ];
 
   const bottomNavItems = [
-    { name: "Support", icon: BiSupport },
-    { name: "Billing", icon: AiOutlineCreditCard },
-    { name: "Settings", icon: FiSettings },
+    { name: "Support", icon: BiSupport, href: "/dashboard/support" },
+    { name: "Billing", icon: AiOutlineCreditCard, href: "/dashboard/billing" },
+    { name: "Settings", icon: FiSettings, href: "/dashboard/settings" },
   ];
 
   return (
@@ -83,7 +83,7 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
 
             <nav className="mt-2">
               {navItems.map((item, index) => (
-                <Link href={`/${item.name.toLowerCase().replace(/\s+/g, '-')}`} key={index} className="flex items-center text-gray-600 hover:bg-gray-100 mx-3 px-4 py-3 rounded-lg">
+                <Link href={item.href} key={index} className="flex items-center text-gray-600 hover:bg-gray-100 mx-3 px-4 py-3 rounded-lg">
                   <item.icon className="w-5 h-5 mr-3 text-gray-400" />
                   <span>{item.name}</span>
                 </Link>

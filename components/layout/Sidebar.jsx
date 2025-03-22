@@ -9,8 +9,12 @@ import { BiCalendarCheck } from "react-icons/bi";
 import { HiX } from "react-icons/hi";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 export default function Sidebar({ showSidebar, setShowSidebar }) {
+  const router = useRouter();
+  const currentPath = router.pathname;
+
   const navItems = [
     { name: "Scheduling", icon: BiCalendarCheck, href: "/dashboard/scheduling" },
     { name: "Cross-Posting", icon: FiTarget, href: "/dashboard/cross-posting" },
@@ -76,15 +80,32 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
         <div className="flex-1 flex flex-col justify-between h-[calc(92%-72px)] md:h-[calc(100%-72px)]">
           {/* Top Navigation */}
           <div className="py-2">
-            <Link href="/dashboard" className="flex items-center text-white bg-blue-500 mx-3 px-4 py-3 rounded-lg mb-2">
+            <Link 
+              href="/dashboard/onboarding" 
+              className={`flex items-center mx-3 px-4 py-3 rounded-lg mb-2 ${
+                currentPath === "/dashboard/onboarding" 
+                  ? "bg-blue-500 text-white"
+                  : "text-gray-600 hover:bg-gray-100"
+              }`}
+            >
               <IoHomeOutline className="w-5 h-5 mr-3" />
               <span>Home</span>
             </Link>
 
             <nav className="mt-2">
               {navItems.map((item, index) => (
-                <Link href={item.href} key={index} className="flex items-center text-gray-600 hover:bg-gray-100 mx-3 px-4 py-3 rounded-lg">
-                  <item.icon className="w-5 h-5 mr-3 text-gray-400" />
+                <Link 
+                  href={item.href} 
+                  key={index} 
+                  className={`flex items-center mx-3 px-4 py-3 rounded-lg ${
+                    currentPath === item.href
+                      ? "bg-blue-500 text-white"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <item.icon className={`w-5 h-5 mr-3 ${
+                    currentPath === item.href ? "text-white" : "text-gray-400"
+                  }`} />
                   <span>{item.name}</span>
                 </Link>
               ))}
@@ -96,8 +117,18 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
             {/* Bottom Navigation */}
             <nav className="py-2">
               {bottomNavItems.map((item, index) => (
-                <Link href={`/${item.name.toLowerCase()}`} key={index} className="flex items-center text-gray-600 hover:bg-gray-100 mx-3 px-4 py-3 rounded-lg">
-                  <item.icon className="w-5 h-5 mr-3 text-gray-400" />
+                <Link 
+                  href={item.href} 
+                  key={index} 
+                  className={`flex items-center mx-3 px-4 py-3 rounded-lg ${
+                    currentPath === item.href
+                      ? "bg-blue-500 text-white"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <item.icon className={`w-5 h-5 mr-3 ${
+                    currentPath === item.href ? "text-white" : "text-gray-400"
+                  }`} />
                   <span>{item.name}</span>
                 </Link>
               ))}

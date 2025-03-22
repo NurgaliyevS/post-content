@@ -1,7 +1,7 @@
 import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 
-export default function CTAButton({ text = "Get Started", dashboardPath = "/dashboard", className = "btn btn-primary" }) {
+export default function CTAButton({ text = "Get Started", dashboardPath = "/dashboard/onboarding", className = "btn btn-primary" }) {
   const { data: session, status } = useSession();
   const router = useRouter();
   
@@ -9,7 +9,7 @@ export default function CTAButton({ text = "Get Started", dashboardPath = "/dash
     if (status === "authenticated") {
       router.push(dashboardPath);
     } else {
-      signIn("reddit", { callbackUrl: "/dashboard" });
+      signIn("reddit", { callbackUrl: "/dashboard/onboarding" });
     }
   };
   

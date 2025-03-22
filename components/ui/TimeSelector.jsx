@@ -39,7 +39,7 @@ const TimeSelector = () => {
     <div className="flex flex-col">
       <p className="text-sm text-gray-500 mb-2">Time</p>
 
-      <div className="border border-gray-200 rounded-lg p-4 bg-white">
+      <div className="border border-gray-200 rounded-lg p-4 bg-white h-[346px]">
         {/* Display selected time */}
         <div className="text-center mb-4 p-2 bg-gray-50 rounded border border-gray-200 text-lg font-medium">
           {selectedTime || "Select a time"}

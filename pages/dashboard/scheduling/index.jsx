@@ -17,11 +17,17 @@ export default function Scheduling() {
   const { data: session, status } = useSession();
   const [loading, setLoading] = useState(true);
   const [text, setText] = useState("");
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [userTimezone, setUserTimezone] = useState("");
 
   useEffect(() => {
     if (status !== "loading") {
       setLoading(false);
     }
+    
+    // Get user's timezone
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    setUserTimezone(timezone);
   }, [status]);
 
   const handleFormatting = (formatType) => {
@@ -54,6 +60,64 @@ export default function Scheduling() {
     }
 
     setText(formattedText);
+  };
+
+  // Calendar functions
+  const getMonthName = (date) => {
+    return date.toLocaleString("default", { month: "long", year: "numeric" });
+  };
+
+  const getDaysInMonth = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    return new Date(year, month + 1, 0).getDate();
+  };
+
+  const getFirstDayOfMonth = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    return new Date(year, month, 1).getDay();
+  };
+
+  const changeMonth = (increment) => {
+    const newDate = new Date(currentDate);
+    newDate.setMonth(newDate.getMonth() + increment);
+    setCurrentDate(newDate);
+  };
+
+  const renderCalendar = () => {
+    const today = new Date();
+    const daysInMonth = getDaysInMonth(currentDate);
+    const firstDayOfMonth = getFirstDayOfMonth(currentDate);
+    const days = [];
+
+    // Add empty cells for days before the first day of the month
+    for (let i = 0; i < firstDayOfMonth; i++) {
+      days.push(<div key={`empty-${i}`} className="p-2"></div>);
+    }
+
+    // Add days of the month
+    for (let i = 1; i <= daysInMonth; i++) {
+      const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), i);
+      const isToday = today.getDate() === i && 
+                      today.getMonth() === currentDate.getMonth() && 
+                      today.getFullYear() === currentDate.getFullYear();
+      const isPast = dayDate < new Date(today.setHours(0, 0, 0, 0));
+
+      days.push(
+        <button 
+          key={i} 
+          className={`p-2 rounded ${
+            isToday ? "bg-blue-100 font-semibold" : "hover:bg-gray-100"
+          } ${isPast ? "text-gray-400 cursor-not-allowed" : ""}`}
+          disabled={isPast}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    return days;
   };
 
   return (
@@ -125,18 +189,18 @@ export default function Scheduling() {
               onChange={(e) => setText(e.target.value)}
             ></textarea>
 
-            <div className="flex gap-8">
+            <div className="flex gap-8 flex-col md:flex-row">
               <div className="flex-1">
                 <p className="text-sm text-gray-500 mb-2">
-                  Asia/Almaty timezone
+                  {userTimezone} timezone
                 </p>
                 <div className="bg-white border border-gray-200 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-4">
-                    <button className="p-1">
+                    <button className="p-1" onClick={() => changeMonth(-1)}>
                       <HiChevronLeft className="w-5 h-5" />
                     </button>
-                    <span className="font-medium">March 2025</span>
-                    <button className="p-1">
+                    <span className="font-medium">{getMonthName(currentDate)}</span>
+                    <button className="p-1" onClick={() => changeMonth(1)}>
                       <HiChevronRight className="w-5 h-5" />
                     </button>
                   </div>
@@ -151,12 +215,8 @@ export default function Scheduling() {
                     <div>Sa</div>
                   </div>
 
-                  <div className="grid grid-cols-7 gap-1 text-sm">
-                    {Array.from({ length: 35 }).map((_, i) => (
-                      <button key={i} className="p-2 hover:bg-gray-100 rounded">
-                        {i + 1}
-                      </button>
-                    ))}
+                  <div className="grid grid-cols-7 gap-1 text-sm min-h-60">
+                    {renderCalendar()}
                   </div>
                 </div>
               </div>

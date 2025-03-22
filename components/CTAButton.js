@@ -9,7 +9,7 @@ export default function CTAButton({ text = "Get Started", dashboardPath = "/dash
     if (status === "authenticated") {
       router.push(dashboardPath);
     } else {
-      signIn("reddit");
+      signIn("reddit", { callbackUrl: "/dashboard" });
     }
   };
   

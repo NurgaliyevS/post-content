@@ -7,4 +7,3 @@ Host: https://redditscheduler.com
 
 # Sitemaps
 Sitemap: https://redditscheduler.com/sitemap.xml
-Sitemap: https://redditscheduler.com/sitemap-pregnancy.xml

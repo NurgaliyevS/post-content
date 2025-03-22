@@ -118,11 +118,7 @@ export default function Scheduling() {
         <button 
           key={i} 
           onClick={() => !isPast && handleDateSelection(i)}
-          className={`p-2 rounded ${
-            isToday ? "bg-blue-100 font-semibold" : ""
-          } ${isSelected ? "bg-blue-500 text-white" : ""} ${
-            !isToday && !isSelected && !isPast ? "hover:bg-gray-100" : ""
-          } ${isPast ? "text-gray-400 cursor-not-allowed" : ""}`}
+          className={`p-2 rounded ${isSelected ? "bg-blue-500 text-white" : ""} ${isPast ? "text-gray-400 cursor-not-allowed" : ""}`}
           disabled={isPast}
         >
           {i}

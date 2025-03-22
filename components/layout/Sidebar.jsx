@@ -1,21 +1,21 @@
 import React from "react";
 import { IoHomeOutline } from "react-icons/io5";
-import { FaRegUserCircle, FaRegCalendarAlt, FaUserAlt } from "react-icons/fa";
-import { MdOutlineOndemandVideo, MdOutlineCampaign } from "react-icons/md";
+import { FaRegUserCircle, FaRegCalendarAlt } from "react-icons/fa";
 import { BiSupport } from "react-icons/bi";
-import { RiMickeyLine } from "react-icons/ri";
-import { FiSettings } from "react-icons/fi";
-import { AiOutlineCreditCard } from "react-icons/ai";
+import { FiTarget, FiSettings } from "react-icons/fi";
+import { AiOutlineCreditCard, AiOutlineLineChart } from "react-icons/ai";
+import { BsGraphUp } from "react-icons/bs";
+import { BiCalendarCheck } from "react-icons/bi";
 import { HiX } from "react-icons/hi";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function Sidebar({ showSidebar, setShowSidebar }) {
   const navItems = [
-    { name: "AI UGC avatars", icon: FaUserAlt },
-    { name: "AI UGC ads", icon: MdOutlineOndemandVideo },
-    { name: "Schedule", icon: FaRegCalendarAlt },
-    { name: "Campaigns", icon: MdOutlineCampaign },
+    { name: "Scheduling", icon: BiCalendarCheck },
+    { name: "Cross-Posting", icon: FiTarget },
+    { name: "Hook Generator", icon: AiOutlineLineChart },
+    { name: "Analytics", icon: BsGraphUp },
   ];
 
   const bottomNavItems = [
@@ -107,7 +107,7 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
             <div className="mx-3 p-4 bg-blue-50 rounded-lg my-4">
               <div className="mb-1 flex items-center justify-between">
                 <span className="text-blue-600 font-medium">
-                  0 videos remaining
+                  0 posts remaining
                 </span>
               </div>
               <p className="text-sm text-blue-600 mb-2">Resets in 2 days</p>

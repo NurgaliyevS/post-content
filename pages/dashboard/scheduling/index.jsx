@@ -7,6 +7,20 @@ import { BiPoll } from "react-icons/bi";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
 import TimeSelector from "@/components/ui/TimeSelector";
 
+const FORMATTING_BUTTONS = [
+  { label: "B", value: "bold" },
+  { label: "I", value: "italic" },
+  { label: "Link", value: "link" },
+  { label: "Strike", value: "strike" },
+  { label: "Code", value: "code" },
+  { label: "Superscript", value: "superscript" },
+  { label: "Spoiler", value: "spoiler" },
+  { label: "Heading", value: "heading" },
+  { label: "Bulleted List", value: "bulleted-list" },
+  { label: "Numbered List", value: "numbered-list" },
+  { label: "Quote Block", value: "quote-block" },
+];
+
 export default function Scheduling() {
   const { data: session, status } = useSession();
   const [loading, setLoading] = useState(true);
@@ -68,18 +82,9 @@ export default function Scheduling() {
             />
 
             <div className="flex flex-wrap gap-2 mb-2">
-              <button className="btn btn-sm">B</button>
-              <button className="btn btn-sm">I</button>
-              <button className="btn btn-sm">Link</button>
-              <button className="btn btn-sm">Strike</button>
-              <button className="btn btn-sm">Inline Code</button>
-              <button className="btn btn-sm">Superscript</button>
-              <button className="btn btn-sm">Spoiler</button>
-              <button className="btn btn-sm">Heading</button>
-              <button className="btn btn-sm">Bulleted List</button>
-              <button className="btn btn-sm">Numbered List</button>
-              <button className="btn btn-sm">Quote Block</button>
-              <button className="btn btn-sm">Table</button>
+              {FORMATTING_BUTTONS.map(button => (
+                <button key={button.value} className="btn btn-sm">{button.label}</button>
+              ))}
             </div>
 
             <textarea

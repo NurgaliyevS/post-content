@@ -11,14 +11,6 @@ const FORMATTING_BUTTONS = [
   { label: "B", value: "bold" },
   { label: "I", value: "italic" },
   { label: "Link", value: "link" },
-  { label: "Strike", value: "strike" },
-  { label: "Code", value: "code" },
-  { label: "Superscript", value: "superscript" },
-  { label: "Spoiler", value: "spoiler" },
-  { label: "Heading", value: "heading" },
-  { label: "Bulleted List", value: "bulleted-list" },
-  { label: "Numbered List", value: "numbered-list" },
-  { label: "Quote Block", value: "quote-block" },
 ];
 
 export default function Scheduling() {

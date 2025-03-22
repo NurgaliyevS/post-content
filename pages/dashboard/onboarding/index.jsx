@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { RiMickeyLine } from 'react-icons/ri';
-import { MdOutlineOndemandVideo, MdOutlineCampaign } from 'react-icons/md';
-import { FaUserAlt, FaRegUserCircle, FaRegCalendarAlt } from 'react-icons/fa';
-import { BiCalendarCheck } from 'react-icons/bi';
+import { BiCalendarCheck, BiSupport } from 'react-icons/bi';
 import { FiTarget } from 'react-icons/fi';
 import { AiOutlineLineChart } from 'react-icons/ai';
 import { BsGraphUp } from 'react-icons/bs';
+import { HiMenu } from 'react-icons/hi';
 import Sidebar from '@/components/layout/Sidebar';
 import FeatureCard from '@/components/ui/FeatureCard';
 import Image from 'next/image';
 import OnboardingChecklist from '@/components/ui/OnboardingChecklist';
+import { RiMickeyLine } from 'react-icons/ri';
 
 export default function Onboarding() {
   const { data: session, status } = useSession();
   const [loading, setLoading] = useState(true);
+  const [showSidebar, setShowSidebar] = useState(false);
 
   useEffect(() => {
     if (status !== 'loading') {
@@ -68,37 +68,50 @@ export default function Onboarding() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <aside>
-        <Sidebar />
+      <aside className="md:w-64 flex-shrink-0">
+        <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
       </aside>
+      
+      <main className="flex-1 p-4 md:p-8 overflow-auto">
+        {/* Mobile menu button */}
+        <div className="md:hidden fixed right-4 bottom-4 z-50">
+          <button 
+            onClick={() => {
+              setShowSidebar((showSidebar) => !showSidebar)
+            }}
+            className="bg-orange-500 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
+          >
+            <HiMenu className="w-6 h-6" />
+          </button>
+        </div>
 
-      <main className="flex-1 p-10 ml-64">
         <div className="max-w-2xl mx-auto">
           {/* Welcome Section */}
-          <section className="text-center mb-12">
-            <div className="inline-block rounded-xl">
-              <Image src="/logo.svg" alt="Logo" width={32} height={32} />
+          <div className="text-center mb-8">
+            <div className="flex justify-center mb-2">
+              <div className="rounded-lg flex items-center justify-center">
+                <Image 
+                  src="/logo.svg" 
+                  alt="Reddit Icon" 
+                  width={32} 
+                  height={32} 
+                />
+              </div>
             </div>
-            <h1 className="text-lg md:text-xl font-bold text-center">Welcome to RedditScheduler</h1>
-          </section>
+
+            <h1 className="text-2xl md:text-3xl font-bold mb-1">Welcome to RedditScheduler</h1>
+          </div>
 
           {/* Feature Cards */}
-          <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-8">
             {featureCards.map((card, index) => (
-              <FeatureCard 
-                key={index}
-                icon={card.icon}
-                title={card.title}
-                description={card.description}
-                iconColor={card.iconColor}
-                iconBgColor={card.iconBgColor}
-              />
+              <FeatureCard key={index} {...card} />
             ))}
-          </section>
+          </div>
 
-          <section className="max-w-2xl mx-auto">
+          <div className="mt-8">
             <OnboardingChecklist />
-          </section>
+          </div>
         </div>
       </main>
     </div>

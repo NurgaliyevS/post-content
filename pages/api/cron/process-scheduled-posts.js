@@ -6,7 +6,7 @@ import { refreshAccessToken } from "@/utils/refreshAccessToken";
 export default async function handler(req, res) {
   console.log('Received headers:', JSON.stringify(req.headers));
   // Verify the cron job secret if you set one
-  const authHeader = req.headers.get('authorization');
+  const authHeader = req.headers['authorization'];
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return new Response('Unauthorized', {
       status: 401,

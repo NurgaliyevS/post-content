@@ -44,6 +44,17 @@ export default async function handler(req, res) {
 
     const subreddits = data.data.children.map(child => child.data);
 
+    // Add test subreddit for development
+    subreddits.push({
+      display_name: "test",
+      display_name_prefixed: "r/test",
+      title: "Testing subreddit",
+      subscribers: 10000,
+      url: "/r/test",
+      created_utc: Date.now() / 1000,
+      description: "A subreddit for testing"
+    });
+
     // Return subreddits with relevant information
     return res.status(200).json({ 
       subreddits,

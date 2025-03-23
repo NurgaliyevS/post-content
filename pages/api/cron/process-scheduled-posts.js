@@ -4,10 +4,12 @@ import { refreshAccessToken } from "@/utils/refreshAccessToken";
 
 // This endpoint will be called by Vercel Cron
 export default async function handler(req, res) {
-  // Verify the cron job secret if you set one
-  const cronSecret = req.headers['x-cron-secret'];
-  if (process.env.CRON_SECRET && cronSecret !== process.env.CRON_SECRET) {
-    return res.status(401).json({ message: 'Unauthorized' });
+  const authHeader = req.headers.get('authorization');
+  console.log(authHeader, 'authHeader');
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return new Response('Unauthorized', {
+      status: 401,
+    });
   }
 
   try {

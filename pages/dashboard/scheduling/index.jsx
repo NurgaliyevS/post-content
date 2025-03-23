@@ -16,6 +16,9 @@ const FORMATTING_BUTTONS = [
 export default function Scheduling() {
   const { data: session, status } = useSession();
   const [loading, setLoading] = useState(true);
+  const [subreddits, setSubreddits] = useState([]);
+  const [subredditsLoading, setSubredditsLoading] = useState(false);
+  const [subredditsError, setSubredditsError] = useState(null);
   const [formData, setFormData] = useState({
     community: "",
     title: "",
@@ -31,12 +34,37 @@ export default function Scheduling() {
   useEffect(() => {
     if (status !== "loading") {
       setLoading(false);
+      
+      if (session) {
+        fetchUserSubreddits();
+      }
     }
     
     // Get user's timezone
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     setUserTimezone(timezone);
-  }, [status]);
+  }, [status, session]);
+
+  const fetchUserSubreddits = async () => {
+    try {
+      setSubredditsLoading(true);
+      setSubredditsError(null);
+      
+      const response = await fetch('/api/reddit/subreddits');
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch subreddits: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setSubreddits(data.subreddits || []);
+    } catch (error) {
+      console.error('Error fetching subreddits:', error);
+      setSubredditsError(error.message);
+    } finally {
+      setSubredditsLoading(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -170,12 +198,15 @@ export default function Scheduling() {
 
     try {
       // Here you would make an API call to save the scheduled post
-      // For example:
-      // await fetch('/api/schedule-post', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
-      // });
+      const response = await fetch('/api/schedule-post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to schedule post');
+      }
       
       // Reset form
       setFormData({
@@ -190,9 +221,33 @@ export default function Scheduling() {
       setSaveStatus("Post scheduled successfully!");
       setTimeout(() => setSaveStatus(""), 3000);
     } catch (error) {
+      console.error('Error scheduling post:', error);
       setSaveStatus("Error scheduling post. Please try again.");
       setTimeout(() => setSaveStatus(""), 3000);
     }
+  };
+
+  const renderSubredditOptions = () => {
+    if (subredditsLoading) {
+      return <option value="" disabled>Loading subreddits...</option>;
+    }
+    
+    if (subredditsError) {
+      return <option value="" disabled>Error loading subreddits</option>;
+    }
+    
+    if (subreddits.length === 0) {
+      return <option value="" disabled>No subreddits found</option>;
+    }
+    
+    return [
+      <option key="placeholder" value="" disabled>Choose a community</option>,
+      ...subreddits.map(subreddit => (
+        <option key={subreddit.name} value={subreddit.display_name_prefixed}>
+          {subreddit.display_name_prefixed}
+        </option>
+      ))
+    ];
   };
 
   return (
@@ -216,13 +271,19 @@ export default function Scheduling() {
               value={formData.community}
               onChange={handleInputChange}
             >
-              <option value="" disabled>
-                Choose a community
-              </option>
-              <option value="r/programming">r/programming</option>
-              <option value="r/webdev">r/webdev</option>
-              <option value="r/reactjs">r/reactjs</option>
+              {renderSubredditOptions()}
             </select>
+            
+            {subredditsError && (
+              <p className="text-red-500 text-sm mt-1">
+                Error: {subredditsError}. <button 
+                  className="text-blue-500 underline" 
+                  onClick={fetchUserSubreddits}
+                >
+                  Try again
+                </button>
+              </p>
+            )}
           </div>
 
           <div className="tabs mb-4">

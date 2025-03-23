@@ -4,7 +4,7 @@ import { refreshAccessToken } from "@/utils/refreshAccessToken";
 
 // This endpoint will be called by Vercel Cron
 export default async function handler(req, res) {
-  console.log(req.headers, 'req.headers');
+  console.log('Received headers:', JSON.stringify(req.headers));
   // Verify the cron job secret if you set one
   const cronSecret = req.headers['x-cron-secret'];
   console.log(cronSecret, 'cronSecret');

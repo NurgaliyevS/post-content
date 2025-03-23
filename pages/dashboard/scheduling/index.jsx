@@ -36,6 +36,10 @@ export default function Scheduling() {
     setLoading(false);
     setInitialized(true);
 
+    // Get user's timezone
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    setUserTimezone(timezone);
+
     // Only fetch subreddits if we have a session
     if (session && subreddits.length === 0 && !subredditsLoading) {
       fetchUserSubreddits();

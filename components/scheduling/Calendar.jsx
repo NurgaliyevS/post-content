@@ -32,11 +32,14 @@ const Calendar = ({
     dayDate.setHours(0, 0, 0, 0);
 
     const isPast = dayDate.getTime() < today.getTime();
+    
+    // Convert selectedDate string to Date object for comparison
+    const selectedDateObj = selectedDate ? new Date(selectedDate) : null;
     const isSelected =
-      selectedDate &&
-      selectedDate.getFullYear() === dayDate.getFullYear() &&
-      selectedDate.getMonth() === dayDate.getMonth() &&
-      selectedDate.getDate() === dayDate.getDate();
+      selectedDateObj &&
+      selectedDateObj.getFullYear() === dayDate.getFullYear() &&
+      selectedDateObj.getMonth() === dayDate.getMonth() &&
+      selectedDateObj.getDate() === dayDate.getDate();
 
     days.push(
       <button
@@ -81,4 +84,4 @@ const Calendar = ({
   );
 };
 
-export default Calendar; 
+export default Calendar;

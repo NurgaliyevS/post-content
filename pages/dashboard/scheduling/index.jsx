@@ -7,6 +7,7 @@ import PostTypeTabs from "@/components/scheduling/PostTypeTabs";
 import FormattingToolbar from "@/components/scheduling/FormattingToolbar";
 import Calendar from "@/components/scheduling/Calendar";
 import SubredditSelector from "@/components/scheduling/SubredditSelector";
+import { format } from "date-fns";
 
 function Scheduling() {
   const { data: session, status } = useSession();
@@ -18,7 +19,7 @@ function Scheduling() {
     community: "",
     title: "",
     text: "",
-    selectedDate: new Date(),
+    selectedDate: format(new Date(), 'yyyy-MM-dd'),
     selectedTime: "",
     type: "text", // Default post type
   });
@@ -146,7 +147,7 @@ function Scheduling() {
     );
     setFormData((prev) => ({
       ...prev,
-      selectedDate: selected,
+      selectedDate: format(selected, 'yyyy-MM-dd'),
     }));
   };
 
@@ -184,7 +185,7 @@ function Scheduling() {
         community: "",
         title: "",
         text: "",
-        selectedDate: new Date(),
+        selectedDate: format(new Date(), 'yyyy-MM-dd'),
         selectedTime: "",
         type: "text",
       });

@@ -19,8 +19,8 @@ function Scheduling() {
     community: "",
     title: "",
     text: "",
-    selectedDate: format(new Date(), 'yyyy-MM-dd'),
-    selectedTime: format(new Date(), 'h:mm aa'),
+    selectedDate: format(new Date(), "yyyy-MM-dd"),
+    selectedTime: format(new Date(), "h:mm aa"),
     type: "text", // Default post type
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   });
@@ -148,7 +148,7 @@ function Scheduling() {
     );
     setFormData((prev) => ({
       ...prev,
-      selectedDate: format(selected, 'yyyy-MM-dd'),
+      selectedDate: format(selected, "yyyy-MM-dd"),
     }));
   };
 
@@ -175,7 +175,10 @@ function Scheduling() {
       const response = await fetch("/api/post/schedule-post", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          text: formData.text.replace(/\n/g, "\n\n"),
+        }),
       });
 
       if (!response.ok) {
@@ -186,7 +189,7 @@ function Scheduling() {
         community: "",
         title: "",
         text: "",
-        selectedDate: format(new Date(), 'yyyy-MM-dd'),
+        selectedDate: format(new Date(), "yyyy-MM-dd"),
         selectedTime: "",
         type: "text",
       });
@@ -231,9 +234,7 @@ function Scheduling() {
 
           <PostTypeTabs
             type={formData.type}
-            onTypeChange={(type) =>
-              setFormData((prev) => ({ ...prev, type }))
-            }
+            onTypeChange={(type) => setFormData((prev) => ({ ...prev, type }))}
           />
 
           <div className="space-y-4">

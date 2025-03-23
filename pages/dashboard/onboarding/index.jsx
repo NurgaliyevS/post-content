@@ -59,7 +59,7 @@ function Onboarding() {
 
   return (
     <DashboardLayout loading={loading}>
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-2xl mx-auto min-h-screen pb-20">
         {/* Welcome Section */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-2">

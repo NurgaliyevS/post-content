@@ -20,8 +20,9 @@ function Scheduling() {
     title: "",
     text: "",
     selectedDate: format(new Date(), 'yyyy-MM-dd'),
-    selectedTime: "",
+    selectedTime: format(new Date(), 'h:mm aa'),
     type: "text", // Default post type
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   });
   const [currentDate, setCurrentDate] = useState(new Date());
   const [userTimezone, setUserTimezone] = useState("");

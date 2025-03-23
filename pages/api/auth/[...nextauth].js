@@ -27,10 +27,7 @@ export const authOptions = {
       }
       
       // Save Reddit tokens to JWT for API access
-      if (account?.provider === "reddit") {
-        token.accessToken = account.access_token;
-        token.refreshToken = account.refresh_token;
-        token.accessTokenExpires = account.expires_at * 1000; // Convert to ms
+      if (token?.accessToken && token?.refreshToken) {
         token.redditId = token.sub;
         
         // Update user info in database
@@ -98,8 +95,8 @@ export const authOptions = {
       if (session?.user) {
         session.user.id = token.id;
         session.user.variant_name = token.variant_name;
-        // Add the access token to the session
         session.accessToken = token.accessToken;
+        session.refreshToken = token.refreshToken;
         session.error = token.error;
       }
       return session;

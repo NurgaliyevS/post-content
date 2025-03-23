@@ -2,7 +2,10 @@
   "crons": [
     {
       "path": "/api/cron/process-scheduled-posts",
-      "schedule": "* * * * *"
+      "schedule": "* * * * *",
+      "headers": {
+        "x-cron-secret": "process.env.CRON_SECRET"
+      }
     }
   ]
 }

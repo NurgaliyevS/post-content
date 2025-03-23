@@ -6,12 +6,13 @@ import { refreshAccessToken } from "@/utils/refreshAccessToken";
 export default async function handler(req, res) {
   console.log('Received headers:', JSON.stringify(req.headers));
   // Verify the cron job secret if you set one
-  const cronSecret = req.headers['x-cron-secret'];
-  console.log(cronSecret, 'cronSecret');
-  if (process.env.CRON_SECRET && cronSecret !== process.env.CRON_SECRET) {
-    return res.status(401).json({ message: 'Unauthorized' });
+  const authHeader = req.headers.get('authorization');
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return new Response('Unauthorized', {
+      status: 401,
+    });
   }
-
+  
   try {
     // Connect to MongoDB
     await connectMongoDB();

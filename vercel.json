@@ -1,12 +1,8 @@
 {
-    "version": 2,
     "crons": [
       {
         "path": "/api/cron/process-scheduled-posts",
-        "schedule": "*/5 * * * *"
+        "schedule": "0 10 * * *"
       }
-    ],
-    "env": {
-      "CRON_SECRET": "@cron_secret"
-    }
+    ]
   }

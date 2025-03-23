@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const TimeSelector = ({ selectedTime, onTimeSelect }) => {
+const TimeSelector = ({ selectedTime, onTimeSelect, selectedDate }) => {
   const [internalTime, setInternalTime] = useState(null);
   const [selectedPeriod, setPeriod] = useState("AM");
 
@@ -45,33 +45,61 @@ const TimeSelector = ({ selectedTime, onTimeSelect }) => {
   // Time periods
   const periods = ["AM", "PM"];
 
+  const isTimeInPast = (hour, minute, period) => {
+    if (!selectedDate) return false;
+    
+    const now = new Date();
+    const selectedDateTime = new Date(selectedDate);
+    
+    // Convert selected time to 24-hour format
+    let hours24 = parseInt(hour);
+    if (period === "PM" && hours24 !== 12) hours24 += 12;
+    if (period === "AM" && hours24 === 12) hours24 = 0;
+    
+    selectedDateTime.setHours(hours24, parseInt(minute), 0, 0);
+    
+    return selectedDateTime < now;
+  };
+
   const handleHourClick = (hour) => {
     const currentMinute = internalTime
       ? internalTime.split(":")[1].split(" ")[0]
       : "00";
     const newTime = `${hour}:${currentMinute} ${selectedPeriod}`;
-    setInternalTime(newTime);
-    onTimeSelect(newTime);
+    
+    if (!isTimeInPast(hour, currentMinute, selectedPeriod)) {
+      setInternalTime(newTime);
+      onTimeSelect(newTime);
+    }
   };
 
   const handleMinuteClick = (minute) => {
     const currentHour = internalTime ? internalTime.split(":")[0] : "12";
     const newTime = `${currentHour}:${minute} ${selectedPeriod}`;
-    setInternalTime(newTime);
-    onTimeSelect(newTime);
+    
+    if (!isTimeInPast(currentHour, minute, selectedPeriod)) {
+      setInternalTime(newTime);
+      onTimeSelect(newTime);
+    }
   };
 
   const handlePeriodClick = (period) => {
-    setPeriod(period);
-    if (internalTime) {
-      const [time] = internalTime.split(" ");
-      const newTime = `${time} ${period}`;
-      setInternalTime(newTime);
-      onTimeSelect(newTime);
-    } else {
+    if (!internalTime) {
       const newTime = `12:00 ${period}`;
       setInternalTime(newTime);
       onTimeSelect(newTime);
+      setPeriod(period);
+      return;
+    }
+
+    const [time] = internalTime.split(" ");
+    const [hour] = time.split(":");
+    
+    if (!isTimeInPast(hour, time.split(":")[1], period)) {
+      const newTime = `${time} ${period}`;
+      setInternalTime(newTime);
+      onTimeSelect(newTime);
+      setPeriod(period);
     }
   };
 
@@ -106,20 +134,26 @@ const TimeSelector = ({ selectedTime, onTimeSelect }) => {
           <div className="border-r border-gray-200 pr-2">
             <div className="text-center font-medium mb-2 text-sm">Hour</div>
             <div className="grid grid-cols-3 gap-1">
-              {hours.map((hourOption) => (
-                <button
-                  key={`hour-${hourOption}`}
-                  onClick={() => handleHourClick(hourOption)}
-                  className={`p-2 rounded-md text-sm  
-                      ${
-                        hour === hourOption
-                          ? "bg-black text-white"
-                          : "hover:bg-gray-100 border border-gray-200"
-                      }`}
-                >
-                  {hourOption}
-                </button>
-              ))}
+              {hours.map((hourOption) => {
+                const isDisabled = isTimeInPast(hourOption, minute || "00", period);
+                return (
+                  <button
+                    key={`hour-${hourOption}`}
+                    onClick={() => handleHourClick(hourOption)}
+                    disabled={isDisabled}
+                    className={`p-2 rounded-md text-sm  
+                        ${
+                          hour === hourOption
+                            ? "bg-black text-white"
+                            : isDisabled
+                            ? "opacity-50 cursor-not-allowed bg-gray-100"
+                            : "hover:bg-gray-100 border border-gray-200"
+                        }`}
+                  >
+                    {hourOption}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -127,20 +161,26 @@ const TimeSelector = ({ selectedTime, onTimeSelect }) => {
           <div className="border-r border-gray-200 pr-2">
             <div className="text-center font-medium mb-2 text-sm">Minute</div>
             <div className="grid grid-cols-2 gap-1">
-              {minutes.map((minuteOption) => (
-                <button
-                  key={`minute-${minuteOption}`}
-                  onClick={() => handleMinuteClick(minuteOption)}
-                  className={`p-2 rounded-md text-sm
-                      ${
-                        minute === minuteOption
-                          ? "bg-black text-white"
-                          : "hover:bg-gray-100 border border-gray-200"
-                      }`}
-                >
-                  {minuteOption}
-                </button>
-              ))}
+              {minutes.map((minuteOption) => {
+                const isDisabled = isTimeInPast(hour || "12", minuteOption, period);
+                return (
+                  <button
+                    key={`minute-${minuteOption}`}
+                    onClick={() => handleMinuteClick(minuteOption)}
+                    disabled={isDisabled}
+                    className={`p-2 rounded-md text-sm
+                        ${
+                          minute === minuteOption
+                            ? "bg-black text-white"
+                            : isDisabled
+                            ? "opacity-50 cursor-not-allowed bg-gray-100"
+                            : "hover:bg-gray-100 border border-gray-200"
+                        }`}
+                  >
+                    {minuteOption}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -148,20 +188,26 @@ const TimeSelector = ({ selectedTime, onTimeSelect }) => {
           <div>
             <div className="text-center font-medium mb-2 text-sm">Period</div>
             <div className="grid grid-rows-2 gap-1">
-              {periods.map((periodOption) => (
-                <button
-                  key={`period-${periodOption}`}
-                  onClick={() => handlePeriodClick(periodOption)}
-                  className={`p-2 rounded-md text-sm
-                      ${
-                        selectedPeriod === periodOption
-                          ? "bg-black text-white"
-                          : "hover:bg-gray-100 border border-gray-200"
-                      }`}
-                >
-                  {periodOption}
-                </button>
-              ))}
+              {periods.map((periodOption) => {
+                const isDisabled = isTimeInPast(hour || "12", minute || "00", periodOption);
+                return (
+                  <button
+                    key={`period-${periodOption}`}
+                    onClick={() => handlePeriodClick(periodOption)}
+                    disabled={isDisabled}
+                    className={`p-2 rounded-md text-sm
+                        ${
+                          selectedPeriod === periodOption
+                            ? "bg-black text-white"
+                            : isDisabled
+                            ? "opacity-50 cursor-not-allowed bg-gray-100"
+                            : "hover:bg-gray-100 border border-gray-200"
+                        }`}
+                  >
+                    {periodOption}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>

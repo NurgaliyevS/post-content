@@ -268,6 +268,7 @@ function Scheduling() {
                 <TimeSelector
                   selectedTime={formData.selectedTime}
                   onTimeSelect={handleTimeSelection}
+                  selectedDate={formData.selectedDate}
                 />
               </div>
             </div>

@@ -9,8 +9,8 @@ import TimeSelector from "@/components/ui/TimeSelector";
 import withAuth from "@/components/withAuth";
 
 const FORMATTING_BUTTONS = [
-  { label: "B", value: "bold" },
-  { label: "I", value: "italic" },
+//   { label: "B", value: "bold" },
+//   { label: "I", value: "italic" },
   { label: "Link", value: "link" },
 ];
 
@@ -228,7 +228,7 @@ function Scheduling() {
 
     try {
       // Here you would make an API call to save the scheduled post
-      const response = await fetch("/api/schedule-post", {
+      const response = await fetch("/api/post/schedule-post", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -284,7 +284,7 @@ function Scheduling() {
 
     return [
       <option key="placeholder" value="" disabled>
-        Choose a community
+        Select a subreddit
       </option>,
       ...subreddits.map((subreddit) => (
         <option key={subreddit.name} value={subreddit.display_name_prefixed}>

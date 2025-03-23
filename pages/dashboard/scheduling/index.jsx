@@ -25,52 +25,49 @@ export default function Scheduling() {
     text: "",
     selectedDate: new Date(),
     selectedTime: "",
-    type: "text" // Default post type
+    type: "text", // Default post type
   });
   const [currentDate, setCurrentDate] = useState(new Date());
   const [userTimezone, setUserTimezone] = useState("");
   const [saveStatus, setSaveStatus] = useState(""); // For displaying save notifications
+  const [initialized, setInitialized] = useState(false);
 
-  useEffect(() => {
-    if (status !== "loading") {
-      setLoading(false);
-      
-      if (session) {
-        fetchUserSubreddits();
-      }
+  if (status !== "loading" && !initialized) {
+    setLoading(false);
+    setInitialized(true);
+
+    // Only fetch subreddits if we have a session
+    if (session && subreddits.length === 0 && !subredditsLoading) {
+      fetchUserSubreddits();
     }
-    
-    // Get user's timezone
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    setUserTimezone(timezone);
-  }, [status, session]);
+  }
 
-  const fetchUserSubreddits = async () => {
+  async function fetchUserSubreddits() {
     try {
       setSubredditsLoading(true);
       setSubredditsError(null);
-      
-      const response = await fetch('/api/reddit/subreddits');
-      
+
+      const response = await fetch("/api/reddit/subreddits");
+
       if (!response.ok) {
         throw new Error(`Failed to fetch subreddits: ${response.status}`);
       }
-      
+
       const data = await response.json();
       setSubreddits(data.subreddits || []);
     } catch (error) {
-      console.error('Error fetching subreddits:', error);
+      console.error("Error fetching subreddits:", error);
       setSubredditsError(error.message);
     } finally {
       setSubredditsLoading(false);
     }
-  };
+  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -81,31 +78,43 @@ export default function Scheduling() {
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const selectedText = formData.text.substring(start, end);
-    
+
     let formattedText = "";
     let newCursorPosition = end;
 
     if (formatType === "bold") {
-      formattedText = formData.text.substring(0, start) + `**${selectedText}**` + formData.text.substring(end);
+      formattedText =
+        formData.text.substring(0, start) +
+        `**${selectedText}**` +
+        formData.text.substring(end);
       newCursorPosition = selectedText.length ? end + 4 : start + 2;
     } else if (formatType === "italic") {
-      formattedText = formData.text.substring(0, start) + `*${selectedText}*` + formData.text.substring(end);
+      formattedText =
+        formData.text.substring(0, start) +
+        `*${selectedText}*` +
+        formData.text.substring(end);
       newCursorPosition = selectedText.length ? end + 2 : start + 1;
     } else if (formatType === "link") {
       if (selectedText) {
         // If text is selected, format it as a link with placeholder URL
-        formattedText = formData.text.substring(0, start) + `[${selectedText}](url)` + formData.text.substring(end);
+        formattedText =
+          formData.text.substring(0, start) +
+          `[${selectedText}](url)` +
+          formData.text.substring(end);
         newCursorPosition = start + selectedText.length + 2; // Position cursor at the start of 'url'
       } else {
         // If no text is selected, insert a link template
-        formattedText = formData.text.substring(0, start) + "[Link text](url)" + formData.text.substring(end);
+        formattedText =
+          formData.text.substring(0, start) +
+          "[Link text](url)" +
+          formData.text.substring(end);
         newCursorPosition = start + 1; // Position cursor after the opening bracket to edit link text
       }
     }
 
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      text: formattedText
+      text: formattedText,
     }));
   };
 
@@ -133,17 +142,21 @@ export default function Scheduling() {
   };
 
   const handleDateSelection = (day) => {
-    const selected = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-    setFormData(prev => ({
+    const selected = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      day
+    );
+    setFormData((prev) => ({
       ...prev,
-      selectedDate: selected
+      selectedDate: selected,
     }));
   };
 
   const handleTimeSelection = (time) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      selectedTime: time
+      selectedTime: time,
     }));
   };
 
@@ -151,7 +164,7 @@ export default function Scheduling() {
     const today = new Date();
     // Reset the time part to ensure accurate date comparison
     today.setHours(0, 0, 0, 0);
-    
+
     const daysInMonth = getDaysInMonth(currentDate);
     const firstDayOfMonth = getFirstDayOfMonth(currentDate);
     const days = [];
@@ -163,21 +176,28 @@ export default function Scheduling() {
 
     // Add days of the month
     for (let i = 1; i <= daysInMonth; i++) {
-      const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), i);
+      const dayDate = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        i
+      );
       dayDate.setHours(0, 0, 0, 0); // Reset time for accurate comparison
-      
+
       const isToday = today.getTime() === dayDate.getTime();
       const isPast = dayDate.getTime() < today.getTime();
-      const isSelected = formData.selectedDate && 
-                          formData.selectedDate.getFullYear() === dayDate.getFullYear() &&
-                          formData.selectedDate.getMonth() === dayDate.getMonth() &&
-                          formData.selectedDate.getDate() === dayDate.getDate();
+      const isSelected =
+        formData.selectedDate &&
+        formData.selectedDate.getFullYear() === dayDate.getFullYear() &&
+        formData.selectedDate.getMonth() === dayDate.getMonth() &&
+        formData.selectedDate.getDate() === dayDate.getDate();
 
       days.push(
-        <button 
-          key={i} 
+        <button
+          key={i}
           onClick={() => !isPast && handleDateSelection(i)}
-          className={`p-2 rounded ${isSelected ? "bg-blue-500 text-white" : ""} ${isPast ? "text-gray-400 cursor-not-allowed" : ""}`}
+          className={`p-2 rounded ${
+            isSelected ? "bg-blue-500 text-white" : ""
+          } ${isPast ? "text-gray-400 cursor-not-allowed" : ""}`}
           disabled={isPast}
         >
           {i}
@@ -190,7 +210,12 @@ export default function Scheduling() {
 
   const schedulePost = async () => {
     // Check required fields
-    if (!formData.community || !formData.title || !formData.selectedDate || !formData.selectedTime) {
+    if (
+      !formData.community ||
+      !formData.title ||
+      !formData.selectedDate ||
+      !formData.selectedTime
+    ) {
       setSaveStatus("Please fill in all required fields");
       setTimeout(() => setSaveStatus(""), 3000);
       return;
@@ -198,16 +223,16 @@ export default function Scheduling() {
 
     try {
       // Here you would make an API call to save the scheduled post
-      const response = await fetch('/api/schedule-post', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+      const response = await fetch("/api/schedule-post", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
       });
-      
+
       if (!response.ok) {
-        throw new Error('Failed to schedule post');
+        throw new Error("Failed to schedule post");
       }
-      
+
       // Reset form
       setFormData({
         community: "",
@@ -215,13 +240,13 @@ export default function Scheduling() {
         text: "",
         selectedDate: new Date(),
         selectedTime: "",
-        type: "text"
+        type: "text",
       });
-      
+
       setSaveStatus("Post scheduled successfully!");
       setTimeout(() => setSaveStatus(""), 3000);
     } catch (error) {
-      console.error('Error scheduling post:', error);
+      console.error("Error scheduling post:", error);
       setSaveStatus("Error scheduling post. Please try again.");
       setTimeout(() => setSaveStatus(""), 3000);
     }
@@ -229,24 +254,38 @@ export default function Scheduling() {
 
   const renderSubredditOptions = () => {
     if (subredditsLoading) {
-      return <option value="" disabled>Loading subreddits...</option>;
+      return (
+        <option value="" disabled>
+          Loading subreddits...
+        </option>
+      );
     }
-    
+
     if (subredditsError) {
-      return <option value="" disabled>Error loading subreddits</option>;
+      return (
+        <option value="" disabled>
+          Error loading subreddits
+        </option>
+      );
     }
-    
+
     if (subreddits.length === 0) {
-      return <option value="" disabled>No subreddits found</option>;
+      return (
+        <option value="" disabled>
+          No subreddits found
+        </option>
+      );
     }
-    
+
     return [
-      <option key="placeholder" value="" disabled>Choose a community</option>,
-      ...subreddits.map(subreddit => (
+      <option key="placeholder" value="" disabled>
+        Choose a community
+      </option>,
+      ...subreddits.map((subreddit) => (
         <option key={subreddit.name} value={subreddit.display_name_prefixed}>
           {subreddit.display_name_prefixed}
         </option>
-      ))
+      )),
     ];
   };
 
@@ -265,7 +304,7 @@ export default function Scheduling() {
 
         <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
           <div className="mb-4">
-            <select 
+            <select
               className="select select-bordered w-full max-w-xs"
               name="community"
               value={formData.community}
@@ -273,11 +312,12 @@ export default function Scheduling() {
             >
               {renderSubredditOptions()}
             </select>
-            
+
             {subredditsError && (
               <p className="text-red-500 text-sm mt-1">
-                Error: {subredditsError}. <button 
-                  className="text-blue-500 underline" 
+                Error: {subredditsError}.{" "}
+                <button
+                  className="text-blue-500 underline"
                   onClick={fetchUserSubreddits}
                 >
                   Try again
@@ -287,9 +327,11 @@ export default function Scheduling() {
           </div>
 
           <div className="tabs mb-4">
-            <button 
-              className={`tab tab-bordered ${formData.type === 'text' ? 'tab-active' : ''} flex items-center gap-2`}
-              onClick={() => setFormData(prev => ({...prev, type: 'text'}))}
+            <button
+              className={`tab tab-bordered ${
+                formData.type === "text" ? "tab-active" : ""
+              } flex items-center gap-2`}
+              onClick={() => setFormData((prev) => ({ ...prev, type: "text" }))}
             >
               <RiFileTextLine /> Text
             </button>
@@ -324,9 +366,9 @@ export default function Scheduling() {
             />
 
             <div className="flex flex-wrap gap-2 mb-2">
-              {FORMATTING_BUTTONS.map(button => (
-                <button 
-                  key={button.value} 
+              {FORMATTING_BUTTONS.map((button) => (
+                <button
+                  key={button.value}
                   className="btn btn-sm"
                   onClick={() => handleFormatting(button.value)}
                 >
@@ -353,7 +395,9 @@ export default function Scheduling() {
                     <button className="p-1" onClick={() => changeMonth(-1)}>
                       <HiChevronLeft className="w-5 h-5" />
                     </button>
-                    <span className="font-medium">{getMonthName(currentDate)}</span>
+                    <span className="font-medium">
+                      {getMonthName(currentDate)}
+                    </span>
                     <button className="p-1" onClick={() => changeMonth(1)}>
                       <HiChevronRight className="w-5 h-5" />
                     </button>
@@ -376,17 +420,22 @@ export default function Scheduling() {
               </div>
 
               <div className="flex-1">
-                <TimeSelector 
-                  selectedTime={formData.selectedTime} 
-                  onTimeSelect={handleTimeSelection} 
+                <TimeSelector
+                  selectedTime={formData.selectedTime}
+                  onTimeSelect={handleTimeSelection}
                 />
               </div>
             </div>
 
             <div className="flex justify-end mt-6">
-              <button 
-                className="btn btn-primary" 
-                disabled={!formData.selectedDate || !formData.selectedTime || !formData.title || !formData.community}
+              <button
+                className="btn btn-primary"
+                disabled={
+                  !formData.selectedDate ||
+                  !formData.selectedTime ||
+                  !formData.title ||
+                  !formData.community
+                }
                 onClick={schedulePost}
               >
                 Schedule Post

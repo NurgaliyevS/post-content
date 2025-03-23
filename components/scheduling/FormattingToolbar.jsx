@@ -1,8 +1,8 @@
 import React from "react";
 
 const FORMATTING_BUTTONS = [
-  { label: "B", value: "bold" },
-  { label: "I", value: "italic" },
+  // { label: "B", value: "bold" },
+  // { label: "I", value: "italic" },
   { label: "Link", value: "link" },
 ];
 

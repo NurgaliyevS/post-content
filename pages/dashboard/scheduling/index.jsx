@@ -191,8 +191,14 @@ function Scheduling() {
         type: "text",
       });
 
-      setSaveStatus("Post scheduled successfully!");
-      setTimeout(() => setSaveStatus(""), 3000);
+      const data = await response.json();
+      if (data?.message) {
+        setSaveStatus(data?.message);
+        setTimeout(() => setSaveStatus(""), 3000);
+      } else {
+        setSaveStatus("Post scheduled successfully!");
+        setTimeout(() => setSaveStatus(""), 3000);
+      }
     } catch (error) {
       console.error("Error scheduling post:", error);
       setSaveStatus("Error scheduling post. Please try again.");
@@ -248,6 +254,7 @@ function Scheduling() {
               name="text"
               value={formData.text}
               onChange={handleInputChange}
+              style={{ whiteSpace: 'pre-wrap' }}
             ></textarea>
 
             <div className="flex gap-8 flex-col md:flex-row">

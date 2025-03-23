@@ -1,9 +1,11 @@
 import React from 'react';
-import { TbCurrencyDollar } from 'react-icons/tb';
-import { FaRegUserCircle, FaRegCalendarAlt } from 'react-icons/fa';
-import { MdOutlineCampaign } from 'react-icons/md';
+import { SiStripe } from 'react-icons/si';
+import { FaArrowRight, FaReddit } from 'react-icons/fa';
+import { FaRegCalendarAlt } from 'react-icons/fa';
+import { useSession } from "next-auth/react";
+import Link from 'next/link';
 
-const OnboardingStep = ({ icon: Icon, title, time, completed, customIcon }) => {
+const OnboardingStep = ({ icon: Icon, title, time, completed, customIcon, actionButton }) => {
   return (
     <div className="bg-white p-4 rounded-lg border border-gray-100 flex items-center mb-3 shadow-sm">
       <div className="flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-500 rounded-full mr-4 flex-shrink-0">
@@ -11,43 +13,59 @@ const OnboardingStep = ({ icon: Icon, title, time, completed, customIcon }) => {
       </div>
       <div className="flex-1">
         <div className="flex justify-between items-center">
-          <span className="font-medium text-gray-800">{title}</span>
-          <span className={completed ? "text-green-500" : "text-gray-400"}>
-            {completed ? "✓" : "Pending"}
-          </span>
+          <div>
+            <span className="font-medium text-gray-800">{title}</span>
+            {time && <div className="text-xs text-gray-400">Estimated {time}</div>}
+          </div>
+          {completed ? (
+            <span className="text-green-500">✓</span>
+          ) : (
+            actionButton
+          )}
         </div>
-        {time && <span className="text-xs text-gray-400">Estimated {time}</span>}
       </div>
     </div>
   );
 };
 
 export default function OnboardingChecklist() {
+  const { data: session } = useSession();
+  const isSubscribed = session?.user?.variant_name !== "free";
+
   const steps = [
+    {
+        title: "Connect Reddit account", 
+        time: "30 seconds",
+        completed: true,
+        iconComponent: FaReddit,
+        actionButton: null
+      },
     {
       title: "Subscription required",
       time: "2-3 minutes",
-      completed: true,
-      customIcon: <TbCurrencyDollar className="w-4 h-4" />,
-      iconComponent: null
-    },
-    {
-      title: "Connect Reddit account",
-      time: "30 seconds",
-      completed: true,
-      iconComponent: FaRegUserCircle
+      completed: isSubscribed,
+      customIcon: <SiStripe className="w-4 h-4" />,
+      iconComponent: null,
+      actionButton: (
+        <Link href="/#pricing">
+          <button className="btn btn-primary btn-sm">Upgrade now
+            <FaArrowRight className='w-3 h-3' />
+          </button>
+        </Link>
+      )
     },
     {
       title: "Schedule your first post",
-      time: "2 minutes",
+      time: "2 minutes", 
       completed: false,
-      iconComponent: FaRegCalendarAlt
-    },
-    {
-      title: "Create your first campaign",
-      time: "5 minutes",
-      completed: false,
-      iconComponent: MdOutlineCampaign
+      iconComponent: FaRegCalendarAlt,
+      actionButton: (
+        <Link href="/dashboard/scheduling">
+          <button className="btn btn-primary btn-sm">Schedule Post
+            <FaArrowRight className='w-3 h-3' />
+          </button>
+        </Link>
+      )
     }
   ];
 
@@ -61,6 +79,7 @@ export default function OnboardingChecklist() {
           time={step.time}
           completed={step.completed}
           customIcon={step.customIcon}
+          actionButton={step.actionButton}
         />
       ))}
     </div>

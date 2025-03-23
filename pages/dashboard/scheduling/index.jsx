@@ -1,18 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { BsLink45Deg, BsImage } from "react-icons/bs";
-import { RiFileTextLine } from "react-icons/ri";
-import { BiPoll } from "react-icons/bi";
-import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
 import TimeSelector from "@/components/ui/TimeSelector";
 import withAuth from "@/components/withAuth";
-
-const FORMATTING_BUTTONS = [
-  { label: "B", value: "bold" },
-  { label: "I", value: "italic" },
-  { label: "Link", value: "link" },
-];
+import PostTypeTabs from "@/components/scheduling/PostTypeTabs";
+import FormattingToolbar from "@/components/scheduling/FormattingToolbar";
+import Calendar from "@/components/scheduling/Calendar";
+import SubredditSelector from "@/components/scheduling/SubredditSelector";
 
 function Scheduling() {
   const { data: session, status } = useSession();
@@ -101,19 +95,17 @@ function Scheduling() {
       newCursorPosition = selectedText.length ? end + 2 : start + 1;
     } else if (formatType === "link") {
       if (selectedText) {
-        // If text is selected, format it as a link with placeholder URL
         formattedText =
           formData.text.substring(0, start) +
           `[${selectedText}](url)` +
           formData.text.substring(end);
-        newCursorPosition = start + selectedText.length + 2; // Position cursor at the start of 'url'
+        newCursorPosition = start + selectedText.length + 2;
       } else {
-        // If no text is selected, insert a link template
         formattedText =
           formData.text.substring(0, start) +
           "[Link text](url)" +
           formData.text.substring(end);
-        newCursorPosition = start + 1; // Position cursor after the opening bracket to edit link text
+        newCursorPosition = start + 1;
       }
     }
 
@@ -165,56 +157,7 @@ function Scheduling() {
     }));
   };
 
-  const renderCalendar = () => {
-    const today = new Date();
-    // Reset the time part to ensure accurate date comparison
-    today.setHours(0, 0, 0, 0);
-
-    const daysInMonth = getDaysInMonth(currentDate);
-    const firstDayOfMonth = getFirstDayOfMonth(currentDate);
-    const days = [];
-
-    // Add empty cells for days before the first day of the month
-    for (let i = 0; i < firstDayOfMonth; i++) {
-      days.push(<div key={`empty-${i}`} className="p-2"></div>);
-    }
-
-    // Add days of the month
-    for (let i = 1; i <= daysInMonth; i++) {
-      const dayDate = new Date(
-        currentDate.getFullYear(),
-        currentDate.getMonth(),
-        i
-      );
-      dayDate.setHours(0, 0, 0, 0); // Reset time for accurate comparison
-
-      const isToday = today.getTime() === dayDate.getTime();
-      const isPast = dayDate.getTime() < today.getTime();
-      const isSelected =
-        formData.selectedDate &&
-        formData.selectedDate.getFullYear() === dayDate.getFullYear() &&
-        formData.selectedDate.getMonth() === dayDate.getMonth() &&
-        formData.selectedDate.getDate() === dayDate.getDate();
-
-      days.push(
-        <button
-          key={i}
-          onClick={() => !isPast && handleDateSelection(i)}
-          className={`p-2 rounded ${
-            isSelected ? "bg-blue-500 text-white" : ""
-          } ${isPast ? "text-gray-400 cursor-not-allowed" : ""}`}
-          disabled={isPast}
-        >
-          {i}
-        </button>
-      );
-    }
-
-    return days;
-  };
-
   const schedulePost = async () => {
-    // Check required fields
     if (
       !formData.community ||
       !formData.title ||
@@ -227,7 +170,6 @@ function Scheduling() {
     }
 
     try {
-      // Here you would make an API call to save the scheduled post
       const response = await fetch("/api/post/schedule-post", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -238,7 +180,6 @@ function Scheduling() {
         throw new Error("Failed to schedule post");
       }
 
-      // Reset form
       setFormData({
         community: "",
         title: "",
@@ -257,43 +198,6 @@ function Scheduling() {
     }
   };
 
-  const renderSubredditOptions = () => {
-    if (subredditsLoading) {
-      return (
-        <option value="" disabled>
-          Loading subreddits...
-        </option>
-      );
-    }
-
-    if (subredditsError) {
-      return (
-        <option value="" disabled>
-          Error loading subreddits
-        </option>
-      );
-    }
-
-    if (subreddits.length === 0) {
-      return (
-        <option value="" disabled>
-          No subreddits found
-        </option>
-      );
-    }
-
-    return [
-      <option key="placeholder" value="" disabled>
-        Select a subreddit
-      </option>,
-      ...subreddits.map((subreddit) => (
-        <option key={subreddit.name} value={subreddit.display_name_prefixed}>
-          {subreddit.display_name_prefixed}
-        </option>
-      )),
-    ];
-  };
-
   return (
     <DashboardLayout loading={loading}>
       <div className="max-w-4xl mx-auto">
@@ -308,57 +212,21 @@ function Scheduling() {
         )}
 
         <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-          <div className="mb-4">
-            <select
-              className="select select-bordered w-full max-w-xs"
-              name="community"
-              value={formData.community}
-              onChange={handleInputChange}
-            >
-              {renderSubredditOptions()}
-            </select>
+          <SubredditSelector
+            subreddits={subreddits}
+            subredditsLoading={subredditsLoading}
+            subredditsError={subredditsError}
+            selectedCommunity={formData.community}
+            onCommunityChange={handleInputChange}
+            onRetry={fetchUserSubreddits}
+          />
 
-            {subredditsError && (
-              <p className="text-red-500 text-sm mt-1">
-                Error: {subredditsError}.{" "}
-                <button
-                  className="text-blue-500 underline"
-                  onClick={fetchUserSubreddits}
-                >
-                  Try again
-                </button>
-              </p>
-            )}
-          </div>
-
-          <div className="tabs mb-4">
-            <button
-              className={`tab tab-bordered ${
-                formData.type === "text" ? "tab-active" : ""
-              } flex items-center gap-2`}
-              onClick={() => setFormData((prev) => ({ ...prev, type: "text" }))}
-            >
-              <RiFileTextLine /> Text
-            </button>
-            <button
-              disabled
-              className="tab tab-bordered flex items-center gap-2 opacity-50"
-            >
-              <BsImage /> Images & Video
-            </button>
-            <button
-              disabled
-              className="tab tab-bordered flex items-center gap-2 opacity-50"
-            >
-              <BsLink45Deg /> Link
-            </button>
-            <button
-              disabled
-              className="tab tab-bordered flex items-center gap-2 opacity-50"
-            >
-              <BiPoll /> Poll
-            </button>
-          </div>
+          <PostTypeTabs
+            type={formData.type}
+            onTypeChange={(type) =>
+              setFormData((prev) => ({ ...prev, type }))
+            }
+          />
 
           <div className="space-y-4">
             <input
@@ -370,17 +238,7 @@ function Scheduling() {
               className="input input-bordered w-full"
             />
 
-            <div className="flex flex-wrap gap-2 mb-2">
-              {FORMATTING_BUTTONS.map((button) => (
-                <button
-                  key={button.value}
-                  className="btn btn-sm"
-                  onClick={() => handleFormatting(button.value)}
-                >
-                  {button.label}
-                </button>
-              ))}
-            </div>
+            <FormattingToolbar onFormat={handleFormatting} />
 
             <textarea
               className="textarea textarea-bordered w-full h-32"
@@ -395,33 +253,15 @@ function Scheduling() {
                 <p className="text-sm text-gray-500 mb-2">
                   {userTimezone} timezone
                 </p>
-                <div className="bg-white border border-gray-200 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <button className="p-1" onClick={() => changeMonth(-1)}>
-                      <HiChevronLeft className="w-5 h-5" />
-                    </button>
-                    <span className="font-medium">
-                      {getMonthName(currentDate)}
-                    </span>
-                    <button className="p-1" onClick={() => changeMonth(1)}>
-                      <HiChevronRight className="w-5 h-5" />
-                    </button>
-                  </div>
-
-                  <div className="grid grid-cols-7 gap-1 text-center text-sm mb-2">
-                    <div>Su</div>
-                    <div>Mo</div>
-                    <div>Tu</div>
-                    <div>We</div>
-                    <div>Th</div>
-                    <div>Fr</div>
-                    <div>Sa</div>
-                  </div>
-
-                  <div className="grid grid-cols-7 gap-1 text-sm min-h-60">
-                    {renderCalendar()}
-                  </div>
-                </div>
+                <Calendar
+                  currentDate={currentDate}
+                  selectedDate={formData.selectedDate}
+                  onDateSelect={handleDateSelection}
+                  onMonthChange={changeMonth}
+                  getMonthName={getMonthName}
+                  getDaysInMonth={getDaysInMonth}
+                  getFirstDayOfMonth={getFirstDayOfMonth}
+                />
               </div>
 
               <div className="flex-1">

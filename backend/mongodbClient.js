@@ -10,7 +10,6 @@ if (!uri) {
 }
 
 const options = {
-  useUnifiedTopology: true,
   serverSelectionTimeoutMS: 30000,
   socketTimeoutMS: 45000,
   connectTimeoutMS: 30000,

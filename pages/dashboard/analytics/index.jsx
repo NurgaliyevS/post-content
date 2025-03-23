@@ -2,8 +2,9 @@
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import withAuth from "@/components/withAuth";
 
-export default function Analytics() {
+function Analytics() {
   const { data: session, status } = useSession();
   const [loading, setLoading] = useState(true);
 
@@ -25,3 +26,5 @@ export default function Analytics() {
     </DashboardLayout>
   );
 }
+
+export default withAuth(Analytics);

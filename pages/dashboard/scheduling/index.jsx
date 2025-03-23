@@ -6,6 +6,7 @@ import { RiFileTextLine } from "react-icons/ri";
 import { BiPoll } from "react-icons/bi";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
 import TimeSelector from "@/components/ui/TimeSelector";
+import withAuth from "@/components/withAuth";
 
 const FORMATTING_BUTTONS = [
   { label: "B", value: "bold" },
@@ -13,7 +14,7 @@ const FORMATTING_BUTTONS = [
   { label: "Link", value: "link" },
 ];
 
-export default function Scheduling() {
+function Scheduling() {
   const { data: session, status } = useSession();
   const [loading, setLoading] = useState(true);
   const [subreddits, setSubreddits] = useState([]);
@@ -451,3 +452,5 @@ export default function Scheduling() {
     </DashboardLayout>
   );
 }
+
+export default withAuth(Scheduling);

@@ -9,8 +9,9 @@ import Image from "next/image";
 import OnboardingChecklist from "@/components/ui/OnboardingChecklist";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import Link from "next/link";
+import withAuth from "@/components/withAuth";
 
-export default function Onboarding() {
+function Onboarding() {
   const { data: session, status } = useSession();
   const [loading, setLoading] = useState(true);
 
@@ -93,3 +94,5 @@ export default function Onboarding() {
     </DashboardLayout>
   );
 }
+
+export default withAuth(Onboarding);

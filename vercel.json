@@ -4,7 +4,7 @@
       "path": "/api/cron/process-scheduled-posts",
       "schedule": "* * * * *",
       "headers": {
-        "x-cron-secret": "@CRON_SECRET"
+        "Authorization": "Bearer @CRON_SECRET"
       }
     }
   ]

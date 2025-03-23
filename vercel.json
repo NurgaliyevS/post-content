@@ -4,8 +4,5 @@
       "path": "/api/cron/process-scheduled-posts",
       "schedule": "* * * * *"
     }
-  ],
-  "env": {
-    "CRON_SECRET": "@CRON_SECRET"
-  }
+  ]
 }

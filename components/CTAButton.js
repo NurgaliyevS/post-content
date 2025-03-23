@@ -1,7 +1,11 @@
 import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 
-export default function CTAButton({ text = "Get Started", dashboardPath = "/dashboard/onboarding", className = "btn btn-primary" }) {
+export default function CTAButton({ 
+  text = "Dashboard", 
+  dashboardPath = "/dashboard/onboarding", 
+  className = "btn btn-primary"
+}) {
   const { data: session, status } = useSession();
   const router = useRouter();
   
@@ -19,7 +23,7 @@ export default function CTAButton({ text = "Get Started", dashboardPath = "/dash
       className={className}
       disabled={status === "loading"}
     >
-      {status === "loading" ? "Loading..." : text + " →"}
+      {status === "loading" ? "Loading..." : text} {status !== "loading" && <span>→</span>}
     </button>
   );
 }

@@ -1,6 +1,4 @@
-import Link from "next/link";
 import ResultsSection from "./ResultsSection";
-import { signIn } from "next-auth/react";
 import CTAButton from "../CTAButton";
 
 export default function HeroSection() {
@@ -15,9 +13,12 @@ export default function HeroSection() {
         Turn Reddit into your traffic machine without the headache
       </p>
       <div className="flex justify-center gap-4">
-        <CTAButton />
-        <button onClick={() => window.location.href = '/demo'} className="btn btn-ghost">
-          ▶ Demo
+        <CTAButton className="btn btn-primary" />
+        <button 
+          onClick={() => window.location.href = '/demo'} 
+          className="btn btn-secondary"
+        >
+          <span>▶</span> Demo
         </button>
       </div>
       <ResultsSection />

@@ -68,7 +68,7 @@ export default function PricingSection() {
                 </li>
               </ul>
               <button className="btn btn-outline mt-4 w-full">
-                Buy Plan
+                Buy Now
               </button>
             </div>
           </div>

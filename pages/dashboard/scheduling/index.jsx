@@ -9,8 +9,8 @@ import TimeSelector from "@/components/ui/TimeSelector";
 import withAuth from "@/components/withAuth";
 
 const FORMATTING_BUTTONS = [
-//   { label: "B", value: "bold" },
-//   { label: "I", value: "italic" },
+  { label: "B", value: "bold" },
+  { label: "I", value: "italic" },
   { label: "Link", value: "link" },
 ];
 

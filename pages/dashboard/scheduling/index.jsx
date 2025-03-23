@@ -254,7 +254,6 @@ function Scheduling() {
               name="text"
               value={formData.text}
               onChange={handleInputChange}
-              style={{ whiteSpace: 'pre-wrap' }}
             ></textarea>
 
             <div className="flex gap-8 flex-col md:flex-row">

@@ -34,14 +34,13 @@ export default async function handler(req, res) {
     
     for (const post of scheduledPosts) {
       try {
-        post.scheduledFor = formatDateWithOffset(post.scheduledFor, post.userTimeZone);
-
         // Get user's timezone, default to UTC if not specified
         const userTimeZone = post.userTimeZone || 'UTC';
         
         // Convert current UTC time to user's timezone
         const currentTimeInUserTZ = currentTimeUTC.setZone(userTimeZone);
         
+        // Convert scheduledFor to DateTime for comparison
         const scheduledDateTime = DateTime.fromJSDate(post.scheduledFor).setZone(userTimeZone);
 
         // Debug log the exact scheduledFor string
@@ -51,8 +50,6 @@ export default async function handler(req, res) {
           scheduledDateTime: scheduledDateTime,
           comparison: scheduledDateTime > currentTimeInUserTZ
         });
-
-        // Convert scheduledFor to DateTime for comparison
 
         // Compare times in the same timezone (user's timezone)
         if (scheduledDateTime > currentTimeInUserTZ) {

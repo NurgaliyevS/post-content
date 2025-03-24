@@ -6,7 +6,7 @@ import { DateTime } from "luxon";
 // Helper function to format date with timezone offset
 function formatDateWithOffset(date, timezone) {
   const dt = DateTime.fromJSDate(date).setZone(timezone);
-  return dt.toFormat("yyyy-MM-dd'T'HH:mm:ssxxx");
+  return dt.toFormat("yyyy-MM-dd'T'HH:mm:ss");
 }
 
 // This endpoint will be called by Vercel Cron

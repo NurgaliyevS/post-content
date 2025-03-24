@@ -5,8 +5,8 @@ import { refreshAccessToken } from "@/utils/refreshAccessToken";
 // This endpoint will be called by Vercel Cron
 export default async function handler(req, res) {
   console.log(process.env.CRON_SECRET, 'CRON_SECRET');
-  console.log(req.headers.get("authorization"), 'authorization');
-  console.log(req.headers.get("authorization") === `Bearer ${process.env.CRON_SECRET}`, 'authorization');
+  console.log(req.headers.authorization, 'authorization');
+  console.log(req.headers.authorization === `Bearer ${process.env.CRON_SECRET}`, 'authorization');
   // console.log('Received headers:', JSON.stringify(req.headers));
   
   // // Debug environment variables

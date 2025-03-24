@@ -4,27 +4,9 @@ import { refreshAccessToken } from "@/utils/refreshAccessToken";
 
 // This endpoint will be called by Vercel Cron
 export default async function handler(req, res) {
-  console.log(process.env.CRON_SECRET, 'CRON_SECRET');
-  console.log(req.headers.authorization, 'authorization');
-  console.log(req.headers.authorization === `Bearer ${process.env.CRON_SECRET}`, 'authorization');
-  // console.log('Received headers:', JSON.stringify(req.headers));
-  
-  // // Debug environment variables
-  // console.log('Expected CRON_SECRET:', process.env.CRON_SECRET);
-  
-  // // Verify the cron job secret
-  // const authHeader = req.headers['authorization'];
-  // console.log('Received auth header:', authHeader);
-  
-  // if (!process.env.CRON_SECRET) {
-  //   console.error('CRON_SECRET environment variable is not defined');
-  //   return res.status(500).json({ error: 'Server configuration error: CRON_SECRET not defined' });
-  // }
-  
-  // if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-  //   console.error('Auth failed: expected', `Bearer ${process.env.CRON_SECRET}`, 'got', authHeader);
-  //   return res.status(401).json({ error: 'Unauthorized' });
-  // }
+  if (req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
   
   try {
     // Connect to MongoDB

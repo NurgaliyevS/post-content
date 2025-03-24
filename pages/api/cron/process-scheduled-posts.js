@@ -1,7 +1,7 @@
 import connectMongoDB from "@/backend/mongodb";
 import ScheduledPost from "@/backend/ScheduledPostSchema";
 import { refreshAccessToken } from "@/utils/refreshAccessToken";
-import { format } from "date-fns";
+import { DateTime } from "luxon";
 
 // This endpoint will be called by Vercel Cron
 export default async function handler(req, res) {
@@ -13,30 +13,50 @@ export default async function handler(req, res) {
     // Connect to MongoDB
     await connectMongoDB();
 
-    // Get current time
-    const currentTime = new Date();
-    console.log(currentTime, 'currentTime without formatting');
-
-    console.log(format(currentTime, 'PPPp'), 'currentTime formatted');
+    // Get current time in UTC
+    const currentTimeUTC = DateTime.now().toUTC();
+    console.log('Current UTC time:', currentTimeUTC.toISO());
     
     // Find posts that are scheduled for now or earlier and still have 'scheduled' status
     const scheduledPosts = await ScheduledPost.find({ 
-      scheduledFor: { $lte: currentTime },
       status: 'scheduled'
     });
     
-    console.log(`Found ${scheduledPosts.length} posts to publish`);
+    console.log(`Found ${scheduledPosts.length} total scheduled posts`);
     
     const results = [];
     
     for (const post of scheduledPosts) {
       try {
+        // Get user's timezone, default to UTC if not specified
+        const userTimeZone = post.userTimeZone || 'UTC';
+        
+        // Convert current UTC time to user's timezone
+        const currentTimeInUserTZ = currentTimeUTC.setZone(userTimeZone);
+        
+        // Parse the scheduled time in user's timezone
+        const scheduledTime = DateTime.fromFormat(post.scheduledFor, "yyyy-MM-dd HH:mm:ss", {
+          zone: userTimeZone
+        });
+
+        console.log(`Post ${post._id}:`, {
+          userTimeZone,
+          currentTimeInUserTZ: currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss"),
+          scheduledTime: scheduledTime.toFormat("yyyy-MM-dd HH:mm:ss")
+        });
+
+        // Compare times in the same timezone (user's timezone)
+        if (scheduledTime > currentTimeInUserTZ) {
+          console.log(`Skipping post ${post._id} - scheduled for future in user's timezone`);
+          continue;
+        }
+
         // The access token might have expired, refresh it
         let accessToken = post.redditAccessToken;
         
         // Check if token needs refresh (tokens last 1 hour)
-        const oneHourAgo = new Date(currentTime.getTime() - 60 * 60 * 1000);
-        if (post.createdAt < oneHourAgo) {
+        const oneHourAgo = currentTimeUTC.minus({ hours: 1 });
+        if (DateTime.fromJSDate(post.createdAt) < oneHourAgo) {
           console.log(`Refreshing token for post ${post._id}`);
           const refreshResult = await refreshAccessToken(post.redditRefreshToken);
           accessToken = refreshResult.access_token;
@@ -84,7 +104,7 @@ export default async function handler(req, res) {
         if (redditResponse.ok && redditData?.json?.data?.url) {
           // Update the post status
           post.status = 'published';
-          post.publishedAt = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+          post.publishedAt = currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss");
           post.redditPostUrl = redditData.json.data.url;
           post.redditPostId = redditData.json.data.id;
           await post.save();
@@ -99,7 +119,7 @@ export default async function handler(req, res) {
         } else {
           // Handle failed publish
           post.status = 'failed';
-          post.failedAt = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+          post.failedAt = currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss");
           post.failureReason = redditData.json?.errors?.join(', ') || 'Unknown error';
           await post.save();
           
@@ -116,7 +136,7 @@ export default async function handler(req, res) {
         
         // Update the post with error info
         post.status = 'failed';
-        post.failedAt = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+        post.failedAt = currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss");
         post.failureReason = error.message;
         await post.save();
         

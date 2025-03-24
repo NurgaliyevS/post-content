@@ -1,7 +1,13 @@
 import connectMongoDB from "@/backend/mongodb";
 import ScheduledPost from "@/backend/ScheduledPostSchema";
 import { refreshAccessToken } from "@/utils/refreshAccessToken";
-// import { DateTime } from "luxon";
+import { DateTime } from "luxon";
+
+// Helper function to format date with timezone offset
+function formatDateWithOffset(date, timezone) {
+  const dt = DateTime.fromJSDate(date).setZone(timezone);
+  return dt.toFormat("yyyy-MM-dd'T'HH:mm:ssxxx");
+}
 
 // This endpoint will be called by Vercel Cron
 export default async function handler(req, res) {
@@ -27,7 +33,11 @@ export default async function handler(req, res) {
     const results = [];
     
     for (const post of scheduledPosts) {
-      console.log(post, 'post before');
+      const formattedDate = formatDateWithOffset(post.scheduledFor, post.userTimeZone);
+      console.log({
+        ...post.toObject(),
+        scheduledFor: formattedDate
+      }, 'post before');
       // try {
       //   // Get user's timezone, default to UTC if not specified
       //   const userTimeZone = post.userTimeZone || 'UTC';

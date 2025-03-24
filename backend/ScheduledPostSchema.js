@@ -34,7 +34,6 @@ const ScheduledPostSchema = new mongoose.Schema({
   },
   userTimeZone: {
     type: String,
-    required: true
   },
   status: {
     type: String,

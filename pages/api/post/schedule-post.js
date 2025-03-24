@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]";
 import connectMongoDB from "@/backend/mongodb";
 import ScheduledPost from "@/backend/ScheduledPostSchema";
-import { format, differenceInMinutes } from "date-fns";
+import { differenceInMinutes } from "date-fns";
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -63,10 +63,6 @@ export default async function handler(req, res) {
     // Calculate time difference in minutes
     const minutesInFuture = differenceInMinutes(scheduledDateTime, currentClientTime);
     
-    console.log('Client current time:', format(currentClientTime, 'PPPp'));
-    console.log('Scheduled time:', format(scheduledDateTime, 'PPPp'));
-    console.log('Minutes in future:', minutesInFuture);
-    
     // Determine if we should post immediately or schedule
     // Post immediately if scheduled time is in the past or within 2 minutes
     const shouldPostImmediately = minutesInFuture <= 2;
@@ -96,7 +92,6 @@ export default async function handler(req, res) {
             'resubmit': 'true'
           })
         });
-
         const redditData = await redditResponse.json();
 
         if (!redditResponse.ok) {
@@ -112,14 +107,14 @@ export default async function handler(req, res) {
           title,
           text,
           type,
-          scheduledFor: format(scheduledDateTime, 'PPPp'), 
+          scheduledFor: scheduledDateTime,
           userTimeZone: timeZone,
           status: 'published',
           redditPostId: redditData.json?.data?.id || null,
           redditFullname: redditData.json?.data?.name || null,
           redditAccessToken: session.accessToken,
           redditRefreshToken: session.refreshToken,
-          postedAt: format(currentClientTime, 'PPPp')
+          postedAt: currentClientTime
         });
         
         const savedPost = await postedPost.save();
@@ -130,8 +125,8 @@ export default async function handler(req, res) {
             id: savedPost._id,
             community,
             title,
-            scheduledFor: format(scheduledDateTime, 'PPPp'),
-            postedAt: format(currentClientTime, 'PPPp'),
+            scheduledFor: scheduledDateTime,
+            postedAt: currentClientTime,
             redditPostId: redditData.json?.data?.id || null,
             redditFullname: redditData.json?.data?.name || null,
             redditUrl: redditData.json?.data?.url || null
@@ -151,9 +146,6 @@ export default async function handler(req, res) {
       // Connect to MongoDB
       await connectMongoDB();
 
-      console.log(format(currentClientTime, 'PPPp'), 'currentClientTime in else');
-      console.log(format(scheduledDateTime, 'PPPp'), 'scheduledDateTime in else');
-      
       // Create a new scheduled post
       const scheduledPost = new ScheduledPost({
         userId: session.user.id,
@@ -161,7 +153,7 @@ export default async function handler(req, res) {
         title,
         text,
         type,
-        scheduledFor: format(scheduledDateTime, 'PPPp'),
+        scheduledFor: scheduledDateTime,
         userTimeZone: timeZone, // Store the user's timezone for reference
         status: 'scheduled',
         redditAccessToken: session.accessToken,
@@ -176,9 +168,9 @@ export default async function handler(req, res) {
           id: savedPost._id,
           community,
           title,
-          scheduledFor: format(scheduledDateTime, 'PPPp'),
+          scheduledFor: scheduledDateTime,
           timeZone,
-          createdAt: format(currentClientTime, 'PPPp')
+          createdAt: currentClientTime
         }
       });
     }

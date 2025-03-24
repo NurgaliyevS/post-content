@@ -178,6 +178,8 @@ function Scheduling() {
         body: JSON.stringify({
           ...formData,
           text: formData.text.replace(/\n/g, "\n\n"),
+          timeZone: userTimezone,
+          currentClientTime: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
         }),
       });
 

@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]";
 import connectMongoDB from "@/backend/mongodb";
 import ScheduledPost from "@/backend/ScheduledPostSchema";
-import { parse, isValid, format, addMinutes, differenceInMinutes } from "date-fns";
+import { parse, isValid, format, differenceInMinutes } from "date-fns";
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -17,7 +17,16 @@ export default async function handler(req, res) {
     }
 
     // Get the submitted data
-    const { community, title, text, selectedDate, selectedTime, timeZone, type = "text" } = req.body;
+    const { 
+      community, 
+      title, 
+      text, 
+      selectedDate, 
+      selectedTime, 
+      timeZone, 
+      currentClientTime, // New field for client's current time
+      type = "text" 
+    } = req.body;
 
     // Use client's timezone or default to UTC
     const userTimeZone = timeZone || 'UTC';
@@ -85,7 +94,6 @@ export default async function handler(req, res) {
       // Log for debugging
       console.log('Parsed scheduled date:', format(scheduledDate, 'PPPp'));
       console.log('User timezone:', userTimeZone);
-      console.log('Current server time:', format(new Date(), 'PPPp'));
       
     } catch (error) {
       return res.status(400).json({ 
@@ -95,13 +103,27 @@ export default async function handler(req, res) {
       });
     }
     
-    // Get current time
-    const now = new Date();
+    // Get client's current time if provided, or use server time as fallback
+    let clientNow;
+    if (currentClientTime) {
+      // Parse the client's current time string to a Date object
+      clientNow = new Date(currentClientTime);
+      if (!isValid(clientNow)) {
+        clientNow = new Date(); // Fallback to server time if invalid
+      }
+    } else {
+      clientNow = new Date(); // Fallback to server time
+    }
     
     // Calculate time difference in minutes
-    const minutesInFuture = differenceInMinutes(scheduledDate, now);
+    const minutesInFuture = differenceInMinutes(scheduledDate, clientNow);
+    
+    console.log('Client current time:', format(clientNow, 'PPPp'));
+    console.log('Scheduled time:', format(scheduledDate, 'PPPp'));
+    console.log('Minutes in future:', minutesInFuture);
     
     // Determine if we should post immediately or schedule
+    // Post immediately if scheduled time is in the past or within 2 minutes
     const shouldPostImmediately = minutesInFuture <= 2;
     
     // If we should post immediately, send it to Reddit now
@@ -145,14 +167,14 @@ export default async function handler(req, res) {
           title,
           text,
           type,
-          scheduledFor: now, // Use current time
+          scheduledFor: scheduledDate, // Store the original scheduled time
           timeZone: userTimeZone,
           status: 'published',
           redditPostId: redditData.json?.data?.id || null,
           redditFullname: redditData.json?.data?.name || null,
           redditAccessToken: session.accessToken,
           redditRefreshToken: session.refreshToken,
-          postedAt: now
+          postedAt: format(currentClientTime, 'PPPp')
         });
         
         const savedPost = await postedPost.save();
@@ -163,7 +185,8 @@ export default async function handler(req, res) {
             id: savedPost._id,
             community,
             title,
-            postedAt: format(now, 'PPPp'),
+            scheduledFor: format(scheduledDate, 'PPPp'),
+            postedAt: format(clientNow, 'PPPp'),
             redditPostId: redditData.json?.data?.id || null,
             redditFullname: redditData.json?.data?.name || null,
             redditUrl: redditData.json?.data?.url || null
@@ -182,6 +205,9 @@ export default async function handler(req, res) {
     else {
       // Connect to MongoDB
       await connectMongoDB();
+
+      console.log(clientNow, 'clientNow in else');
+      console.log(scheduledDate, 'scheduledDate in else');
       
       // Create a new scheduled post
       const scheduledPost = new ScheduledPost({
@@ -207,7 +233,7 @@ export default async function handler(req, res) {
           title,
           scheduledFor: format(scheduledDate, 'PPPp'),
           userTimeZone: userTimeZone,
-          createdAt: format(savedPost.createdAt, 'PPPp')
+          createdAt: format(clientNow, 'PPPp')
         }
       });
     }

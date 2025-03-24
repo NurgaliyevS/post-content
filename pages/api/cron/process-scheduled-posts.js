@@ -46,7 +46,6 @@ export default async function handler(req, res) {
         console.log('Raw scheduledFor:', {
           currentTimeInUserTZ: currentTimeInUserTZ,
           scheduledFor: post.scheduledFor,
-          post: post
         });
 
         // Compare times in the same timezone (user's timezone)

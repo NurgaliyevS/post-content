@@ -36,9 +36,11 @@ export default async function handler(req, res) {
         
         // Debug log the exact scheduledFor string
         console.log('Raw scheduledFor:', {
+          currentTimeInUserTZ: currentTimeInUserTZ,
           value: post.scheduledFor,
           type: typeof post.scheduledFor,
-          length: post.scheduledFor?.length
+          length: post.scheduledFor?.length,
+          post: post
         });
         
         // Try parsing with different formats
@@ -53,6 +55,8 @@ export default async function handler(req, res) {
         
         let scheduledTime = null;
         let usedFormat = null;
+
+        console.log(post.scheduledFor, 'post.scheduledFor');
         
         for (const format of formats) {
           const parsed = DateTime.fromFormat(post.scheduledFor, format, {

@@ -34,13 +34,44 @@ export default async function handler(req, res) {
         // Convert current UTC time to user's timezone
         const currentTimeInUserTZ = currentTimeUTC.setZone(userTimeZone);
         
-        // Parse the scheduled time in user's timezone using the correct format (PPPp)
-        const scheduledTime = DateTime.fromFormat(post.scheduledFor, "MMMM d'th', yyyy 'at' h:mm aa", {
-          zone: userTimeZone
+        // Debug log the exact scheduledFor string
+        console.log('Raw scheduledFor:', {
+          value: post.scheduledFor,
+          type: typeof post.scheduledFor,
+          length: post.scheduledFor?.length
         });
-
-        if (!scheduledTime.isValid) {
-          console.error(`Invalid scheduled time for post ${post._id}:`, scheduledTime.invalidReason);
+        
+        // Try parsing with different formats
+        const formats = [
+          "MMMM d'th', yyyy 'at' h:mm aa",
+          "MMMM d'th', yyyy 'at' h:mm a",
+          "MMMM d'th', yyyy 'at' h:mm",
+          "MMMM d, yyyy 'at' h:mm aa",
+          "MMMM d, yyyy 'at' h:mm a",
+          "MMMM d, yyyy 'at' h:mm"
+        ];
+        
+        let scheduledTime = null;
+        let usedFormat = null;
+        
+        for (const format of formats) {
+          const parsed = DateTime.fromFormat(post.scheduledFor, format, {
+            zone: userTimeZone
+          });
+          
+          if (parsed.isValid) {
+            scheduledTime = parsed;
+            usedFormat = format;
+            break;
+          }
+        }
+        
+        if (!scheduledTime?.isValid) {
+          console.error(`Invalid scheduled time for post ${post._id}:`, {
+            scheduledFor: post.scheduledFor,
+            invalidReason: scheduledTime?.invalidReason,
+            triedFormats: formats
+          });
           continue;
         }
 
@@ -48,7 +79,8 @@ export default async function handler(req, res) {
           userTimeZone,
           currentTimeInUserTZ: currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss"),
           scheduledTime: scheduledTime.toFormat("yyyy-MM-dd HH:mm:ss"),
-          originalScheduledFor: post.scheduledFor
+          originalScheduledFor: post.scheduledFor,
+          usedFormat
         });
 
         // Compare times in the same timezone (user's timezone)

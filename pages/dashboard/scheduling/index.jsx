@@ -7,7 +7,7 @@ import PostTypeTabs from "@/components/scheduling/PostTypeTabs";
 import FormattingToolbar from "@/components/scheduling/FormattingToolbar";
 import Calendar from "@/components/scheduling/Calendar";
 import SubredditSelector from "@/components/scheduling/SubredditSelector";
-import { format } from "date-fns";
+import { format, parse, setHours, setMinutes, add, sub } from "date-fns";
 
 function Scheduling() {
   const { data: session, status } = useSession();
@@ -141,14 +141,13 @@ function Scheduling() {
   };
 
   const handleDateSelection = (day) => {
-    const selected = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
-      day
-    );
+    const monthStr = format(currentDate, "yyyy-MM");
+    const dayStr = day.toString().padStart(2, "0");
+    const dateStr = `${monthStr}-${dayStr}`;
+    
     setFormData((prev) => ({
       ...prev,
-      selectedDate: format(selected, "yyyy-MM-dd"),
+      selectedDate: dateStr,
     }));
   };
 
@@ -172,14 +171,41 @@ function Scheduling() {
     }
 
     try {
+      // Parse the date string
+      const scheduledDate = parse(formData.selectedDate, "yyyy-MM-dd", new Date());
+      
+      // Parse the time string
+      const timeMatch = formData.selectedTime.match(/^(\d+):(\d+) (AM|PM)$/);
+      if (!timeMatch) {
+        throw new Error(`Invalid time format: ${formData.selectedTime}`);
+      }
+      
+      const [_, hours, minutes, period] = timeMatch;
+      let hour = parseInt(hours, 10);
+      
+      // Convert to 24-hour format
+      if (period === "PM" && hour < 12) hour += 12;
+      if (period === "AM" && hour === 12) hour = 0;
+      
+      // Set hours and minutes on the scheduledDate
+      let scheduledDateTime = setHours(scheduledDate, hour);
+      scheduledDateTime = setMinutes(scheduledDateTime, parseInt(minutes, 10));
+      
+      // Format as ISO string for API
+      const scheduledDateTimeISO = format(scheduledDateTime, "yyyy-MM-dd'T'HH:mm:ssxxx");
+      const currentTimeISO = format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx");
+      
       const response = await fetch("/api/post/schedule-post", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...formData,
+          community: formData.community,
+          title: formData.title,
           text: formData.text.replace(/\n/g, "\n\n"),
+          scheduledDateTime: scheduledDateTimeISO,
           timeZone: userTimezone,
-          currentClientTime: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
+          currentClientTime: currentTimeISO,
+          type: formData.type
         }),
       });
 
@@ -192,7 +218,7 @@ function Scheduling() {
         title: "",
         text: "",
         selectedDate: format(new Date(), "yyyy-MM-dd"),
-        selectedTime: "",
+        selectedTime: format(new Date(), "h:mm aa"),
         type: "text",
       });
 

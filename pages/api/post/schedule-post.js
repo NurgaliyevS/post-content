@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]";
 import connectMongoDB from "@/backend/mongodb";
 import ScheduledPost from "@/backend/ScheduledPostSchema";
-import { parse, isValid, format, differenceInMinutes } from "date-fns";
+import { format, differenceInMinutes } from "date-fns";
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -21,10 +21,9 @@ export default async function handler(req, res) {
       community, 
       title, 
       text, 
-      selectedDate, 
-      selectedTime, 
+      scheduledDateTime, // ISO formatted date-time string
       timeZone, 
-      currentClientTime, // New field for client's current time
+      currentClientTime, // ISO formatted current client time
       type = "text" 
     } = req.body;
 
@@ -34,10 +33,10 @@ export default async function handler(req, res) {
     console.log(req.body, 'req.body');
 
     // Validate required fields
-    if (!community || !title || !selectedDate || !selectedTime) {
+    if (!community || !title || !scheduledDateTime) {
       return res.status(400).json({ 
         message: 'Missing required fields',
-        received: { community, title, text, selectedDate, selectedTime }
+        received: { community, title, text, scheduledDateTime }
       });
     }
     
@@ -63,63 +62,12 @@ export default async function handler(req, res) {
         error: 'No Reddit refresh token found in session'
       });
     }
-
-    // Parse and validate the date using date-fns
-    let scheduledDate;
-    
-    try {
-      // Validate date format (YYYY-MM-DD)
-      const parsedDate = parse(selectedDate, 'yyyy-MM-dd', new Date());
-      if (!isValid(parsedDate)) {
-        throw new Error(`Invalid date format: ${selectedDate}. Expected YYYY-MM-DD`);
-      }
-
-      // Parse time (HH:MM AM/PM)
-      const timeRegex = /^(1[0-2]|0?[1-9]):([0-5][0-9]) (AM|PM)$/;
-      const timeMatch = selectedTime.match(timeRegex);
-      if (!timeMatch) {
-        throw new Error(`Invalid time format: ${selectedTime}. Expected HH:MM AM/PM`);
-      }
-
-      const [_, hours, minutes, period] = timeMatch;
-      
-      // Create a date object for the selected date and time
-      const dateTimeStr = `${selectedDate} ${hours}:${minutes} ${period}`;
-      scheduledDate = parse(dateTimeStr, 'yyyy-MM-dd h:mm aa', new Date());
-
-      if (!isValid(scheduledDate)) {
-        throw new Error(`Invalid date/time: ${dateTimeStr}`);
-      }
-      
-      // Log for debugging
-      console.log('Parsed scheduled date:', format(scheduledDate, 'PPPp'));
-      console.log('User timezone:', userTimeZone);
-      
-    } catch (error) {
-      return res.status(400).json({ 
-        message: 'Invalid date or time format',
-        error: error.message,
-        received: { selectedDate, selectedTime, timeZone: userTimeZone }
-      });
-    }
-    
-    // Get client's current time if provided, or use server time as fallback
-    let clientNow;
-    if (currentClientTime) {
-      // Parse the client's current time string to a Date object
-      clientNow = new Date(currentClientTime);
-      if (!isValid(clientNow)) {
-        clientNow = new Date(); // Fallback to server time if invalid
-      }
-    } else {
-      clientNow = new Date(); // Fallback to server time
-    }
     
     // Calculate time difference in minutes
-    const minutesInFuture = differenceInMinutes(scheduledDate, clientNow);
+    const minutesInFuture = differenceInMinutes(scheduledDateTime, currentClientTime);
     
-    console.log('Client current time:', format(clientNow, 'PPPp'));
-    console.log('Scheduled time:', format(scheduledDate, 'PPPp'));
+    console.log('Client current time:', format(currentClientTime, 'PPPp'));
+    console.log('Scheduled time:', format(scheduledDateTime, 'PPPp'));
     console.log('Minutes in future:', minutesInFuture);
     
     // Determine if we should post immediately or schedule
@@ -167,7 +115,7 @@ export default async function handler(req, res) {
           title,
           text,
           type,
-          scheduledFor: scheduledDate, // Store the original scheduled time
+          scheduledFor: format(scheduledDateTime, 'PPPp'), 
           timeZone: userTimeZone,
           status: 'published',
           redditPostId: redditData.json?.data?.id || null,
@@ -185,8 +133,8 @@ export default async function handler(req, res) {
             id: savedPost._id,
             community,
             title,
-            scheduledFor: format(scheduledDate, 'PPPp'),
-            postedAt: format(clientNow, 'PPPp'),
+            scheduledFor: format(scheduledDateTime, 'PPPp'),
+            postedAt: format(currentClientTime, 'PPPp'),
             redditPostId: redditData.json?.data?.id || null,
             redditFullname: redditData.json?.data?.name || null,
             redditUrl: redditData.json?.data?.url || null
@@ -206,8 +154,8 @@ export default async function handler(req, res) {
       // Connect to MongoDB
       await connectMongoDB();
 
-      console.log(clientNow, 'clientNow in else');
-      console.log(scheduledDate, 'scheduledDate in else');
+      console.log(format(currentClientTime, 'PPPp'), 'currentClientTime in else');
+      console.log(format(scheduledDateTime, 'PPPp'), 'scheduledDateTime in else');
       
       // Create a new scheduled post
       const scheduledPost = new ScheduledPost({
@@ -216,7 +164,7 @@ export default async function handler(req, res) {
         title,
         text,
         type,
-        scheduledFor: scheduledDate,
+        scheduledFor: format(scheduledDateTime, 'PPPp'),
         timeZone: userTimeZone, // Store the user's timezone for reference
         status: 'scheduled',
         redditAccessToken: session.accessToken,
@@ -231,9 +179,9 @@ export default async function handler(req, res) {
           id: savedPost._id,
           community,
           title,
-          scheduledFor: format(scheduledDate, 'PPPp'),
-          userTimeZone: userTimeZone,
-          createdAt: format(clientNow, 'PPPp')
+          scheduledFor: format(scheduledDateTime, 'PPPp'),
+          userTimeZone,
+          createdAt: format(currentClientTime, 'PPPp')
         }
       });
     }

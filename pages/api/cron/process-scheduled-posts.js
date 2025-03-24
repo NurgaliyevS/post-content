@@ -34,15 +34,21 @@ export default async function handler(req, res) {
         // Convert current UTC time to user's timezone
         const currentTimeInUserTZ = currentTimeUTC.setZone(userTimeZone);
         
-        // Parse the scheduled time in user's timezone
-        const scheduledTime = DateTime.fromFormat(post.scheduledFor, "yyyy-MM-dd HH:mm:ss", {
+        // Parse the scheduled time in user's timezone using the correct format (PPPp)
+        const scheduledTime = DateTime.fromFormat(post.scheduledFor, "MMMM d'th', yyyy 'at' h:mm aa", {
           zone: userTimeZone
         });
+
+        if (!scheduledTime.isValid) {
+          console.error(`Invalid scheduled time for post ${post._id}:`, scheduledTime.invalidReason);
+          continue;
+        }
 
         console.log(`Post ${post._id}:`, {
           userTimeZone,
           currentTimeInUserTZ: currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss"),
-          scheduledTime: scheduledTime.toFormat("yyyy-MM-dd HH:mm:ss")
+          scheduledTime: scheduledTime.toFormat("yyyy-MM-dd HH:mm:ss"),
+          originalScheduledFor: post.scheduledFor
         });
 
         // Compare times in the same timezone (user's timezone)

@@ -28,6 +28,7 @@ function Scheduling() {
   const [userTimezone, setUserTimezone] = useState("");
   const [saveStatus, setSaveStatus] = useState(""); // For displaying save notifications
   const [initialized, setInitialized] = useState(false);
+  const [isLoadingForm, setIsLoadingForm] = useState(false);
 
   if (status !== "loading" && !initialized) {
     setLoading(false);
@@ -144,7 +145,7 @@ function Scheduling() {
     const monthStr = format(currentDate, "yyyy-MM");
     const dayStr = day.toString().padStart(2, "0");
     const dateStr = `${monthStr}-${dayStr}`;
-    
+
     setFormData((prev) => ({
       ...prev,
       selectedDate: dateStr,
@@ -170,31 +171,39 @@ function Scheduling() {
       return;
     }
 
+    setIsLoadingForm(true);
     try {
       // Parse the date string
-      const scheduledDate = parse(formData.selectedDate, "yyyy-MM-dd", new Date());
-      
+      const scheduledDate = parse(
+        formData.selectedDate,
+        "yyyy-MM-dd",
+        new Date()
+      );
+
       // Parse the time string
       const timeMatch = formData.selectedTime.match(/^(\d+):(\d+) (AM|PM)$/);
       if (!timeMatch) {
         throw new Error(`Invalid time format: ${formData.selectedTime}`);
       }
-      
+
       const [_, hours, minutes, period] = timeMatch;
       let hour = parseInt(hours, 10);
-      
+
       // Convert to 24-hour format
       if (period === "PM" && hour < 12) hour += 12;
       if (period === "AM" && hour === 12) hour = 0;
-      
+
       // Set hours and minutes on the scheduledDate
       let scheduledDateTime = setHours(scheduledDate, hour);
       scheduledDateTime = setMinutes(scheduledDateTime, parseInt(minutes, 10));
-      
+
       // Format as ISO string for API
-      const scheduledDateTimeISO = format(scheduledDateTime, "yyyy-MM-dd'T'HH:mm:ssxxx");
+      const scheduledDateTimeISO = format(
+        scheduledDateTime,
+        "yyyy-MM-dd'T'HH:mm:ssxxx"
+      );
       const currentTimeISO = format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx");
-      
+
       const response = await fetch("/api/post/schedule-post", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -205,7 +214,7 @@ function Scheduling() {
           scheduledDateTime: scheduledDateTimeISO,
           timeZone: userTimezone,
           currentClientTime: currentTimeISO,
-          type: formData.type
+          type: formData.type,
         }),
       });
 
@@ -234,6 +243,8 @@ function Scheduling() {
       console.error("Error scheduling post:", error);
       setSaveStatus("Error scheduling post. Please try again.");
       setTimeout(() => setSaveStatus(""), 3000);
+    } finally {
+      setIsLoadingForm(false);
     }
   };
 
@@ -317,11 +328,12 @@ function Scheduling() {
                   !formData.selectedDate ||
                   !formData.selectedTime ||
                   !formData.title ||
-                  !formData.community
+                  !formData.community ||
+                  isLoadingForm
                 }
                 onClick={schedulePost}
               >
-                Schedule Post
+                {isLoadingForm ? "Scheduling..." : "Schedule Post"}
               </button>
             </div>
           </div>

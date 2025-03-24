@@ -27,9 +27,6 @@ export default async function handler(req, res) {
       type = "text" 
     } = req.body;
 
-    // Use client's timezone or default to UTC
-    const userTimeZone = timeZone || 'UTC';
-
     console.log(req.body, 'req.body');
 
     // Validate required fields
@@ -116,7 +113,7 @@ export default async function handler(req, res) {
           text,
           type,
           scheduledFor: format(scheduledDateTime, 'PPPp'), 
-          timeZone: userTimeZone,
+          userTimeZone: timeZone,
           status: 'published',
           redditPostId: redditData.json?.data?.id || null,
           redditFullname: redditData.json?.data?.name || null,
@@ -165,7 +162,7 @@ export default async function handler(req, res) {
         text,
         type,
         scheduledFor: format(scheduledDateTime, 'PPPp'),
-        timeZone: userTimeZone, // Store the user's timezone for reference
+        userTimeZone: timeZone, // Store the user's timezone for reference
         status: 'scheduled',
         redditAccessToken: session.accessToken,
         redditRefreshToken: session.refreshToken
@@ -180,7 +177,7 @@ export default async function handler(req, res) {
           community,
           title,
           scheduledFor: format(scheduledDateTime, 'PPPp'),
-          userTimeZone,
+          timeZone,
           createdAt: format(currentClientTime, 'PPPp')
         }
       });

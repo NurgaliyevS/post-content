@@ -3,12 +3,6 @@ import ScheduledPost from "@/backend/ScheduledPostSchema";
 import { refreshAccessToken } from "@/utils/refreshAccessToken";
 import { DateTime } from "luxon";
 
-// Helper function to format date with timezone offset
-function formatDateWithOffset(date, timezone) {
-  const dt = DateTime.fromJSDate(date).setZone(timezone);
-  return dt.toFormat("yyyy-MM-dd'T'HH:mm:ss");
-}
-
 // This endpoint will be called by Vercel Cron
 export default async function handler(req, res) {
   if (req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -21,7 +15,7 @@ export default async function handler(req, res) {
 
     // Get current time in UTC
     const currentTimeUTC = DateTime.now().toUTC();
-    console.log('Current UTC time:', currentTimeUTC.toISO());
+    console.log('Current server time:', currentTimeUTC);
     
     // Find posts that are scheduled for now or earlier and still have 'scheduled' status
     const scheduledPosts = await ScheduledPost.find({ 

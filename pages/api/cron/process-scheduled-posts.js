@@ -42,14 +42,20 @@ export default async function handler(req, res) {
         // Convert current UTC time to user's timezone
         const currentTimeInUserTZ = currentTimeUTC.setZone(userTimeZone);
         
+        const scheduledDateTime = DateTime.fromJSDate(post.scheduledFor).setZone(userTimeZone);
+
         // Debug log the exact scheduledFor string
         console.log('Raw scheduledFor:', {
           currentTimeInUserTZ: currentTimeInUserTZ,
           scheduledFor: post.scheduledFor,
+          scheduledDateTime: scheduledDateTime,
+          comparison: scheduledDateTime > currentTimeInUserTZ
         });
 
+        // Convert scheduledFor to DateTime for comparison
+
         // Compare times in the same timezone (user's timezone)
-        if (post.scheduledFor > currentTimeInUserTZ) {
+        if (scheduledDateTime > currentTimeInUserTZ) {
           console.log(`Skipping post ${post._id} - scheduled for future in user's timezone`);
           continue;
         }

@@ -25,6 +25,12 @@ export const authOptions = {
         token.id = user.id;
         token.variant_name = user.variant_name || "free";
       }
+
+      if (account && account.access_token && account.refresh_token) {
+        token.accessToken = account.access_token;
+        token.refreshToken = account.refresh_token;
+        token.accessTokenExpires = Date.now() + account.expires_at * 1000;
+      }
       
       // Save Reddit tokens to JWT for API access
       if (token?.accessToken && token?.refreshToken) {
@@ -72,7 +78,6 @@ export const authOptions = {
           });
 
           const refreshedTokens = await response.json();
-
           if (!response.ok) {
             throw refreshedTokens;
           }

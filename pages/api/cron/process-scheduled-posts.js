@@ -1,6 +1,7 @@
 import connectMongoDB from "@/backend/mongodb";
 import ScheduledPost from "@/backend/ScheduledPostSchema";
 import { refreshAccessToken } from "@/utils/refreshAccessToken";
+import { format } from "date-fns";
 
 // This endpoint will be called by Vercel Cron
 export default async function handler(req, res) {
@@ -11,9 +12,12 @@ export default async function handler(req, res) {
   try {
     // Connect to MongoDB
     await connectMongoDB();
-    
+
     // Get current time
     const currentTime = new Date();
+    console.log(currentTime, 'currentTime without formatting');
+
+    console.log(format(currentTime, 'PPPp'), 'currentTime formatted');
     
     // Find posts that are scheduled for now or earlier and still have 'scheduled' status
     const scheduledPosts = await ScheduledPost.find({ 
@@ -80,7 +84,7 @@ export default async function handler(req, res) {
         if (redditResponse.ok && redditData?.json?.data?.url) {
           // Update the post status
           post.status = 'published';
-          post.publishedAt = new Date();
+          post.publishedAt = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
           post.redditPostUrl = redditData.json.data.url;
           post.redditPostId = redditData.json.data.id;
           await post.save();
@@ -95,7 +99,7 @@ export default async function handler(req, res) {
         } else {
           // Handle failed publish
           post.status = 'failed';
-          post.failedAt = new Date();
+          post.failedAt = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
           post.failureReason = redditData.json?.errors?.join(', ') || 'Unknown error';
           await post.save();
           
@@ -112,7 +116,7 @@ export default async function handler(req, res) {
         
         // Update the post with error info
         post.status = 'failed';
-        post.failedAt = new Date();
+        post.failedAt = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
         post.failureReason = error.message;
         await post.save();
         

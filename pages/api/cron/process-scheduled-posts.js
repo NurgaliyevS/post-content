@@ -27,6 +27,7 @@ export default async function handler(req, res) {
     const results = [];
     
     for (const post of scheduledPosts) {
+      console.log(post, 'post before');
       try {
         // Get user's timezone, default to UTC if not specified
         const userTimeZone = post.userTimeZone || 'UTC';

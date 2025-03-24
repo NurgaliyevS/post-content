@@ -20,8 +20,8 @@ export default async function handler(req, res) {
     await connectMongoDB();
 
     // Get current time in UTC
-    // const currentTimeUTC = DateTime.now().toUTC();
-    // console.log('Current UTC time:', currentTimeUTC.toISO());
+    const currentTimeUTC = DateTime.now().toUTC();
+    console.log('Current UTC time:', currentTimeUTC.toISO());
     
     // Find posts that are scheduled for now or earlier and still have 'scheduled' status
     const scheduledPosts = await ScheduledPost.find({ 

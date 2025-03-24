@@ -1,7 +1,8 @@
 import connectMongoDB from "@/backend/mongodb";
 import ScheduledPost from "@/backend/ScheduledPostSchema";
 import { refreshAccessToken } from "@/utils/refreshAccessToken";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
+import { zonedTimeToUtc } from 'date-fns-tz';
 
 // This endpoint will be called by Vercel Cron
 export default async function handler(req, res) {
@@ -13,24 +14,39 @@ export default async function handler(req, res) {
     // Connect to MongoDB
     await connectMongoDB();
 
-    // Get current time
+    // Get current time in UTC
     const currentTime = new Date();
-    console.log(currentTime, 'currentTime without formatting');
-
-    console.log(format(currentTime, 'PPPp'), 'currentTime formatted');
+    console.log('Current server time (UTC):', format(currentTime, 'PPPp'));
     
     // Find posts that are scheduled for now or earlier and still have 'scheduled' status
     const scheduledPosts = await ScheduledPost.find({ 
-      scheduledFor: { $lte: currentTime },
       status: 'scheduled'
     });
     
-    console.log(`Found ${scheduledPosts.length} posts to publish`);
+    console.log(`Found ${scheduledPosts.length} total scheduled posts`);
     
     const results = [];
     
     for (const post of scheduledPosts) {
       try {
+        // Convert the scheduled time from user's timezone to UTC for comparison
+        const scheduledTime = parseISO(post.scheduledFor);
+        console.log(scheduledTime, 'scheduledTime');
+        const userTimeZone = post.userTimeZone || 'UTC';
+        console.log(userTimeZone, 'userTimeZone');
+        const scheduledTimeUTC = zonedTimeToUtc(scheduledTime, userTimeZone);
+        console.log(scheduledTimeUTC, 'scheduledTimeUTC');
+
+        console.log(scheduledTimeUTC > currentTime, 'scheduledTimeUTC > currentTime');
+        
+        // Only process posts that are due
+        if (scheduledTimeUTC > currentTime) {
+          console.log(`Post ${post._id} is scheduled for ${format(scheduledTimeUTC, 'PPPp')} UTC, skipping...`);
+          continue;
+        }
+        
+        console.log(`Processing post ${post._id} scheduled for ${format(scheduledTimeUTC, 'PPPp')} UTC`);
+        
         // The access token might have expired, refresh it
         let accessToken = post.redditAccessToken;
         

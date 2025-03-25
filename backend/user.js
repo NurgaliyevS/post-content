@@ -6,11 +6,12 @@ const UserSchema = new mongoose.Schema(
     email: { type: String, unique: true },
     redditId: { type: String, unique: true },
     image: String,
-    receipt_link: String,
     customer_portal_url: String,
-    variant_name: { type: String, default: 'free' }, // Updated
+    variant_name: { type: String, default: "free" }, // Updated
     subscription_renews_at: { type: String, default: null }, // Updated
     ends_at: { type: String, default: null }, // Updated
+    customer_id: String,
+    subscription_id: String,
   },
   { timestamps: true }
 );

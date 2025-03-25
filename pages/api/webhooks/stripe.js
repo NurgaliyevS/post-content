@@ -45,16 +45,22 @@ export default async function handler(req, res) {
         const customerId = session.customer;
         const subscriptionId = session.subscription;
 
+        console.log(session.subscription, 'session subscription');
+
         // Create customer portal session
         const portalSession = await stripe.billingPortal.sessions.create({
           customer: customerId,
           return_url: "https://www.redditscheduler.com/dashboard",
         });
 
+        console.log(portalSession.url, 'portal session');
+
         // Retrieve subscription details
         const subscription = await stripe.subscriptions.retrieve(
           subscriptionId
         );
+
+        console.log(subscription, 'subscription retrieve');
 
         try {
           // Find or create user

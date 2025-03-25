@@ -23,7 +23,6 @@ export const authOptions = {
       // Save user ID to token
       if (user) {
         token.id = user.id;
-        token.variant_name = user.variant_name || "free";
       }
 
       if (account && account.access_token && account.refresh_token) {
@@ -50,7 +49,6 @@ export const authOptions = {
             email: token.email || null,
             redditId: token.sub,
             image: token.picture || null,
-            variant_name: token.variant_name || "free",
           });
           token.id = result.insertedId.toString();
         } else {
@@ -62,13 +60,11 @@ export const authOptions = {
                 name: token.name,
                 email: token.email || null,
                 image: token.picture || null,
-                variant_name: token.variant_name || "free",
                 redditId: token.sub,
               }
             }
           );
           token.id = dbUser._id.toString();
-          token.variant_name = dbUser.variant_name || "free";
         }
       }
       
@@ -112,7 +108,6 @@ export const authOptions = {
     session: async ({ session, token }) => {
       if (session?.user) {
         session.user.id = token.id;
-        session.user.variant_name = token.variant_name;
         session.accessToken = token.accessToken;
         session.refreshToken = token.refreshToken;
         session.error = token.error;

@@ -4,7 +4,7 @@ const UserSchema = new mongoose.Schema(
   {
     name: String,
     email: { type: String, unique: true },
-    redditId: { type: String, unique: true },
+    redditId: String,
     image: String,
     customer_portal_url: String,
     variant_name: { type: String, default: "free" }, // Updated
@@ -12,6 +12,7 @@ const UserSchema = new mongoose.Schema(
     ends_at: { type: String, default: null }, // Updated
     customer_id: String,
     subscription_id: String,
+    customer_name: String,
   },
   { timestamps: true }
 );

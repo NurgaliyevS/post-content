@@ -56,14 +56,13 @@ export default async function handler(req, res) {
           subscriptionId
         );
 
-        console.log("Subscription:", subscription);
-
         try {
           // Find or create user
           let user = await User.findOne({ name: redditUsername });
 
           const userData = {
             name: redditUsername,
+            customer_name: name,
             email: email,
             customer_portal_url: portalSession.url,
             variant_name: subscription.plan.nickname,
@@ -78,18 +77,8 @@ export default async function handler(req, res) {
             user = await User.create(userData);
           } else {
             user = await User.findOneAndUpdate(
-              {
-                name: redditUsername,
-                email: email,
-                customer_portal_url: portalSession.url,
-                variant_name: subscription.plan.nickname,
-                subscription_renews_at: new Date(
-                  subscription.current_period_end * 1000
-                ).toISOString(),
-                customer_id: customerId,
-                subscription_id: subscriptionId,
-              },
-              { $set: userData },
+              { name: redditUsername },
+              { $set: userData, },
               { new: true, upsert: true }
             );
           }

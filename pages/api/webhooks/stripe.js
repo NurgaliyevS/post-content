@@ -45,26 +45,39 @@ export default async function handler(req, res) {
         const customerId = session.customer;
         const subscriptionId = session.subscription;
 
-        console.log(session.subscription, 'session subscription');
-
         // Create customer portal session
         const portalSession = await stripe.billingPortal.sessions.create({
           customer: customerId,
           return_url: "https://www.redditscheduler.com/dashboard",
         });
 
-        console.log(portalSession.url, 'portal session');
-
         // Retrieve subscription details
         const subscription = await stripe.subscriptions.retrieve(
           subscriptionId
         );
 
-        console.log(subscription, 'subscription retrieve');
-
         try {
-          // Find or create user
           let user = await User.findOne({ name: redditUsername });
+
+          // because the user is already subscribed, we update the user with the new subscription details
+          if (user && portalSession.url && !subscription?.plan?.nickname) {
+            const userData = {
+              customer_portal_url: portalSession.url,
+              // TODO: find variant_name now it is null
+              subscription_renews_at: new Date(
+                subscription.current_period_end * 1000
+              ).toISOString(),
+              customer_id: customerId,
+              subscription_id: subscriptionId,
+            };
+
+            await User.findOneAndUpdate(
+              { name: redditUsername },
+              { $set: userData },
+              { new: true, upsert: true }
+            );
+            break;
+          }
 
           const userData = {
             name: redditUsername,
@@ -79,17 +92,17 @@ export default async function handler(req, res) {
             subscription_id: subscriptionId,
           };
 
+          // if user doesn't exist, create new user
           if (!user) {
             user = await User.create(userData);
+            // first time subscribed
           } else {
             user = await User.findOneAndUpdate(
               { name: redditUsername },
-              { $set: userData, },
+              { $set: userData },
               { new: true, upsert: true }
             );
           }
-
-          console.log("User created/updated:", user);
         } catch (dbError) {
           console.error("Database error:", dbError);
           // Handle potential duplicate key errors
@@ -97,39 +110,11 @@ export default async function handler(req, res) {
         break;
       }
 
-      case "customer.subscription.updated": {
-        const subscription = event.data.object;
-        const customerId = subscription.customer;
-
-        const result = await User.findOneAndUpdate(
-          { customer_id: customerId },
-          {
-            subscription_renews_at: new Date(
-              subscription.current_period_end * 1000
-            ).toISOString(),
-            ends_at: null,
-            variant_name: subscription.status === "active" ? "starter" : "free",
-          },
-          { new: true }
-        );
-        console.log("Subscription Update Result:", result);
-        break;
-      }
-
       case "customer.subscription.deleted": {
         const subscription = event.data.object;
-        const customerId = subscription.customer;
 
-        const result = await User.findOneAndUpdate(
-          { customer_id: customerId },
-          {
-            variant_name: "free",
-            subscription_renews_at: null,
-            ends_at: new Date(subscription.canceled_at * 1000).toISOString(),
-          },
-          { new: true }
-        );
-        console.log("Subscription Deletion Result:", result);
+        // make sure to find user via session.custom_fields[0].text.value
+
         break;
       }
     }

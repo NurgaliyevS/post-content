@@ -41,7 +41,7 @@ export const authOptions = {
         const db = client.db();
         
         // Check if user exists
-        let dbUser = await db.collection("users").findOne({ redditId: token.sub });
+        let dbUser = await db.collection("users").findOne({ name: token.name });
 
         if (!dbUser) {
           // Create new user for Reddit sign-in
@@ -54,6 +54,19 @@ export const authOptions = {
           });
           token.id = result.insertedId.toString();
         } else {
+          // Update existing user with latest info
+          await db.collection("users").updateOne(
+            { name: token.name },
+            {
+              $set: {
+                name: token.name,
+                email: token.email || null,
+                image: token.picture || null,
+                variant_name: token.variant_name || "free",
+                redditId: token.sub,
+              }
+            }
+          );
           token.id = dbUser._id.toString();
           token.variant_name = dbUser.variant_name || "free";
         }
@@ -111,7 +124,7 @@ export const authOptions = {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
-  debug: process.env.NODE_ENV === "development",
+  debug: false,
 };
 
 export default NextAuth(authOptions);

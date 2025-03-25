@@ -109,14 +109,6 @@ export default async function handler(req, res) {
         }
         break;
       }
-
-      case "customer.subscription.deleted": {
-        const subscription = event.data.object;
-
-        // make sure to find user via session.custom_fields[0].text.value
-
-        break;
-      }
     }
 
     res.json({ received: true });

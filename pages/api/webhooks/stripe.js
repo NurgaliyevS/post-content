@@ -51,7 +51,14 @@ export default async function handler(req, res) {
           subscription_id: session.subscription,
           customer_name: session.customer_details.name,
           post_available: parseInt(metadata.post_available),
-          email: session.customer_details.email || session.customer_details.email,
+        }
+
+        if (session?.customer_details?.email) {
+          payload.email = session.customer_details.email;
+        }
+
+        if (session?.customer_email) {
+          payload.email = session.customer_email;
         }
 
         console.log(payload, "payload in checkout.session.completed");

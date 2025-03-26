@@ -1,30 +1,52 @@
 import { isDevelopment } from "@/utils/isDevelopment";
+import { useState } from 'react';
 
 export default function PricingSection() {
-    const getStripeLink = (plan) => {
-      if (isDevelopment) {
-        switch(plan) {
-          case 'starter':
-            return 'https://buy.stripe.com/test_14kaGJ0LdgF8cRG3cd';
-          case 'growth': 
-            return 'https://buy.stripe.com/test_aEU0251Ph4Wqg3SdQS';
-          case 'scale':
-            return 'https://buy.stripe.com/test_scale_link';
-          default:
-            return '#';
+    const [loading, setLoading] = useState(false);
+
+    const handleSubscription = async (plan) => {
+        try {
+            setLoading(true);
+            const response = await fetch('/api/create-checkout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    plan,
+                    planDetails: getPlanDetails(plan)
+                }),
+            });
+
+            const { url } = await response.json();
+            window.location.href = url;
+        } catch (error) {
+            console.error('Subscription error:', error);
+            alert('Something went wrong. Please try again.');
+        } finally {
+            setLoading(false);
         }
-      } else {
-        switch(plan) {
-          case 'starter':
-            return 'https://buy.stripe.com/prod_starter_link';
-          case 'growth':
-            return 'https://buy.stripe.com/prod_growth_link'; 
-          case 'scale':
-            return 'https://buy.stripe.com/prod_scale_link';
-          default:
-            return '#';
-        }
-      }
+    };
+
+    const getPlanDetails = (plan) => {
+        const details = {
+            starter: {
+                name: 'Starter',
+                post_available: 10,
+                price: 900 // in cents
+            },
+            growth: {
+                name: 'Growth',
+                post_available: 50,
+                price: 1800 // in cents
+            },
+            scale: {
+        name: "Scale",
+        post_available: 150,
+        price: 2700, // in cents
+      },
+    };
+    return details[plan];
     };
 
     return (
@@ -51,7 +73,13 @@ export default function PricingSection() {
                   <span>✓</span> Unlimited subreddits
                 </li>
               </ul>
-              <a href={getStripeLink('starter')} className="btn btn-outline mt-4 w-full">Buy Now</a>
+              <button 
+                onClick={() => handleSubscription('starter')}
+                disabled={loading}
+                className="btn btn-outline mt-4 w-full"
+              >
+                {loading ? 'Loading...' : 'Buy Now'}
+              </button>
             </div>
           </div>
   
@@ -73,7 +101,13 @@ export default function PricingSection() {
                   <span>✓</span> Unlimited subreddits
                 </li>
               </ul>
-              <a href={getStripeLink('growth')} className="btn btn-primary mt-4 w-full">Buy Now</a>
+              <button 
+                onClick={() => handleSubscription('growth')}
+                disabled={loading}
+                className="btn btn-primary mt-4 w-full"
+              >
+                {loading ? 'Loading...' : 'Buy Now'}
+              </button>
             </div>
           </div>
   
@@ -95,9 +129,13 @@ export default function PricingSection() {
                   <span>✓</span> Unlimited subreddits
                 </li>
               </ul>
-              <a href={getStripeLink('scale')} className="btn btn-outline mt-4 w-full">
-                Buy Now
-              </a>
+              <button 
+                onClick={() => handleSubscription('scale')}
+                disabled={loading}
+                className="btn btn-outline mt-4 w-full"
+              >
+                {loading ? 'Loading...' : 'Buy Now'}
+              </button>
             </div>
           </div>
         </div>

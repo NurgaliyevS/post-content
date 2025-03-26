@@ -1,174 +1,106 @@
-import { buffer } from "micro";
-import Stripe from "stripe";
-import User from "@/backend/user";
-import dbConnect from "@/backend/mongodb";
+import Stripe from 'stripe';
+import { buffer } from 'micro';
+import User from '@/backend/user';
+import connectMongoDB from '@/backend/mongodb';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
-const addPostCount = (plan) => {
-  switch (plan) {
-    case "free":
-      return 0;
-    case "Starter":
-      return 10;
-    case "Growth":
-      return 50;
-    case "Scale":
-      return 150;
-  }
+    api: {
+        bodyParser: false,
+    },
 };
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method not allowed" });
-  }
-
-  try {
-    // Get the raw body as a buffer
-    const rawBody = await buffer(req);
-    const signature = req.headers["stripe-signature"];
-
-    if (!signature) {
-      return res.status(400).json({ error: "No signature found" });
+    if (req.method !== 'POST') {
+        return res.status(405).json({ message: 'Method not allowed' });
     }
 
-    // Verify the event
-    const event = stripe.webhooks.constructEvent(
-      rawBody,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET
-    );
+    await connectMongoDB();
 
-    console.log("Webhook event type:", event.type);
+    const buf = await buffer(req);
+    const sig = req.headers['stripe-signature'];
 
-    await dbConnect();
+    let event;
 
-    switch (event.type) {
-      case "checkout.session.completed": {
+    try {
+        event = stripe.webhooks.constructEvent(buf, sig, webhookSecret);
+    } catch (err) {
+        console.error('Webhook error:', err.message);
+        return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    if (event.type === 'checkout.session.completed') {
         const session = event.data.object;
-        const email = session.customer_details.email;
-        const name = session.customer_details.name;
-        const redditUsername = session.custom_fields[0].text.value;
-        const customerId = session.customer;
-        const subscriptionId = session.subscription;
+        const metadata = session.metadata;
+        const redditUser = session?.custom_fields?.[0]?.text?.value;
 
-        // Create customer portal session
+        // get the customer portal url via retrieve
         const portalSession = await stripe.billingPortal.sessions.create({
-          customer: customerId,
-          return_url: "https://www.redditscheduler.com/dashboard",
+          customer: session.customer,
+          return_url: "https://www.redditscheduler.com/dashboard/onboarding",
         });
 
-        // Retrieve subscription details
         const subscription = await stripe.subscriptions.retrieve(
-          subscriptionId
+          session.subscription
         );
 
-        try {
-          let user = await User.findOne({ customer_id: customerId });
+        console.log(portalSession.url, "customerPortalUrl url");
+        console.log(portalSession, "portalSession");
+        console.log(subscription, "subscription");
 
-          // because the user is already subscribed, we update the user with the new subscription details
-          if (user && portalSession.url && !subscription?.plan?.nickname) {
-            const planName =
-              subscription.plan.nickname ||
-              subscription.items.data[0].price.metadata?.plan_name ||
-              "Unknown Plan";
+        console.log(metadata, "metadata");
 
-            console.log(planName, "planName");
+        const user = await User.find({ name: redditUser });
 
-            console.log(subscription.plan.nickname, "subscription.plan.nickname");
-            console.log(subscription.items.data[0], "subscription.items.data[0]");
-            console.log(subscription.items.data[0].price, "subscription.items.data[0].price");
-
-            const userData = {
-              customer_portal_url: portalSession.url,
-              subscription_renews_at: new Date(
-                subscription.current_period_end * 1000
-              ).toISOString(),
-              subscription_id: subscriptionId,
-            };
-
-            await User.findOneAndUpdate(
-              { customer_id: customerId },
-              { $set: userData },
-              { new: true, upsert: true }
-            );
-            break;
-          }
-
-          // first time subscribed
-          let userExisted = await User.findOne({ name: redditUsername });
-
-          console.log(subscription, "subscription");
-          console.log(subscription.items, 'items');
-          console.log(subscription.items.data[0], 'items.data[0]');
-          console.log(subscription.items.data[0].plan, 'plan');
-
-          const userData = {
-            name: redditUsername,
-            customer_name: name,
-            email: email,
-            customer_portal_url: portalSession.url,
-            variant_name: subscription.plan.nickname,
-            subscription_renews_at: new Date(
-              subscription.current_period_end * 1000
-            ).toISOString(),
-            customer_id: customerId,
-            subscription_id: subscriptionId,
-          };
-
-          userData.post_available = addPostCount(subscription.plan.nickname);
-
-          // if user doesn't exist, create new user
-          if (!userExisted) {
-            user = await User.create(userData);
-            // first time subscribed
-          } else {
-            user = await User.findOneAndUpdate(
-              { name: redditUsername },
-              { $set: userData },
-              { new: true, upsert: true }
-            );
-          }
-        } catch (dbError) {
-          console.error("Database error:", dbError);
-          // Handle potential duplicate key errors
+        const payload = {
+          customer_portal_url: portalSession.url,
+          subscription_id: session.subscription,
+          variant_name: metadata.plan,
+          subscription_renews_at: new Date(subscription.current_period_end * 1000).toISOString(),
+          ends_at: new Date(subscription.current_period_end * 1000).toISOString(),
+          customer_id: session.subscription,
+          subscription_id: session.id,
+          customer_name: session.customer_details.name,
+          post_available: parseInt(metadata.post_available),
+          email: session.customer_details.email,
         }
-        break;
-      }
 
-      case "customer.subscription.updated": {
-        const subscription = event.data.object;
-        const cancelAtPeriodEnd = subscription.cancel_at_period_end;
-        const canceledAt = subscription.canceled_at;
-        const customerId = subscription.customer;
+        console.log(payload, "payload");
 
-        const user = await User.findOne({ customer_id: customerId });
-
-        if (cancelAtPeriodEnd && user) {
+        if (user) {
           await User.findOneAndUpdate(
-            { customer_id: customerId },
-            {
-              $set: {
-                ends_at: canceledAt,
-                subscription_renews_at: null,
-                variant_name: "free",
-                ends_at: canceledAt,
-              },
-            }
+            { name: redditUser },
+            { $set: payload },
+            { new: true, upsert: true }
           );
+        } else {
+          await User.create(payload);
         }
-      }
     }
 
-    res.json({ received: true });
-  } catch (error) {
-    console.error("Error processing webhook:", error);
-    res.status(400).json({ error: error.message });
-  }
+    if (event.type === 'customer.subscription.updated') {
+        const subscription = event.data.object;
+        // if the subscription has been cancelled
+        if (subscription?.cancel_at_period_end) {
+          const payload = {
+            ends_at: new Date(subscription.current_period_end * 1000).toISOString(),
+            subscription_renews_at: null,
+            variant_name: "free",
+          }
+
+          console.log(payload, "payload");
+
+          await User.findOneAndUpdate(
+            { customer_id: subscription.id },
+            { $set: payload },
+            { new: true, upsert: true }
+          );
+        }
+
+        // if the subscription has been renewed, do not rely on status because it will be active even if the subscription has been cancelled
+    }
+
+    return res.status(200).json({ received: true });
 }

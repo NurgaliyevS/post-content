@@ -1,4 +1,32 @@
+import { isDevelopment } from "@/utils/isDevelopment";
+
 export default function PricingSection() {
+    const getStripeLink = (plan) => {
+      if (isDevelopment) {
+        switch(plan) {
+          case 'starter':
+            return 'https://buy.stripe.com/test_14kaGJ0LdgF8cRG3cd';
+          case 'growth': 
+            return 'https://buy.stripe.com/test_aEU0251Ph4Wqg3SdQS';
+          case 'scale':
+            return 'https://buy.stripe.com/test_scale_link';
+          default:
+            return '#';
+        }
+      } else {
+        switch(plan) {
+          case 'starter':
+            return 'https://buy.stripe.com/prod_starter_link';
+          case 'growth':
+            return 'https://buy.stripe.com/prod_growth_link'; 
+          case 'scale':
+            return 'https://buy.stripe.com/prod_scale_link';
+          default:
+            return '#';
+        }
+      }
+    };
+
     return (
       <section id="pricing" className="py-16 px-4">
         <h2 className="text-3xl font-bold text-center mb-12">
@@ -23,7 +51,7 @@ export default function PricingSection() {
                   <span>✓</span> Unlimited subreddits
                 </li>
               </ul>
-              <button className="btn btn-outline mt-4 w-full">Buy Now</button>
+              <a href={getStripeLink('starter')} className="btn btn-outline mt-4 w-full">Buy Now</a>
             </div>
           </div>
   
@@ -45,7 +73,7 @@ export default function PricingSection() {
                   <span>✓</span> Unlimited subreddits
                 </li>
               </ul>
-              <button className="btn btn-primary mt-4 w-full">Buy Now</button>
+              <a href={getStripeLink('growth')} className="btn btn-primary mt-4 w-full">Buy Now</a>
             </div>
           </div>
   
@@ -67,9 +95,9 @@ export default function PricingSection() {
                   <span>✓</span> Unlimited subreddits
                 </li>
               </ul>
-              <button className="btn btn-outline mt-4 w-full">
+              <a href={getStripeLink('scale')} className="btn btn-outline mt-4 w-full">
                 Buy Now
-              </button>
+              </a>
             </div>
           </div>
         </div>

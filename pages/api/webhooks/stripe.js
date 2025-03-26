@@ -77,8 +77,6 @@ export default async function handler(req, res) {
     if (event.type === 'customer.subscription.updated') {
         const subscription = event.data.object;
 
-        console.log(subscription, "subscription in customer.subscription.updated");
-
         // if the subscription has been cancelled
         if (subscription?.cancel_at_period_end) {
           const payload = {
@@ -100,13 +98,6 @@ export default async function handler(req, res) {
   
       // Retrieve full subscription details
       const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-
-      console.log(invoice, "invoice in invoice.payment_succeeded");
-      console.log(subscription, "subscription in invoice.payment_succeeded");
-      console.log(invoice.customer, "invoice.customer in invoice.payment_succeeded");
-      console.log(invoice.subscription, "invoice.subscription in invoice.payment_succeeded");
-      console.log(invoice.period_end, "invoice.period_end in invoice.payment_succeeded");
-      console.log(subscription.cancel_at, "subscription.cancel_at in invoice.payment_succeeded");
 
       const user = await User.findOne({ customer_id: invoice.customer });
 

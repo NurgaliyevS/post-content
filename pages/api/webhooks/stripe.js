@@ -51,7 +51,7 @@ export default async function handler(req, res) {
           subscription_id: session.subscription,
           customer_name: session.customer_details.name,
           post_available: parseInt(metadata.post_available),
-          email: session.customer_details.email,
+          email: session.customer_details.email || session.customer_details.email,
         }
 
         console.log(payload, "payload in checkout.session.completed");
@@ -82,7 +82,7 @@ export default async function handler(req, res) {
           console.log(payload, "payload in customer.subscription.updated");
 
           await User.findOneAndUpdate(
-            { customer_id: subscription.id },
+            { customer_id: subscription.customer },
             { $set: payload },
             { new: true, upsert: true }
           );
@@ -96,7 +96,10 @@ export default async function handler(req, res) {
       // Retrieve full subscription details
       const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
-      const user = await User.findOne({ customer_id: subscriptionId });
+      console.log(invoice, "invoice in invoice.payment_succeeded");
+      console.log(subscription, "subscription in invoice.payment_succeeded");
+
+      const user = await User.findOne({ customer_id: invoice.customer });
 
       const payload = {
         post_available: parseInt(subscription.metadata.post_available),
@@ -117,7 +120,7 @@ export default async function handler(req, res) {
         console.log(payload, "payload in invoice.payment_succeeded");
 
         await User.findOneAndUpdate(
-          { customer_id: subscriptionId },
+          { customer_id: invoice.customer },
           { $set: payload },
           { new: true, upsert: true }
         );

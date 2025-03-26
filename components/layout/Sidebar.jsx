@@ -178,7 +178,7 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
             </nav>
 
             {/* Usage Meter */}
-            <div className="mx-3 p-4 bg-blue-50 rounded-lg my-4">
+            <div className="mx-3 p-4 bg-blue-50 rounded-lg my-4 h-32">
               <div className="mb-1 flex items-center justify-between">
                 <span className="text-blue-600 font-medium">
                   {user?.post_available || 0} posts
@@ -187,9 +187,13 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
               <p className="text-sm text-blue-600 my-4">{formatDate()}</p>
               <div className="w-full bg-blue-200 rounded-full h-2">
                 <div
-                  className={`bg-blue-500 h-2 rounded-full w-${
-                    user?.post_available || 0
-                  }`}
+                  style={{
+                    width: `${Math.min(
+                      ((user?.post_available || 0) / 50) * 100,
+                      100
+                    )}%`,
+                  }}
+                  className="bg-blue-500 h-2 rounded-full"
                 ></div>
               </div>
             </div>

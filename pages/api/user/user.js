@@ -12,7 +12,7 @@ export default async function handler(req, res) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const user = await User.findOne({ email: session.user.email });
+    const user = await User.findOne({ name: session.user.name });
     res.status(200).json(user);
   }
 }

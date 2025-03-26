@@ -15,7 +15,7 @@ export default function HeroSection() {
       <div className="flex justify-center gap-4">
         <CTAButton className="btn btn-primary" />
         <button 
-          onClick={() => window.location.href = '/demo'} 
+          onClick={() => window.location.href = '#demo'} 
           className="btn btn-secondary"
         >
           <span>▶</span> Demo

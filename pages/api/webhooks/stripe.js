@@ -82,7 +82,6 @@ export default async function handler(req, res) {
         // if the subscription has been cancelled
         if (subscription?.cancel_at_period_end) {
           const payload = {
-            ends_at: new Date(subscription.current_period_end * 1000).toISOString(),
             subscription_renews_at: null,
           }
 
@@ -91,7 +90,7 @@ export default async function handler(req, res) {
           await User.findOneAndUpdate(
             { customer_id: subscription.customer },
             { $set: payload },
-            { new: true, upsert: true }
+            { new: true }
           );
         }
     }
@@ -129,7 +128,7 @@ export default async function handler(req, res) {
         await User.findOneAndUpdate(
           { customer_id: invoice.customer },
           { $set: payload },
-          { new: true, upsert: true }
+          { new: true }
         );
       }
     }

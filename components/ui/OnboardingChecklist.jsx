@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { SiStripe } from 'react-icons/si';
 import { FaArrowRight, FaReddit } from 'react-icons/fa';
 import { FaRegCalendarAlt } from 'react-icons/fa';
@@ -30,7 +30,7 @@ const OnboardingStep = ({ icon: Icon, title, time, completed, customIcon, action
 
 export default function OnboardingChecklist() {
   const { data: session } = useSession();
-  const isSubscribed = session?.user?.variant_name !== "free";
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   const steps = [
     {
@@ -42,7 +42,7 @@ export default function OnboardingChecklist() {
       },
     {
       title: "Subscription required",
-      time: "2-3 minutes",
+      time: "2 minutes",
       completed: isSubscribed,
       customIcon: <SiStripe className="w-4 h-4" />,
       iconComponent: null,
@@ -68,6 +68,16 @@ export default function OnboardingChecklist() {
       )
     }
   ];
+
+  useEffect(() => {
+    const getUser = async () => {
+      const response = await fetch("/api/user/user");
+      const userData = await response.json();
+      setIsSubscribed(userData?.variant_name !== "free");
+    };
+
+    getUser();
+  }, []);
 
   return (
     <div className="space-y-2">

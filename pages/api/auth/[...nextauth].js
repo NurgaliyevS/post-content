@@ -58,7 +58,7 @@ export const authOptions = {
             {
               $set: {
                 name: token.name,
-                email: token.email || null,
+                ...(token.email && { email: token.email }),
                 image: token.picture || null,
                 redditId: token.sub,
               }

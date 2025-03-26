@@ -13,7 +13,6 @@ const UserSchema = new mongoose.Schema(
     customer_id: String,
     subscription_id: String,
     customer_name: String,
-    post_count: { type: Number, default: 0 },
     post_available: { type: Number, default: 0 },
   },
   { timestamps: true }

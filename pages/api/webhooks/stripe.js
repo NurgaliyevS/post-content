@@ -46,12 +46,6 @@ export default async function handler(req, res) {
           session.subscription
         );
 
-        console.log(portalSession.url, "customerPortalUrl url");
-        console.log(portalSession, "portalSession");
-        console.log(subscription, "subscription");
-
-        console.log(metadata, "metadata");
-
         const user = await User.find({ name: redditUser });
 
         const payload = {
@@ -67,7 +61,7 @@ export default async function handler(req, res) {
           email: session.customer_details.email,
         }
 
-        console.log(payload, "payload");
+        console.log(payload, "payload in checkout.session.completed");
 
         if (user) {
           await User.findOneAndUpdate(
@@ -87,10 +81,9 @@ export default async function handler(req, res) {
           const payload = {
             ends_at: new Date(subscription.current_period_end * 1000).toISOString(),
             subscription_renews_at: null,
-            variant_name: "free",
           }
 
-          console.log(payload, "payload");
+          console.log(payload, "payload in customer.subscription.updated");
 
           await User.findOneAndUpdate(
             { customer_id: subscription.id },
@@ -98,8 +91,47 @@ export default async function handler(req, res) {
             { new: true, upsert: true }
           );
         }
+    }
 
-        // if the subscription has been renewed, do not rely on status because it will be active even if the subscription has been cancelled
+    if (event.type === 'invoice.payment_succeeded') {
+      const invoice = event.data.object;
+      const subscriptionId = invoice.subscription;
+  
+      // Retrieve full subscription details
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+
+      const portalSession = await stripe.billingPortal.sessions.create({
+        customer: invoice.customer,
+        return_url: "https://www.redditscheduler.com/dashboard/onboarding"
+      });
+
+      const user = await User.findOne({ customer_id: subscriptionId });
+
+      const payload = {
+        post_available: parseInt(subscription.metadata.post_available),
+        ends_at: new Date(invoice.period_end * 1000).toISOString(),
+        subscription_renews_at: new Date(invoice.period_start * 1000).toISOString(),
+        customer_portal_url: portalSession.url,
+      }
+
+      if (user) {
+        const userPlan = user.variant_name;
+        if (userPlan === "starter") {
+          payload.post_available = 10;
+        } else if (userPlan === "growth") {
+          payload.post_available = 50;
+        } else if (userPlan === "scale") {
+          payload.post_available = 100;
+        }
+
+        console.log(payload, "payload in invoice.payment_succeeded");
+
+        await User.findOneAndUpdate(
+          { customer_id: subscriptionId },
+          { $set: payload },
+          { new: true, upsert: true }
+        );
+      }
     }
 
     return res.status(200).json({ received: true });

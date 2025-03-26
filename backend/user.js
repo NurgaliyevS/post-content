@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const UserSchema = new mongoose.Schema(
   {
     name: String,
-    email: { type: String, unique: true },
+    email: { type: String},
     redditId: String,
     image: String,
     variant_name: { type: String, default: "free" }, // Updated

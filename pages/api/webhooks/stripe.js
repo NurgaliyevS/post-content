@@ -46,7 +46,7 @@ export default async function handler(req, res) {
           subscription_id: session.subscription,
           variant_name: metadata.plan,
           subscription_renews_at: new Date(subscription.current_period_end * 1000).toISOString(),
-          ends_at: new Date(subscription.current_period_end * 1000 + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          ends_at: new Date(subscription.current_period_end * 1000).toISOString(),
           customer_id: session.customer,
           subscription_id: session.subscription,
           customer_name: session.customer_details.name,

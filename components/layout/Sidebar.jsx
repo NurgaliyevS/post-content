@@ -38,7 +38,7 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
     {
       name: "Billing",
       icon: AiOutlineCreditCard,
-      href: user?.customer_portal_url || "/#billing",
+      href: user?.customer_portal_url || "/#pricing",
     },
     { name: "Settings", icon: FiSettings, href: "/dashboard/settings" },
   ];
@@ -58,7 +58,7 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
       return "Resets in " + formatDistanceToNow(new Date(user.ends_at));
     } else {
       return (
-        <Link href="/#billing" className="btn btn-primary btn-sm">
+        <Link href="/#pricing" className="btn btn-primary btn-sm">
           Upgrade
         </Link>
       );

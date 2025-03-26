@@ -13,6 +13,8 @@ export default async function handler(req, res) {
     await connectMongoDB();
     const user = await User.findOne({ name: req.body.name });
 
+    console.log(user, "user in create-portal-session");
+
     if (!user?.customer_id) {
       return res.status(400).json({ error: 'No subscription found' });
     }

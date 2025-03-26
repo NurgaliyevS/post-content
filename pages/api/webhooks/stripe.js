@@ -36,24 +36,21 @@ export default async function handler(req, res) {
         const metadata = session.metadata;
         const redditUser = session?.custom_fields?.[0]?.text?.value;
 
-        // get the customer portal url via retrieve
-        const portalSession = await stripe.billingPortal.sessions.create({
-          customer: session.customer,
-          return_url: "https://www.redditscheduler.com/dashboard/onboarding",
-        });
-
         const subscription = await stripe.subscriptions.retrieve(
           session.subscription
         );
 
+        console.log(subscription, "subscription in checkout.session.completed");
+        console.log(subscription?.current_period_end, "subscription.current_period_end");
+        console.log(subscription?.cancel_at, "subscription.cancel_at");
+
         const user = await User.find({ name: redditUser });
 
         const payload = {
-          customer_portal_url: portalSession.url,
           subscription_id: session.subscription,
           variant_name: metadata.plan,
           subscription_renews_at: new Date(subscription.current_period_end * 1000).toISOString(),
-          ends_at: new Date(subscription.current_period_end * 1000).toISOString(),
+          ends_at: subscription?.cancel_at ? new Date(subscription.cancel_at * 1000).toISOString() : null,
           customer_id: session.subscription,
           subscription_id: session.id,
           customer_name: session.customer_details.name,
@@ -100,18 +97,12 @@ export default async function handler(req, res) {
       // Retrieve full subscription details
       const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
-      const portalSession = await stripe.billingPortal.sessions.create({
-        customer: invoice.customer,
-        return_url: "https://www.redditscheduler.com/dashboard/onboarding"
-      });
-
       const user = await User.findOne({ customer_id: subscriptionId });
 
       const payload = {
         post_available: parseInt(subscription.metadata.post_available),
-        ends_at: new Date(invoice.period_end * 1000).toISOString(),
-        subscription_renews_at: new Date(invoice.period_start * 1000).toISOString(),
-        customer_portal_url: portalSession.url,
+        subscription_renews_at: new Date(invoice.period_end * 1000).toISOString(),
+        ends_at: subscription.cancel_at ? new Date(subscription.cancel_at * 1000).toISOString() : null,
       }
 
       if (user) {

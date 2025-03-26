@@ -15,6 +15,7 @@ import { formatDistanceToNow } from "date-fns";
 export default function Sidebar({ showSidebar, setShowSidebar }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [billingUrl, setBillingUrl] = useState("/#pricing");
 
   const router = useRouter();
   const currentPath = router.pathname;
@@ -39,7 +40,7 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
     {
       name: "Billing",
       icon: AiOutlineCreditCard,
-      href: user?.customer_portal_url || "/#pricing",
+      href: billingUrl || "/#pricing",
     },
     { name: "Settings", icon: FiSettings, href: "/dashboard/settings" },
   ];
@@ -50,6 +51,27 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
         const response = await fetch("/api/user/user");
         const userData = await response.json();
         setUser(userData);
+
+        // Fetch billing portal URL
+        if (userData?.name) {
+          try {
+            const portalResponse = await fetch('/api/create-portal-session', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                name: userData.name
+              }),
+            });
+            
+            const { url } = await portalResponse.json();
+            setBillingUrl(url);
+          } catch (error) {
+            console.error('Error creating portal session:', error);
+            setBillingUrl("/#pricing");
+          }
+        }
       } catch (error) {
         console.error("Failed to fetch user data", error);
       } finally {
@@ -199,22 +221,41 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
                 ))
               ) : (
                 bottomNavItems.map((item, index) => (
-                  <Link
-                    href={item.href}
-                    key={index}
-                    className={`flex items-center mx-3 px-4 py-3 rounded-lg ${
-                      currentPath === item.href
-                        ? "bg-blue-500 text-white"
-                        : "text-gray-600 hover:bg-gray-100"
-                    }`}
-                  >
-                    <item.icon
-                      className={`w-5 h-5 mr-3 ${
-                        currentPath === item.href ? "text-white" : "text-gray-400"
+                  item.name === "Billing" ? (
+                    <a
+                      key={index}
+                      href={item.href}
+                      className={`flex items-center mx-3 px-4 py-3 rounded-lg ${
+                        currentPath === item.href
+                          ? "bg-blue-500 text-white"
+                          : "text-gray-600 hover:bg-gray-100"
                       }`}
-                    />
-                    <span>{item.name}</span>
-                  </Link>
+                    >
+                      <item.icon
+                        className={`w-5 h-5 mr-3 ${
+                          currentPath === item.href ? "text-white" : "text-gray-400"
+                        }`}
+                      />
+                      <span>{item.name}</span>
+                    </a>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      key={index}
+                      className={`flex items-center mx-3 px-4 py-3 rounded-lg ${
+                        currentPath === item.href
+                          ? "bg-blue-500 text-white"
+                          : "text-gray-600 hover:bg-gray-100"
+                      }`}
+                    >
+                      <item.icon
+                        className={`w-5 h-5 mr-3 ${
+                          currentPath === item.href ? "text-white" : "text-gray-400"
+                        }`}
+                      />
+                      <span>{item.name}</span>
+                    </Link>
+                  )
                 ))
               )}
             </nav>

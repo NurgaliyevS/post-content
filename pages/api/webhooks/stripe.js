@@ -105,6 +105,8 @@ export default async function handler(req, res) {
       console.log(subscription, "subscription in invoice.payment_succeeded");
       console.log(invoice.customer, "invoice.customer in invoice.payment_succeeded");
       console.log(invoice.subscription, "invoice.subscription in invoice.payment_succeeded");
+      console.log(invoice.period_end, "invoice.period_end in invoice.payment_succeeded");
+      console.log(subscription.cancel_at, "subscription.cancel_at in invoice.payment_succeeded");
 
       const user = await User.findOne({ customer_id: invoice.customer });
 

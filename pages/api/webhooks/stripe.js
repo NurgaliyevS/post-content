@@ -40,17 +40,13 @@ export default async function handler(req, res) {
           session.subscription
         );
 
-        console.log(subscription, "subscription in checkout.session.completed");
-        console.log(subscription?.current_period_end, "subscription.current_period_end");
-        console.log(subscription?.cancel_at, "subscription.cancel_at");
-
         const user = await User.find({ name: redditUser });
 
         const payload = {
           subscription_id: session.subscription,
           variant_name: metadata.plan,
           subscription_renews_at: new Date(subscription.current_period_end * 1000).toISOString(),
-          ends_at: subscription?.cancel_at ? new Date(subscription.cancel_at * 1000).toISOString() : null,
+          ends_at: new Date(subscription.current_period_end * 1000 + 30 * 24 * 60 * 60 * 1000).toISOString(),
           customer_id: session.customer,
           subscription_id: session.subscription,
           customer_name: session.customer_details.name,
@@ -73,6 +69,9 @@ export default async function handler(req, res) {
 
     if (event.type === 'customer.subscription.updated') {
         const subscription = event.data.object;
+
+        console.log(subscription, "subscription in customer.subscription.updated");
+
         // if the subscription has been cancelled
         if (subscription?.cancel_at_period_end) {
           const payload = {

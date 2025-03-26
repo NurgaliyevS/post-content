@@ -16,7 +16,7 @@ export default function Footer() {
           <p>
             RedditScheduler
             <br />
-            Automating your Reddit presence
+            Turn Reddit into your traffic machine without the headache
           </p>
         </div>
         <div>

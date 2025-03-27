@@ -1,8 +1,8 @@
 export default function FeaturesSection() {
     return (
-      <section id="features" className="py-16 px-4">
+      <section id="features" className="py-16 px-4 mx-auto">
         <h2 className="text-3xl font-bold text-center mb-12">Features</h2>
-        <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-8 mx-auto">
           <div className="card bg-base-100">
             <div className="card-body">
               <div className="text-primary text-2xl mb-2">📊</div>

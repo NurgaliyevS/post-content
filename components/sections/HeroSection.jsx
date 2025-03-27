@@ -3,7 +3,7 @@ import CTAButton from "../CTAButton";
 
 export default function HeroSection() {
   return (
-    <main className="text-center px-4 py-16 max-w-4xl mx-auto">
+    <div className="text-center px-4 py-16 mx-auto">
       <h1 className="text-4xl md:text-5xl font-bold mb-4">
         Schedule Reddit posts that drive
         <br />
@@ -22,6 +22,6 @@ export default function HeroSection() {
         </button>
       </div>
       <ResultsSection />
-    </main>
+    </div>
   );
 }

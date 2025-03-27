@@ -10,14 +10,16 @@ export default function Home() {
   return (
     <>
       <SEO />
-      <div className="min-h-screen bg-[#F3F4EF]">
-        <Navbar />
-        <HeroSection />
-        <AlternativesSection />
-        <FeaturesSection />
-        <PricingSection />
-        <Footer />
-      </div>
+      <main className="min-h-screen bg-[#F3F4EF]">
+        <div className="max-w-4xl mx-auto">
+          <Navbar />
+          <HeroSection />
+          <AlternativesSection />
+          <FeaturesSection />
+          <PricingSection />
+          <Footer />
+        </div>
+      </main>
     </>
   );
 }

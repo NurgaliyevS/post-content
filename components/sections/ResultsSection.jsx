@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function ResultsSection() {
   return (
-    <div className="mt-16 max-w-6xl mx-auto">
+    <div className="mt-16 mx-auto">
       <h2 className="text-2xl font-semibold mb-8 text-center">Real Results</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

@@ -1,10 +1,10 @@
 export default function AlternativesSection() {
     return (
-      <section className="py-16 px-4">
+      <section className="py-16 mx-auto">
         <h2 className="text-3xl font-bold text-center mb-8">
           Alternatives are expensive.
         </h2>
-        <div className="grid md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-4 mx-auto">
           <div className="p-6 rounded-xl border border-red-200 bg-red-50">
             <div className="flex justify-between mb-2">
               <span className="font-semibold">Marketing Agencies</span>

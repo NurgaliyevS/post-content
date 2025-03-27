@@ -61,7 +61,7 @@ export default function PricingSection() {
             </div>
             <ul className="space-y-2">
               <li className="flex items-center gap-2">
-                <span>✓</span> 10 scheduled posts per month
+                <span>✓</span> 10 posts per month
               </li>
               <li className="flex items-center gap-2">
                 <span>✓</span> Viral hooks
@@ -89,7 +89,7 @@ export default function PricingSection() {
             </div>
             <ul className="space-y-2">
               <li className="flex items-center gap-2">
-                <span>✓</span> 50 scheduled posts per month
+                <span>✓</span> 50 posts per month
               </li>
               <li className="flex items-center gap-2">
                 <span>✓</span> Viral hooks
@@ -117,7 +117,7 @@ export default function PricingSection() {
             </div>
             <ul className="space-y-2">
               <li className="flex items-center gap-2">
-                <span>✓</span> 150 scheduled posts per month
+                <span>✓</span> 150 posts per month
               </li>
               <li className="flex items-center gap-2">
                 <span>✓</span> Viral hooks

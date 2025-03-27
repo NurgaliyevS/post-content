@@ -1,4 +1,5 @@
 import React from "react";
+import Select from 'react-select';
 
 const SubredditSelector = ({
   subreddits,
@@ -8,53 +9,48 @@ const SubredditSelector = ({
   onCommunityChange,
   onRetry,
 }) => {
-  const renderSubredditOptions = () => {
-    if (subredditsLoading) {
-      return (
-        <option value="" disabled>
-          Loading subreddits...
-        </option>
-      );
-    }
+  // Transform subreddits to react-select format
+  const subredditOptions = subreddits.map((subreddit) => ({
+    value: subreddit.display_name_prefixed,
+    label: subreddit.display_name_prefixed,
+    key: subreddit.id,
+  }));
 
-    if (subredditsError) {
-      return (
-        <option value="" disabled>
-          Error loading subreddits
-        </option>
-      );
-    }
+  // Handle change for react-select
+  const handleChange = (selectedOption) => {
+    onCommunityChange({
+      target: {
+        name: 'community',
+        value: selectedOption ? selectedOption.value : '',
+      },
+    });
+  };
 
-    if (subreddits.length === 0) {
-      return (
-        <option value="" disabled>
-          No subreddits found
-        </option>
-      );
-    }
-
-    return [
-      <option key="placeholder" value="" disabled>
-        Select a subreddit
-      </option>,
-      ...subreddits.map((subreddit) => (
-        <option key={subreddit.name} value={subreddit.display_name_prefixed}>
-          {subreddit.display_name_prefixed}
-        </option>
-      )),
-    ];
+  // Determine what to show based on loading/error states
+  const getPlaceholder = () => {
+    if (subredditsLoading) return 'Loading subreddits...';
+    if (subredditsError) return 'Error loading subreddits';
+    return 'Select a subreddit';
   };
 
   return (
     <div className="mb-4">
-      <select
-        className="select select-bordered w-full max-w-xs"
-        name="community"
-        value={selectedCommunity}
-        onChange={onCommunityChange}
-      >
-        {renderSubredditOptions()}
-      </select>
+      <Select
+        options={subredditOptions}
+        value={
+          selectedCommunity 
+            ? { value: selectedCommunity, label: selectedCommunity } 
+            : null
+        }
+        onChange={handleChange}
+        isLoading={subredditsLoading}
+        placeholder={getPlaceholder()}
+        noOptionsMessage={() => "No subreddits found"}
+        filterOption={(option, inputValue) => 
+          option.label.toLowerCase().includes(inputValue.toLowerCase()) ||
+          option.label.toLowerCase().replace('r/', '').includes(inputValue.toLowerCase())
+        }
+      />
 
       {subredditsError && (
         <p className="text-red-500 text-sm mt-1">
@@ -68,4 +64,4 @@ const SubredditSelector = ({
   );
 };
 
-export default SubredditSelector; 
+export default SubredditSelector;

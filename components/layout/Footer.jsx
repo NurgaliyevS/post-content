@@ -3,8 +3,8 @@ import Image from "next/image";
 
 export default function Footer() {
   return (
-    <section className="py-16 px-4 mx-auto">
-      <div className="flex flex-col md:flex-row justify-between gap-8 max-w-3xl mx-auto py-8">
+    <section className="py-4 px-4 mx-auto">
+      <div className="flex flex-col md:flex-row justify-between gap-8 max-w-4xl mx-auto py-10">
         <div className="flex flex-col gap-4">
           <Image
             src="/logo.svg"
@@ -70,7 +70,7 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-gray-200">
-        <div className="max-w-3xl mx-auto px-4 py-6">
+        <div className="max-w-4xl mx-auto px-4 py-6">
           <p className="text-xs text-center text-gray-500">
             © 2025 RedditScheduler. All rights reserved.
           </p>

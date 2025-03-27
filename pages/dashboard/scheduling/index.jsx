@@ -289,11 +289,19 @@ function Scheduling() {
             <FormattingToolbar onFormat={handleFormatting} />
 
             <textarea
-              className="textarea textarea-bordered w-full h-32"
+              className="textarea textarea-bordered w-full min-h-32"
               placeholder="Text"
               name="text"
               value={formData.text}
-              onChange={handleInputChange}
+              onChange={(e) => {
+                // Reset height to auto
+                e.target.style.height = "auto";
+
+                // Set height based on scroll height
+                e.target.style.height = `${e.target.scrollHeight}px`;
+
+                handleInputChange(e);
+              }}
             ></textarea>
 
             <div className="flex gap-8 flex-col md:flex-row">

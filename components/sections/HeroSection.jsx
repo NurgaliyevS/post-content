@@ -1,7 +1,13 @@
 import ResultsSection from "./ResultsSection";
 import CTAButton from "../CTAButton";
+import VideoModal from '../VideoModal';
 
 export default function HeroSection() {
+  const openVideoModal = () => {
+    const modal = document.getElementById('video_modal');
+    modal.showModal();
+  };
+
   return (
     <div className="text-center px-4 py-16 mx-auto">
       <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -15,13 +21,14 @@ export default function HeroSection() {
       <div className="flex justify-center gap-4">
         <CTAButton className="btn btn-primary" />
         <button 
-          onClick={() => window.location.href = '#demo'} 
+          onClick={openVideoModal} 
           className="btn btn-secondary"
         >
           <span>▶</span> Demo
         </button>
       </div>
       <ResultsSection />
+      <VideoModal />
     </div>
   );
 }

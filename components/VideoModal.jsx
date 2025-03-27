@@ -1,45 +1,25 @@
 import { useState, useEffect } from "react";
 import { FiX } from "react-icons/fi";
 
-function VideoModal({ isOpen, onClose, videoId }) {
-  // Prevent scrolling when modal is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
-    
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [isOpen]);
-
-  if (!isOpen) return null;
-
+export default function VideoModal() {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75" onClick={onClose}>
-      <div className="relative w-full max-w-4xl bg-white rounded-lg shadow-xl" onClick={e => e.stopPropagation()}>
-        <button 
-          className="absolute top-2 right-2 z-10 p-2 bg-white rounded-full shadow-md text-gray-700 hover:text-gray-900"
-          onClick={onClose}
-        >
-          <FiX className="w-6 h-6" />
-        </button>
-        
-        <div className="relative pt-[56.25%] w-full overflow-hidden rounded-lg">
-          <iframe 
+    <dialog id="video_modal" className="modal">
+      <div className="modal-box w-11/12 max-w-4xl relative">
+        <form method="dialog">
+          <button className="btn btn-sm btn-circle absolute right-2 top-2 z-10">
+            <FiX className="w-5 h-5" />
+          </button>
+        </form>
+        <div className="relative" style={{ paddingBottom: '56.25%' }}>
+          <iframe
             className="absolute top-0 left-0 w-full h-full"
-            src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
-            title="YouTube video player" 
-            frameBorder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            src="https://www.youtube.com/embed/cqWBjQyynQU?autoplay=1"
+            title="YouTube video player"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           ></iframe>
         </div>
       </div>
-    </div>
+    </dialog>
   );
 }
-
-export default VideoModal; 

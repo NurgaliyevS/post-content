@@ -10,7 +10,7 @@ export default function Home() {
   return (
     <>
       <SEO />
-      <div className="min-h-screen bg-base-100">
+      <div className="min-h-screen bg-[#F3F4EF]">
         <Navbar />
         <HeroSection />
         <AlternativesSection />

@@ -4,7 +4,7 @@ import Image from "next/image";
 export default function Footer() {
   return (
     <>
-      <footer className="footer p-10 bg-base-200 text-base-content">
+      <footer className="footer text-base-content max-w-5xl mx-auto pb-10">
         <div>
           <Image
             src="/logo.svg"
@@ -44,8 +44,8 @@ export default function Footer() {
           </Link>
         </div>
       </footer>
-      <footer className="footer px-10 py-4 border-t bg-base-200 text-base-content border-base-300">
-        <div className="text-sm">
+      <footer className="footer py-10 border-t text-base-content border-base-300 max-w-5xl mx-auto flex items-center justify-center">
+        <div className="text-sm text-center text-gray-500">
           © 2025 RedditScheduler. All rights reserved.
         </div>
       </footer>

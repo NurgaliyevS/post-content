@@ -1,6 +1,7 @@
 import ResultsSection from "./ResultsSection";
 import CTAButton from "../CTAButton";
 import VideoModal from '../VideoModal';
+import { FiPlay } from "react-icons/fi";
 
 export default function HeroSection() {
   const openVideoModal = () => {
@@ -24,7 +25,7 @@ export default function HeroSection() {
           onClick={openVideoModal} 
           className="btn btn-secondary"
         >
-          <span>▶</span> Demo
+          <FiPlay className="w-4 h-4" /> Demo
         </button>
       </div>
       <ResultsSection />

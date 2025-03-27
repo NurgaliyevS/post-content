@@ -25,12 +25,12 @@ export const customConfig = {
     og: {
       title: "RedditScheduler - Schedule Reddit posts that drive traffic to your website",
       url: "https://redditscheduler.com",
-      image: "https://redditscheduler.com/company_related/og-image.webp",
+      image: "https://redditscheduler.com/company_related/og-image.jpg",
       imageAlt:
         "RedditScheduler - Automate your Reddit posts and drive traffic to your website. Schedule posts, analyze subreddits, and track performance - all in one platform.",
       content: "https://x.com/tech_nurgaliyev",
       twitterSite: "@tech_nurgaliyev",
-      twitterImage: "https://redditscheduler.com/company_related/og-image.webp",
+      twitterImage: "https://redditscheduler.com/company_related/og-image.jpg",
     },
   },
   blog: {

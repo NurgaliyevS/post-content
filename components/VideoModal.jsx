@@ -1,44 +1,48 @@
-import { useState, useEffect } from "react";
+import React, { useRef } from "react";
 import { FiX } from "react-icons/fi";
 
 export default function VideoModal() {
-  useEffect(() => {
-    const modal = document.getElementById('video_modal');
-    const iframe = modal?.querySelector('iframe');
-    
-    const stopVideo = () => {
-      if (iframe) {
-        const currentSrc = iframe.src;
-        iframe.src = '';
-        iframe.src = currentSrc;
-      }
-    };
+  const modalRef = useRef(null);
+  const iframeRef = useRef(null);
 
-    const handleClickOutside = (e) => {
-      if (e.target === modal) {
-        modal.close();
-      }
-    };
+  const stopVideo = () => {
+    if (iframeRef.current) {
+      const currentSrc = iframeRef.current.src;
+      iframeRef.current.src = '';
+      iframeRef.current.src = currentSrc;
+    }
+  };
 
-    modal?.addEventListener('close', stopVideo);
-    modal?.addEventListener('click', handleClickOutside);
-    
-    return () => {
-      modal?.removeEventListener('close', stopVideo);
-      modal?.removeEventListener('click', handleClickOutside);
-    };
-  }, []);
+  const handleClickOutside = (e) => {
+    if (e.target === modalRef.current) {
+      stopVideo();
+      modalRef.current.close();
+    }
+  };
 
   return (
-    <dialog id="video_modal" className="modal">
+    <dialog 
+      id="video_modal" 
+      ref={modalRef}
+      className="modal"
+      onClick={handleClickOutside}
+    >
       <div className="modal-box w-11/12 max-w-4xl relative">
-        <form method="dialog">
-          <button className="btn btn-sm btn-circle absolute right-2 top-2 z-10">
+        <form method="dialog" onSubmit={(e) => {
+          e.preventDefault();
+          stopVideo();
+          modalRef.current.close();
+        }}>
+          <button 
+            type="submit" 
+            className="btn btn-sm btn-circle absolute right-2 top-2 z-10"
+          >
             <FiX className="w-5 h-5" />
           </button>
         </form>
         <div className="relative" style={{ paddingBottom: '56.25%' }}>
           <iframe
+            ref={iframeRef}
             className="absolute top-0 left-0 w-full h-full"
             src="https://www.youtube.com/embed/cqWBjQyynQU"
             title="YouTube video player"

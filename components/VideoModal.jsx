@@ -2,6 +2,33 @@ import { useState, useEffect } from "react";
 import { FiX } from "react-icons/fi";
 
 export default function VideoModal() {
+  useEffect(() => {
+    const modal = document.getElementById('video_modal');
+    const iframe = modal?.querySelector('iframe');
+    
+    const stopVideo = () => {
+      if (iframe) {
+        const currentSrc = iframe.src;
+        iframe.src = '';
+        iframe.src = currentSrc;
+      }
+    };
+
+    const handleClickOutside = (e) => {
+      if (e.target === modal) {
+        modal.close();
+      }
+    };
+
+    modal?.addEventListener('close', stopVideo);
+    modal?.addEventListener('click', handleClickOutside);
+    
+    return () => {
+      modal?.removeEventListener('close', stopVideo);
+      modal?.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
   return (
     <dialog id="video_modal" className="modal">
       <div className="modal-box w-11/12 max-w-4xl relative">

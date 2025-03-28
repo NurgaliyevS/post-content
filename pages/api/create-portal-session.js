@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     const user = await User.findOne({ name: req.body.name });
 
     if (!user?.customer_id) {
-      return res.status(400).json({ error: 'No subscription found' });
+      return res.status(200).json({ url: `${process.env.NEXTAUTH_URL}/#pricing` });
     }
 
     const portalSession = await stripe.billingPortal.sessions.create({

@@ -244,7 +244,7 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
             </div>
 
             {/* User Profile */}
-            <div className="p-4 border-t border-gray-200 flex items-center">
+            <div className="p-4 border-t border-gray-200 flex items-center h-20">
               <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-3">
                 <FaRegUserCircle className="w-6 h-6 text-gray-500" />
               </div>

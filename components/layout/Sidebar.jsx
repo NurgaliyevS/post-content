@@ -35,13 +35,13 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
   ];
 
   const bottomNavItems = [
-    { name: "Support", icon: BiSupport, href: "/dashboard/support" },
+    // { name: "Support", icon: BiSupport, href: "/dashboard/support" },
     {
       name: "Billing",
       icon: AiOutlineCreditCard,
       href: billingUrl || "/#pricing",
     },
-    { name: "Settings", icon: FiSettings, href: "/dashboard/settings" },
+    // { name: "Settings", icon: FiSettings, href: "/dashboard/settings" },
   ];
 
   useEffect(() => {

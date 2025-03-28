@@ -51,14 +51,26 @@ const TimeSelector = ({ selectedTime, onTimeSelect, selectedDate }) => {
     const now = new Date();
     const selectedDateTime = new Date(selectedDate);
     
+    // Only validate time if the selected date is today
+    const isToday = selectedDateTime.toDateString() === now.toDateString();
+    if (!isToday) return false;
+    
     // Convert selected time to 24-hour format
     let hours24 = parseInt(hour);
     if (period === "PM" && hours24 !== 12) hours24 += 12;
     if (period === "AM" && hours24 === 12) hours24 = 0;
     
-    selectedDateTime.setHours(hours24, parseInt(minute), 0, 0);
+    // Create a new date object for comparison
+    const compareDateTime = new Date(selectedDateTime);
+    compareDateTime.setHours(hours24, parseInt(minute), 0, 0);
     
-    return selectedDateTime < now;
+    // Get current time rounded down to the nearest 15 minutes
+    const currentMinutes = now.getMinutes();
+    const roundedMinutes = Math.floor(currentMinutes / 15) * 15;
+    const roundedNow = new Date(now);
+    roundedNow.setMinutes(roundedMinutes, 0, 0);
+    
+    return compareDateTime < roundedNow;
   };
 
   const handleHourClick = (hour) => {

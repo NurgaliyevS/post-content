@@ -7,7 +7,7 @@ import Link from 'next/link';
 
 const OnboardingStep = ({ icon: Icon, title, time, completed, customIcon, actionButton }) => {
   return (
-    <div className="bg-white p-4 rounded-lg border border-gray-100 flex items-center mb-3 shadow-sm">
+    <div className={`bg-white p-4 rounded-lg border border-gray-100 flex items-center mb-3 shadow-sm ${completed ? 'opacity-50' : ''}`}>
       <div className="flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-500 rounded-full mr-4 flex-shrink-0">
         {customIcon ? customIcon : <Icon className="w-4 h-4" />}
       </div>

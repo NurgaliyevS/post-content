@@ -101,7 +101,7 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
       <div
         className={`
         fixed top-0 left-0 z-50 
-        w-64 bg-white border-r border-gray-200 
+        w-64 bg-[#F3F4EF] border-r border-[#DADBD2] 
         h-screen overflow-y-auto transition-transform duration-300 ease-in-out
         md:translate-x-0
         ${showSidebar ? "translate-x-0" : "-translate-x-full"}

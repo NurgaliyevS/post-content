@@ -8,7 +8,7 @@ function DashboardLayout({ children, loading }) {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-gray-50 items-center justify-center">
+      <div className="flex min-h-screen bg-[#F3F4EF] items-center justify-center">
         <div className="text-center">
           <div className="inline-block p-3 bg-black rounded-xl mb-3">
             <RiMickeyLine className="w-10 h-10 text-white animate-pulse" />
@@ -20,7 +20,7 @@ function DashboardLayout({ children, loading }) {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-[#F3F4EF]">
       <aside className="md:w-64 flex-shrink-0">
         <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
       </aside>

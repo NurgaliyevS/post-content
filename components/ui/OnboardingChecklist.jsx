@@ -31,6 +31,7 @@ const OnboardingStep = ({ icon: Icon, title, time, completed, customIcon, action
 export default function OnboardingChecklist() {
   const { data: session } = useSession();
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [amountOfScheduledPosts, setAmountOfScheduledPosts] = useState(0);
 
   const steps = [
     {
@@ -57,7 +58,7 @@ export default function OnboardingChecklist() {
     {
       title: "Schedule your first post",
       time: "2 minutes", 
-      completed: false,
+      completed: amountOfScheduledPosts > 0,
       iconComponent: FaRegCalendarAlt,
       actionButton: (
         <Link href="/dashboard/scheduling">
@@ -70,14 +71,26 @@ export default function OnboardingChecklist() {
   ];
 
   useEffect(() => {
-    const getUser = async () => {
-      const response = await fetch("/api/user/user");
-      const userData = await response.json();
-      setIsSubscribed(userData?.variant_name !== "free");
-    };
-
     getUser();
   }, []);
+
+  useEffect(() => {
+    getScheduledPosts();
+  }, []);
+
+  const getUser = async () => {
+    const response = await fetch("/api/user/user");
+    const userData = await response.json();
+    setIsSubscribed(userData?.variant_name !== "free");
+  };
+
+  const getScheduledPosts = async () => {
+    const response = await fetch("/api/post/get-post");
+    const scheduledPosts = await response.json();
+    if (scheduledPosts?.scheduledPosts?.length > 0) {
+      setAmountOfScheduledPosts(scheduledPosts?.scheduledPosts?.length);
+    }
+  };
 
   return (
     <div className="space-y-2">

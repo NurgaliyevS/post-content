@@ -85,8 +85,6 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
     }
   };
 
-  console.log(bottomNavItems, "bottom nav items");
-
   return (
     <>
       {/* Mobile overlay */}

@@ -16,6 +16,8 @@ export default async function handler(req, res) {
 
     let accessToken = session.accessToken;
     const refreshToken = session.refreshToken;
+
+    console.log(session, 'session');
     
     if (!accessToken) {
       return res.status(400).json({ error: 'Reddit access token not available' });

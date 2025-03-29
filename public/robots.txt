@@ -2,6 +2,14 @@
 User-agent: *
 Allow: /
 
+# *
+User-agent: *
+Disallow: /dashboard/
+
+# *
+User-agent: *
+Disallow: /api/
+
 # Host
 Host: https://redditscheduler.com
 

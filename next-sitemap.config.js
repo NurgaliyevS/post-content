@@ -8,6 +8,8 @@ module.exports = {
   robotsTxtOptions: {
     policies: [
       { userAgent: '*', allow: '/' },
+      { userAgent: '*', disallow: '/dashboard/' },
+      { userAgent: '*', disallow: '/api/' },
     ],
   },
   sitemapSize: 7000,

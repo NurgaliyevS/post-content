@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import TimeSelector from "@/components/ui/TimeSelector";
 import withAuth from "@/components/withAuth";
 import PostTypeTabs from "@/components/scheduling/PostTypeTabs";
 import FormattingToolbar from "@/components/scheduling/FormattingToolbar";
-import Calendar from "@/components/scheduling/Calendar";
 import SubredditSelector from "@/components/scheduling/SubredditSelector";
 import { format, parse, setHours, setMinutes, add, sub } from "date-fns";
 

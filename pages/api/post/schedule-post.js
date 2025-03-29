@@ -43,8 +43,6 @@ export default async function handler(req, res) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    console.log(session, 'session');
-
     // Get the submitted data
     const { 
       community, 
@@ -173,6 +171,8 @@ export default async function handler(req, res) {
     else {
       // Connect to MongoDB
       await connectMongoDB();
+
+      console.log("scheduling post...")
 
       // Create a new scheduled post
       const scheduledPost = new ScheduledPost({

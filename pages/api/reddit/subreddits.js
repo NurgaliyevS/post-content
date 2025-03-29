@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]";
+import { refreshAccessToken } from '@/utils/refreshAccessToken';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -13,24 +14,65 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    // Get Reddit access token from session
-    const accessToken = session.accessToken;
+    let accessToken = session.accessToken;
+    const refreshToken = session.refreshToken;
     
     if (!accessToken) {
       return res.status(400).json({ error: 'Reddit access token not available' });
     }
 
-    // Fetch user's subscribed subreddits
-    const response = await fetch('https://oauth.reddit.com/subreddits/mine/subscriber?limit=100', {
+    // First attempt with current token
+    let response = await fetch('https://oauth.reddit.com/subreddits/mine/subscriber?limit=100', {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
-        'User-Agent': 'YourAppName/1.0.0'
+        'User-Agent': 'RedditScheduler/1.0.0'
       }
     });
 
+    // If unauthorized, try refreshing the token
+    if (response.status === 401 && refreshToken) {
+      try {
+        console.log('Attempting to refresh token...');
+        const refreshedTokens = await refreshAccessToken(refreshToken);
+        accessToken = refreshedTokens.access_token;
+        
+        // Retry with new token
+        response = await fetch('https://oauth.reddit.com/subreddits/mine/subscriber?limit=100', {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'User-Agent': 'RedditScheduler/1.0.0'
+          }
+        });
+      } catch (refreshError) {
+        console.error('Token refresh failed:', refreshError);
+        return res.status(401).json({ 
+          error: 'Authentication failed',
+          details: 'Failed to refresh access token'
+        });
+      }
+    }
+
+    // Handle response after potential refresh
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Reddit API error:', errorData);
+      const contentType = response.headers.get('content-type');
+      let errorData;
+      
+      try {
+        if (contentType?.includes('application/json')) {
+          errorData = await response.json();
+        } else {
+          errorData = await response.text();
+        }
+      } catch (e) {
+        errorData = 'Could not parse error response';
+      }
+
+      console.error('Reddit API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorData
+      });
+
       return res.status(response.status).json({ 
         error: 'Failed to fetch subreddits',
         details: errorData

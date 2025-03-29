@@ -20,11 +20,10 @@ function Scheduling() {
     title: "",
     text: "",
     selectedDate: format(new Date(), "yyyy-MM-dd"),
-    selectedTime: format(new Date(), "h:mm aa"),
-    type: "text", // Default post type
+    selectedTime: format(new Date(), "HH:mm"),
+    type: "text",
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   });
-  const [currentDate, setCurrentDate] = useState(new Date());
   const [userTimezone, setUserTimezone] = useState("");
   const [saveStatus, setSaveStatus] = useState(""); // For displaying save notifications
   const [initialized, setInitialized] = useState(false);
@@ -118,44 +117,11 @@ function Scheduling() {
     }));
   };
 
-  // Calendar functions
-  const getMonthName = (date) => {
-    return date.toLocaleString("default", { month: "long", year: "numeric" });
-  };
-
-  const getDaysInMonth = (date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    return new Date(year, month + 1, 0).getDate();
-  };
-
-  const getFirstDayOfMonth = (date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    return new Date(year, month, 1).getDay();
-  };
-
-  const changeMonth = (increment) => {
-    const newDate = new Date(currentDate);
-    newDate.setMonth(newDate.getMonth() + increment);
-    setCurrentDate(newDate);
-  };
-
-  const handleDateSelection = (day) => {
-    const monthStr = format(currentDate, "yyyy-MM");
-    const dayStr = day.toString().padStart(2, "0");
-    const dateStr = `${monthStr}-${dayStr}`;
-
-    setFormData((prev) => ({
+  const handleDateTimeChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
       ...prev,
-      selectedDate: dateStr,
-    }));
-  };
-
-  const handleTimeSelection = (time) => {
-    setFormData((prev) => ({
-      ...prev,
-      selectedTime: time,
+      [name]: value
     }));
   };
 
@@ -180,21 +146,11 @@ function Scheduling() {
         new Date()
       );
 
-      // Parse the time string
-      const timeMatch = formData.selectedTime.match(/^(\d+):(\d+) (AM|PM)$/);
-      if (!timeMatch) {
-        throw new Error(`Invalid time format: ${formData.selectedTime}`);
-      }
-
-      const [_, hours, minutes, period] = timeMatch;
-      let hour = parseInt(hours, 10);
-
-      // Convert to 24-hour format
-      if (period === "PM" && hour < 12) hour += 12;
-      if (period === "AM" && hour === 12) hour = 0;
-
+      // Parse the time string (now in 24-hour format)
+      const [hours, minutes] = formData.selectedTime.split(':');
+      
       // Set hours and minutes on the scheduledDate
-      let scheduledDateTime = setHours(scheduledDate, hour);
+      let scheduledDateTime = setHours(scheduledDate, parseInt(hours, 10));
       scheduledDateTime = setMinutes(scheduledDateTime, parseInt(minutes, 10));
 
       // Format as ISO string for API
@@ -227,7 +183,7 @@ function Scheduling() {
         title: "",
         text: "",
         selectedDate: format(new Date(), "yyyy-MM-dd"),
-        selectedTime: format(new Date(), "h:mm aa"),
+        selectedTime: format(new Date(), "HH:mm"),
         type: "text",
       });
 
@@ -304,29 +260,24 @@ function Scheduling() {
               }}
             ></textarea>
 
-            <div className="flex gap-8 flex-col md:flex-row">
-              <div className="flex-1">
-                <p className="text-sm text-gray-500 mb-2">
-                  {userTimezone} timezone
-                </p>
-                <Calendar
-                  currentDate={currentDate}
-                  selectedDate={formData.selectedDate}
-                  onDateSelect={handleDateSelection}
-                  onMonthChange={changeMonth}
-                  getMonthName={getMonthName}
-                  getDaysInMonth={getDaysInMonth}
-                  getFirstDayOfMonth={getFirstDayOfMonth}
-                />
-              </div>
-
-              <div className="flex-1">
-                <TimeSelector
-                  selectedTime={formData.selectedTime}
-                  onTimeSelect={handleTimeSelection}
-                  selectedDate={formData.selectedDate}
-                />
-              </div>
+            <div className="flex gap-4 mt-4">
+              <input
+                type="date"
+                name="selectedDate"
+                value={formData.selectedDate}
+                onChange={handleDateTimeChange}
+                min={format(new Date(), "yyyy-MM-dd")}
+                className="input input-bordered"
+              />
+              
+              <input
+                type="time"
+                name="selectedTime"
+                value={formData.selectedTime}
+                onChange={handleDateTimeChange}
+                className="input input-bordered"
+                format="HH:mm"
+              />
             </div>
 
             <div className="flex justify-end mt-6">

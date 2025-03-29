@@ -143,11 +143,12 @@ export default async function handler(req, res) {
         scheduledFor: scheduledDateTime,
         userTimeZone: timeZone,
         status: 'published',
-        redditPostId: redditData.json?.data?.id || null,
-        redditFullname: redditData.json?.data?.name || null,
+        redditPostId: redditData?.json?.data?.id || null,
+        redditFullname: redditData?.json?.data?.name || null,
         redditAccessToken: session.accessToken,
         redditRefreshToken: session.refreshToken,
-        postedAt: currentClientTime
+        postedAt: currentClientTime,
+        redditPostUrl: redditData?.json?.data?.url || null
       });
       
       const savedPost = await postedPost.save();
@@ -160,9 +161,9 @@ export default async function handler(req, res) {
           title,
           scheduledFor: scheduledDateTime,
           postedAt: currentClientTime,
-          redditPostId: redditData.json?.data?.id || null,
-          redditFullname: redditData.json?.data?.name || null,
-          redditUrl: redditData.json?.data?.url || null
+          redditPostId: redditData?.json?.data?.id || null,
+          redditFullname: redditData?.json?.data?.name || null,
+          redditPostUrl: redditData?.json?.data?.url || null
         }
       });
       

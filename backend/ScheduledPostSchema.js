@@ -23,10 +23,6 @@ const ScheduledPostSchema = new mongoose.Schema({
     enum: ["text", "link", "image"],
     default: "text"
   },
-  url: {
-    type: String,
-    default: ""
-  },
   scheduledFor: {
     type: Date,
   },

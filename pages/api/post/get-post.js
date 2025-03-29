@@ -17,8 +17,8 @@ export default async function handler(req, res) {
 
     await connectMongoDB();
     
-    // get all scheduled posts that user has
-    const scheduledPosts = await ScheduledPost.find({ userId: session.user.id });
+    // latest posts first
+    const scheduledPosts = await ScheduledPost.find({ userId: session.user.id }).sort({ createdAt: -1 });
 
     return res.status(200).json({ scheduledPosts });
   } catch (error) {

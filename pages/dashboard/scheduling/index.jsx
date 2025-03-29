@@ -6,6 +6,7 @@ import PostTypeTabs from "@/components/scheduling/PostTypeTabs";
 import FormattingToolbar from "@/components/scheduling/FormattingToolbar";
 import SubredditSelector from "@/components/scheduling/SubredditSelector";
 import { format, parse, setHours, setMinutes, add, sub } from "date-fns";
+import Post from "@/components/ui/Post";
 
 function Scheduling() {
   const { data: session, status } = useSession();
@@ -204,9 +205,9 @@ function Scheduling() {
 
   return (
     <DashboardLayout loading={loading}>
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl">
         <h1 className="text-2xl md:text-3xl font-bold mb-6">
-          Schedule Your Reddit Posts
+          Schedule Reddit Posts
         </h1>
 
         {saveStatus && (
@@ -296,6 +297,7 @@ function Scheduling() {
           </div>
         </div>
       </div>
+      <Post />
     </DashboardLayout>
   );
 }

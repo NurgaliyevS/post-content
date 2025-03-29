@@ -3,10 +3,37 @@ import { authOptions } from "../auth/[...nextauth]";
 import connectMongoDB from "@/backend/mongodb";
 import ScheduledPost from "@/backend/ScheduledPostSchema";
 import { differenceInMinutes } from "date-fns";
+import { refreshAccessToken } from '@/utils/refreshAccessToken';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
+  }
+
+  async function makeRedditRequest(accessToken, body) {
+    const response = await fetch('https://oauth.reddit.com/api/submit', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'RedditScheduler/1.0.0'
+      },
+      body: new URLSearchParams(body)
+    });
+
+    // If unauthorized, throw specific error
+    if (response.status === 401) {
+      throw new Error('UNAUTHORIZED');
+    }
+
+    // Handle non-JSON responses
+    const contentType = response.headers.get('content-type');
+    if (!contentType?.includes('application/json')) {
+      const text = await response.text();
+      throw new Error(`Non-JSON response: ${text.substring(0, 100)}...`);
+    }
+
+    return response.json();
   }
 
   try {
@@ -73,75 +100,74 @@ export default async function handler(req, res) {
     if (shouldPostImmediately) {
       console.log('Posting to Reddit immediately...');
       
-      try {
-        // Construct Reddit API request for submission
-        const redditApiUrl = `https://oauth.reddit.com/api/submit`;
-        
-        // Make the actual API call to Reddit
-        const redditResponse = await fetch(redditApiUrl, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${session.accessToken}`,
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'User-Agent': 'RedditScheduler/1.0.0'
-          },
-          body: new URLSearchParams({
-            'sr': community.replace('r/', ''), // Remove 'r/' prefix if present
-            'kind': 'self',                   // 'self' for text posts
-            'title': title,
-            'text': text,
-            'api_type': 'json',
-            'resubmit': 'true'
-          })
-        });
-        const redditData = await redditResponse.json();
+      const postBody = {
+        'sr': community.replace('r/', ''),
+        'kind': 'self',
+        'title': title,
+        'text': text,
+        'api_type': 'json',
+        'resubmit': 'true'
+      };
 
-        if (!redditResponse.ok) {
-          throw new Error(redditData.error || redditData.message || 'Failed to submit post to Reddit');
+      let redditData;
+      try {
+        // First attempt with current token
+        redditData = await makeRedditRequest(session.accessToken, postBody);
+      } catch (error) {
+        if (error.message === 'UNAUTHORIZED' && session.refreshToken) {
+          console.log('Token expired, attempting refresh...');
+          // Try refreshing the token
+          const refreshedTokens = await refreshAccessToken(session.refreshToken);
+          
+          // Retry with new token
+          redditData = await makeRedditRequest(refreshedTokens.access_token, postBody);
+          
+          // Update session token for future requests
+          session.accessToken = refreshedTokens.access_token;
+        } else {
+          throw error;
         }
-        
-        // Connect to MongoDB
-        await connectMongoDB();
-        
-        const postedPost = new ScheduledPost({
-          userId: session.user.id,
-          community: community.replace('r/', ''),
+      }
+
+      if (!redditData?.json?.data) {
+        throw new Error('Invalid response from Reddit API');
+      }
+
+      // Connect to MongoDB
+      await connectMongoDB();
+      
+      const postedPost = new ScheduledPost({
+        userId: session.user.id,
+        community: community.replace('r/', ''),
+        title,
+        text,
+        type,
+        scheduledFor: scheduledDateTime,
+        userTimeZone: timeZone,
+        status: 'published',
+        redditPostId: redditData.json?.data?.id || null,
+        redditFullname: redditData.json?.data?.name || null,
+        redditAccessToken: session.accessToken,
+        redditRefreshToken: session.refreshToken,
+        postedAt: currentClientTime
+      });
+      
+      const savedPost = await postedPost.save();
+
+      return res.status(200).json({
+        message: 'Post submitted to Reddit immediately',
+        data: {
+          id: savedPost._id,
+          community,
           title,
-          text,
-          type,
           scheduledFor: scheduledDateTime,
-          userTimeZone: timeZone,
-          status: 'published',
+          postedAt: currentClientTime,
           redditPostId: redditData.json?.data?.id || null,
           redditFullname: redditData.json?.data?.name || null,
-          redditAccessToken: session.accessToken,
-          redditRefreshToken: session.refreshToken,
-          postedAt: currentClientTime
-        });
-        
-        const savedPost = await postedPost.save();
-
-        return res.status(200).json({
-          message: 'Post submitted to Reddit immediately',
-          data: {
-            id: savedPost._id,
-            community,
-            title,
-            scheduledFor: scheduledDateTime,
-            postedAt: currentClientTime,
-            redditPostId: redditData.json?.data?.id || null,
-            redditFullname: redditData.json?.data?.name || null,
-            redditUrl: redditData.json?.data?.url || null
-          }
-        });
-        
-      } catch (error) {
-        console.error('Error posting to Reddit:', error);
-        return res.status(500).json({ 
-          message: 'Error posting to Reddit',
-          error: error.message 
-        });
-      }
+          redditUrl: redditData.json?.data?.url || null
+        }
+      });
+      
     } 
     // Otherwise, schedule the post for later
     else {

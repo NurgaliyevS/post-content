@@ -1,8 +1,6 @@
 import { useEffect } from "react";
 
 const CrispChat = ({ websiteId }) => {
-  console.log("websiteId", websiteId);
-
   useEffect(() => {
     // Only run on client-side
     if (typeof window !== "undefined" && websiteId) {

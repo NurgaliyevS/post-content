@@ -13,6 +13,7 @@ const UserSchema = new mongoose.Schema(
     subscription_id: String,
     customer_name: String,
     post_available: { type: Number, default: 0 },
+    has_received_first_subscription_email: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

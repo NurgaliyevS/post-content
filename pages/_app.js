@@ -5,6 +5,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PlausibleProvider from "next-plausible";
 import { customConfig } from "@/project.custom.config";
+import CrispChat from "@/components/CrispChat";
 
 export default function App({
   Component,
@@ -26,6 +27,7 @@ export default function App({
         draggable
         pauseOnHover
       />
+      <CrispChat websiteId={process.env.NEXT_PUBLIC_CRISP_WEBSITE_ID} />
     </SessionProvider>
     </PlausibleProvider>
   );

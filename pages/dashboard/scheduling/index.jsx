@@ -27,6 +27,7 @@ function Scheduling() {
   const [saveStatus, setSaveStatus] = useState(""); // For displaying save notifications
   const [initialized, setInitialized] = useState(false);
   const [isLoadingForm, setIsLoadingForm] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   if (status !== "loading" && !initialized) {
     setLoading(false);
@@ -189,9 +190,11 @@ function Scheduling() {
       const data = await response.json();
       if (data?.message) {
         setSaveStatus(data?.message);
+        setRefreshTrigger(prev => prev + 1);
         setTimeout(() => setSaveStatus(""), 3000);
       } else {
         setSaveStatus("Post scheduled successfully!");
+        setRefreshTrigger(prev => prev + 1);
         setTimeout(() => setSaveStatus(""), 3000);
       }
     } catch (error) {
@@ -297,7 +300,7 @@ function Scheduling() {
           </div>
         </div>
       </div>
-      <Post />
+      <Post key={refreshTrigger} />
     </DashboardLayout>
   );
 }

@@ -75,7 +75,7 @@ function Post() {
               <div className="border-t border-gray-200 mt-2 pt-2">
                 <span className="text-gray-500 text-sm flex gap-2 items-center">
                   <FaCalendar className="w-3 h-3" />
-                  {format(new Date(post.createdAt), "MM/dd/yyyy HH:mm")}
+                  {format(new Date(post.scheduledFor), "MM/dd/yyyy HH:mm")}
                 </span>
               </div>
             </a>

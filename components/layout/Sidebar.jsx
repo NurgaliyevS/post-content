@@ -11,11 +11,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { formatDistanceToNow } from "date-fns";
+import { useSidebar } from '@/context/SidebarContext';
 
 export default function Sidebar({ showSidebar, setShowSidebar }) {
-  const [user, setUser] = useState(null);
-  const [billingUrl, setBillingUrl] = useState("/#pricing");
-
+  const { state: { user, billingUrl }, refreshData } = useSidebar();
   const router = useRouter();
   const currentPath = router.pathname;
 
@@ -43,35 +42,6 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
     },
     // { name: "Settings", icon: FiSettings, href: "/dashboard/settings" },
   ];
-
-  useEffect(() => {
-    const getUser = async () => {
-      const response = await fetch("/api/user/user");
-      const userData = await response.json();
-      setUser(userData);
-
-      if (userData?.name) {
-        try {
-          const portalResponse = await fetch("/api/create-portal-session", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              name: userData.name,
-            }),
-          });
-          const { url } = await portalResponse.json();
-          setBillingUrl(url);
-        } catch (error) {
-          console.error("Error creating portal session:", error);
-          setBillingUrl("/#pricing");
-        }
-      }
-    };
-
-    getUser();
-  }, []);
 
   const formatDate = () => {
     if (user?.ends_at) {

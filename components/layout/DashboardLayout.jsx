@@ -1,17 +1,24 @@
 import { useState } from "react";
 import { HiMenu } from "react-icons/hi";
 import Sidebar from "@/components/layout/Sidebar";
-import { RiMickeyLine } from "react-icons/ri";
+import { useSidebar } from "@/context/SidebarContext";
+import Image from "next/image";
 
 function DashboardLayout({ children, loading }) {
   const [showSidebar, setShowSidebar] = useState(false);
+  const { state } = useSidebar();
 
-  if (loading) {
+  if (state.loading) {
     return (
       <div className="flex min-h-screen bg-[#F3F4EF] items-center justify-center">
         <div className="text-center">
-          <div className="inline-block p-3 bg-black rounded-xl mb-3">
-            <RiMickeyLine className="w-10 h-10 text-white animate-pulse" />
+          <div className="inline-block p-3 rounded-xl mb-3">
+            <Image
+              src="/logo.svg"
+              alt="Reddit Scheduler Logo"
+              width={32}
+              height={32}
+            />
           </div>
           <h1 className="text-xl font-bold">Loading...</h1>
         </div>

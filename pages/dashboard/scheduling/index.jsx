@@ -10,7 +10,7 @@ import Post from "@/components/ui/Post";
 
 function Scheduling() {
   const { data: session, status } = useSession();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [subreddits, setSubreddits] = useState([]);
   const [subredditsLoading, setSubredditsLoading] = useState(false);
   const [subredditsError, setSubredditsError] = useState(null);

@@ -4,7 +4,7 @@ import Sidebar from "@/components/layout/Sidebar";
 import { useSidebar } from "@/context/SidebarContext";
 import Image from "next/image";
 
-function DashboardLayout({ children, loading }) {
+function DashboardLayout({ children }) {
   const [showSidebar, setShowSidebar] = useState(false);
   const { state } = useSidebar();
 

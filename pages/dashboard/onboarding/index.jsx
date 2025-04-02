@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { BiCalendarCheck } from "react-icons/bi";
 import { FiTarget } from "react-icons/fi";
-import { AiOutlineLineChart } from "react-icons/ai";
-import { BsGraphUp } from "react-icons/bs";
 import FeatureCard from "@/components/ui/FeatureCard";
 import Image from "next/image";
 import OnboardingChecklist from "@/components/ui/OnboardingChecklist";
@@ -13,13 +11,6 @@ import withAuth from "@/components/withAuth";
 
 function Onboarding() {
   const { data: session, status } = useSession();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (status !== "loading") {
-      setLoading(false);
-    }
-  }, [status]);
 
   const featureCards = [
     {
@@ -38,27 +29,10 @@ function Onboarding() {
       iconBgColor: "bg-green-100",
       href: "/dashboard/cross-posting",
     },
-    {
-      icon: AiOutlineLineChart,
-      title: "Hook Generator",
-      description: "Viral templates to maximize engagement on your posts",
-      iconColor: "text-purple-500",
-      iconBgColor: "bg-purple-100",
-      href: "/dashboard/hook-generator",
-    },
-    {
-      icon: BsGraphUp,
-      title: "Analytics",
-      description:
-        "Track views, engagement rates, and comments across your posts (coming soon)",
-      iconColor: "text-orange-500",
-      iconBgColor: "bg-orange-100",
-      href: "/dashboard/analytics",
-    },
   ];
 
   return (
-    <DashboardLayout loading={loading}>
+    <DashboardLayout>
       <div className="max-w-2xl mx-auto min-h-screen pb-20">
         {/* Welcome Section */}
         <div className="text-center mb-8">

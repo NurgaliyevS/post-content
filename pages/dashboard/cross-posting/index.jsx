@@ -34,10 +34,10 @@ function CrossPosting() {
         </h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col">
             <h2 className="text-lg font-semibold mb-4">Source Post</h2>
 
-            <div className="space-y-3 mt-4">
+            <div className="space-y-3 mt-4 flex-grow overflow-y-auto max-h-[500px]">
               {posts.map((post) => (
                 <div
                   key={post._id}

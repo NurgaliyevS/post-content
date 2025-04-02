@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { IoHomeOutline } from "react-icons/io5";
 import { FaRegUserCircle, FaRegCalendarAlt } from "react-icons/fa";
-import { BiSupport } from "react-icons/bi";
 import { FiTarget, FiSettings } from "react-icons/fi";
 import { AiOutlineCreditCard, AiOutlineLineChart } from "react-icons/ai";
-import { BsGraphUp } from "react-icons/bs";
 import { BiCalendarCheck } from "react-icons/bi";
 import { HiX } from "react-icons/hi";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { formatDistanceToNow } from "date-fns";
-import { useSidebar } from '@/context/SidebarContext';
+import { useSidebar } from "@/context/SidebarContext";
 
 export default function Sidebar({ showSidebar, setShowSidebar }) {
-  const { state: { user, billingUrl }, refreshData } = useSidebar();
+  const {
+    state: { user, billingUrl },
+    refreshData,
+  } = useSidebar();
   const router = useRouter();
   const currentPath = router.pathname;
 
@@ -25,12 +26,11 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
       href: "/dashboard/scheduling",
     },
     { name: "Cross-Posting", icon: FiTarget, href: "/dashboard/cross-posting" },
-    {
-      name: "Hook Generator",
-      icon: AiOutlineLineChart,
-      href: "/dashboard/hook-generator",
-    },
-    { name: "Analytics", icon: BsGraphUp, href: "/dashboard/analytics" },
+    // {
+    //   name: "Hook Generator",
+    //   icon: AiOutlineLineChart,
+    //   href: "/dashboard/hook-generator",
+    // },
   ];
 
   const bottomNavItems = [

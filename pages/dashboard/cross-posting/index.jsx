@@ -5,7 +5,7 @@ import withAuth from "@/components/withAuth";
 import { FiArrowRight, FiCalendar, FiCheck } from "react-icons/fi";
 import { FaUsers } from "react-icons/fa";
 import axios from "axios";
-import { format } from "date-fns";
+import { format, parse, setHours, setMinutes } from "date-fns";
 
 function CrossPosting() {
   const { data: session } = useSession();
@@ -13,6 +13,14 @@ function CrossPosting() {
   const [subreddits, setSubreddits] = useState([]);
   const [subredditsLoading, setSubredditsLoading] = useState(false);
   const [subredditsError, setSubredditsError] = useState(null);
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [formData, setFormData] = useState({
+    selectedDate: format(new Date(), "yyyy-MM-dd"),
+    selectedTime: format(new Date(), "HH:mm"),
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  });
+  const [saveStatus, setSaveStatus] = useState("");
+  const [isLoadingForm, setIsLoadingForm] = useState(false);
 
   useEffect(() => {
     fetchPosts();
@@ -51,14 +59,80 @@ function CrossPosting() {
     }
   };
 
+  const handleDateTimeChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const schedulePost = async () => {
+    if (!selectedPost || !formData.selectedDate || !formData.selectedTime) {
+      setSaveStatus("Please select a post and schedule time");
+      setTimeout(() => setSaveStatus(""), 3000);
+      return;
+    }
+
+    setIsLoadingForm(true);
+    try {
+      const scheduledDate = parse(
+        formData.selectedDate,
+        "yyyy-MM-dd",
+        new Date()
+      );
+      const [hours, minutes] = formData.selectedTime.split(":");
+
+      let scheduledDateTime = setHours(scheduledDate, parseInt(hours, 10));
+      scheduledDateTime = setMinutes(scheduledDateTime, parseInt(minutes, 10));
+
+      const scheduledDateTimeISO = format(
+        scheduledDateTime,
+        "yyyy-MM-dd'T'HH:mm:ssxxx"
+      );
+      const currentTimeISO = format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx");
+
+      const response = await fetch("/api/post/schedule-post", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...selectedPost,
+          scheduledDateTime: scheduledDateTimeISO,
+          timeZone: formData.timeZone,
+          currentClientTime: currentTimeISO,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to schedule post");
+      }
+
+      const data = await response.json();
+      setSaveStatus(data?.message || "Post scheduled successfully!");
+      setTimeout(() => setSaveStatus(""), 3000);
+    } catch (error) {
+      console.error("Error scheduling post:", error);
+      setSaveStatus("Error scheduling post. Please try again.");
+      setTimeout(() => setSaveStatus(""), 3000);
+    } finally {
+      setIsLoadingForm(false);
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="">
         <h1 className="text-2xl md:text-3xl font-bold mb-6">Cross-Posting</h1>
 
+        {saveStatus && (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-800">
+            {saveStatus}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col">
-            <h2 className="text-lg font-semibold mb-4">Source Post</h2>
+            <h2 className="text-lg font-semibold">Source Post</h2>
 
             <div className="space-y-3 mt-4 flex-grow overflow-y-auto max-h-[500px]">
               {posts.map((post) => (
@@ -91,16 +165,12 @@ function CrossPosting() {
           </div>
 
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold mb-4">Target Subreddits</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold mb-4">Target Subreddits</h2>
+              <button className="text-sm text-blue-600">Select All</button>
+            </div>
 
             <div className="mb-4">
-              <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium">
-                  Select Target Subreddits
-                </label>
-                <button className="text-sm text-blue-600">Select All</button>
-              </div>
-
               <div className="h-60 overflow-y-auto space-y-2 border rounded-md p-2">
                 {subredditsLoading ? (
                   <div className="text-center p-4 text-gray-500">
@@ -141,16 +211,17 @@ function CrossPosting() {
             </div>
 
             <div className="border-t pt-4 mt-4">
-              <h3 className="text-md font-medium mb-3">Scheduling Options</h3>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">Date</label>
                   <div className="relative">
                     <input
                       type="date"
+                      name="selectedDate"
+                      value={formData.selectedDate}
+                      onChange={handleDateTimeChange}
+                      min={format(new Date(), "yyyy-MM-dd")}
                       className="w-full p-2 border rounded-md"
-                      defaultValue="2025-04-02"
                     />
                   </div>
                 </div>
@@ -159,140 +230,31 @@ function CrossPosting() {
                   <div className="relative">
                     <input
                       type="time"
+                      name="selectedTime"
+                      value={formData.selectedTime}
+                      onChange={handleDateTimeChange}
                       className="w-full p-2 border rounded-md"
-                      defaultValue="15:30"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">
-                  Posting Interval (minutes)
-                </label>
-                <select className="w-full p-2 border rounded-md">
-                  <option>Post all at once</option>
-                  <option>15 minutes</option>
-                  <option>30 minutes</option>
-                  <option>60 minutes</option>
-                  <option>Custom</option>
-                </select>
-              </div>
-
               <div className="flex justify-end">
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center">
-                  Schedule Cross-Posts
+                <button
+                  className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center"
+                  onClick={schedulePost}
+                  disabled={
+                    !selectedPost ||
+                    !formData.selectedDate ||
+                    !formData.selectedTime ||
+                    isLoadingForm
+                  }
+                >
+                  {isLoadingForm ? "Scheduling..." : "Schedule Cross-Posts"}
                   <FiArrowRight className="ml-2" />
                 </button>
               </div>
             </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">Cross-Posting History</h2>
-            <select className="p-2 border rounded-md text-sm">
-              <option>All Status</option>
-              <option>Scheduled</option>
-              <option>Published</option>
-              <option>Failed</option>
-            </select>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="p-3 text-left text-sm font-medium text-gray-500">
-                    Original Post
-                  </th>
-                  <th className="p-3 text-left text-sm font-medium text-gray-500">
-                    Cross-Posted To
-                  </th>
-                  <th className="p-3 text-left text-sm font-medium text-gray-500">
-                    Schedule
-                  </th>
-                  <th className="p-3 text-left text-sm font-medium text-gray-500">
-                    Status
-                  </th>
-                  <th className="p-3 text-left text-sm font-medium text-gray-500">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                <tr>
-                  <td className="p-3">
-                    <div className="font-medium">
-                      A tool that schedule your posts on Reddit
-                    </div>
-                    <div className="text-sm text-gray-500">r/microsaas</div>
-                  </td>
-                  <td className="p-3">
-                    <div className="flex flex-wrap gap-1">
-                      <span className="bg-gray-100 px-2 py-1 rounded text-xs">
-                        r/SideProject
-                      </span>
-                      <span className="bg-gray-100 px-2 py-1 rounded text-xs">
-                        r/startups
-                      </span>
-                      <span className="bg-gray-100 px-2 py-1 rounded text-xs">
-                        +2 more
-                      </span>
-                    </div>
-                  </td>
-                  <td className="p-3">
-                    <div className="flex items-center">
-                      <FiCalendar className="text-gray-400 mr-1" />
-                      <span>04/03/2025 10:15</span>
-                    </div>
-                  </td>
-                  <td className="p-3">
-                    <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">
-                      Scheduled
-                    </span>
-                  </td>
-                  <td className="p-3">
-                    <button className="text-blue-600 hover:text-blue-800 text-sm">
-                      Edit
-                    </button>
-                    <button className="text-red-600 hover:text-red-800 text-sm ml-3">
-                      Cancel
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td className="p-3">
-                    <div className="font-medium">Test post</div>
-                    <div className="text-sm text-gray-500">r/test</div>
-                  </td>
-                  <td className="p-3">
-                    <div className="flex flex-wrap gap-1">
-                      <span className="bg-gray-100 px-2 py-1 rounded text-xs">
-                        r/webdev
-                      </span>
-                    </div>
-                  </td>
-                  <td className="p-3">
-                    <div className="flex items-center">
-                      <FiCheck className="text-green-500 mr-1" />
-                      <span>04/01/2025 22:10</span>
-                    </div>
-                  </td>
-                  <td className="p-3">
-                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-                      Published
-                    </span>
-                  </td>
-                  <td className="p-3">
-                    <button className="text-blue-600 hover:text-blue-800 text-sm">
-                      View
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
           </div>
         </div>
       </div>

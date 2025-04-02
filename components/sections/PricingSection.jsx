@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FaArrowRight } from "react-icons/fa";
 
 export default function PricingSection() {
   const [loading, setLoading] = useState(false);
@@ -75,7 +76,8 @@ export default function PricingSection() {
               disabled={loading}
               className="btn btn-outline mt-4 w-full"
             >
-              {loading ? "Loading..." : "Buy Now"}
+              {loading ? "Loading..." : "Start 7 day free trial"}
+              <FaArrowRight className="w-3 h-3" />
             </button>
           </div>
         </div>
@@ -103,7 +105,8 @@ export default function PricingSection() {
               disabled={loading}
               className="btn btn-primary mt-4 w-full"
             >
-              {loading ? "Loading..." : "Buy Now"}
+              {loading ? "Loading..." : "Start 7 day free trial"}
+              <FaArrowRight className="w-3 h-3" />
             </button>
           </div>
         </div>
@@ -131,7 +134,8 @@ export default function PricingSection() {
               disabled={loading}
               className="btn btn-outline mt-4 w-full"
             >
-              {loading ? "Loading..." : "Buy Now"}
+              {loading ? "Loading..." : "Start 7 day free trial"}
+              <FaArrowRight className="w-3 h-3" />
             </button>
           </div>
         </div>

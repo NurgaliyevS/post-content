@@ -41,6 +41,16 @@ export default async function handler(req, res) {
       session.subscription
     );
 
+    // Check if the subscription is in trial period
+    const isInTrial = subscription?.status === "trialing";
+
+    console.log("subscription", subscription?.status);
+    const trialEndsAt = isInTrial
+      ? new Date(subscription.trial_end * 1000).toISOString()
+      : null;
+
+    console.log("trialEndsAt", trialEndsAt);
+
     const user = await User.find({ name: redditUser });
 
     const payload = {
@@ -54,6 +64,8 @@ export default async function handler(req, res) {
       subscription_id: session.subscription,
       customer_name: session.customer_details.name,
       post_available: parseInt(metadata.post_available),
+      is_in_trial: isInTrial,
+      trial_ends_at: trialEndsAt,
     };
 
     if (session?.customer_details?.email) {
@@ -80,19 +92,30 @@ export default async function handler(req, res) {
   if (event.type === "customer.subscription.updated") {
     const subscription = event.data.object;
 
+    // Check if the subscription status has changed from trial to active
+    const isInTrial = subscription?.status === "trialing";
+    console.log(subscription.status, "subscription.status");
+    const trialEndsAt = isInTrial
+      ? new Date(subscription.trial_end * 1000).toISOString()
+      : null;
+    console.log("trialEndsAt", trialEndsAt);
+
+    const payload = {
+      is_in_trial: isInTrial,
+      trial_ends_at: trialEndsAt,
+    };
+
     // if the subscription has been cancelled
     if (subscription?.cancel_at_period_end) {
-      const payload = {
-        subscription_renews_at: null,
-      };
-
-      console.log(payload, "payload in customer.subscription.updated");
-
-      await User.findOneAndUpdate(
-        { customer_id: subscription.customer },
-        { $set: payload }
-      );
+      payload.subscription_renews_at = null;
     }
+
+    console.log(payload, "payload in customer.subscription.updated");
+
+    await User.findOneAndUpdate(
+      { customer_id: subscription.customer },
+      { $set: payload }
+    );
   }
 
   if (event.type === "invoice.payment_succeeded") {
@@ -112,6 +135,14 @@ export default async function handler(req, res) {
         : null,
     };
 
+    console.log(invoice.billing_reason, "invoice.billing_reason");
+
+    // Check if this payment marks the end of a trial period
+    if (invoice.billing_reason === "subscription_cycle") {
+      payload.is_in_trial = false;
+      payload.trial_ends_at = null;
+    }
+
     if (user) {
       const userPlan = user.variant_name;
       if (userPlan === "starter") {
@@ -129,7 +160,7 @@ export default async function handler(req, res) {
         { $set: payload }
       );
 
-      // Check if this is the first subscription payment and email hasn’t been sent
+      // Check if this is the first subscription payment and email hasn't been sent
       if (
         invoice?.billing_reason === "subscription_create" &&
         !user?.has_received_first_subscription_email
@@ -159,6 +190,26 @@ export default async function handler(req, res) {
         }
       }
     }
+  }
+
+  if (event.type === "customer.subscription.deleted") {
+    const subscription = event.data.object;
+    
+    const payload = {
+      variant_name: "free", // Reset to free plan
+      subscription_renews_at: null,
+      ends_at: new Date().toISOString(), // Set to current date since it's canceled immediately
+      subscription_id: null, // Optional: Clear the subscription ID
+      is_in_trial: false,
+      trial_ends_at: null
+    };
+  
+    console.log(payload, "payload in customer.subscription.deleted");
+  
+    await User.findOneAndUpdate(
+      { customer_id: subscription.customer },
+      { $set: payload }
+    );
   }
 
   return res.status(200).json({ received: true });

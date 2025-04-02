@@ -37,7 +37,7 @@ export default async function handler(req, res) {
             currency: "usd",
             product_data: {
               name: `Reddit Scheduler - ${planDetails.name}`,
-              description: `Creator access to Reddit Scheduler.  ${planDetails.post_available} posts to schedule per month.`,
+              description: `Creator access to Reddit Scheduler. ${planDetails.post_available} posts to schedule per month. Includes 7-day free trial.`,
               metadata: {
                 post_available: planDetails.post_available,
               },
@@ -56,6 +56,9 @@ export default async function handler(req, res) {
         plan,
         post_available: planDetails.post_available,
       },
+      subscription_data: {
+        trial_period_days: 7
+      }
     };
 
     if (session?.user?.name) {

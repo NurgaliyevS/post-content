@@ -10,10 +10,35 @@ import { format } from "date-fns";
 function CrossPosting() {
   const { data: session } = useSession();
   const [posts, setPosts] = useState([]);
+  const [subreddits, setSubreddits] = useState([]);
+  const [subredditsLoading, setSubredditsLoading] = useState(false);
+  const [subredditsError, setSubredditsError] = useState(null);
 
   useEffect(() => {
     fetchPosts();
+    fetchUserSubreddits();
   }, []);
+
+  const fetchUserSubreddits = async () => {
+    try {
+      setSubredditsLoading(true);
+      setSubredditsError(null);
+
+      const response = await fetch("/api/reddit/subreddits");
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch subreddits: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setSubreddits(data.subreddits || []);
+    } catch (error) {
+      console.error("Error fetching subreddits:", error);
+      setSubredditsError(error.message);
+    } finally {
+      setSubredditsLoading(false);
+    }
+  };
 
   const fetchPosts = async () => {
     try {
@@ -29,9 +54,7 @@ function CrossPosting() {
   return (
     <DashboardLayout>
       <div className="">
-        <h1 className="text-2xl md:text-3xl font-bold mb-6">
-          Cross-Posting
-        </h1>
+        <h1 className="text-2xl md:text-3xl font-bold mb-6">Cross-Posting</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col">
@@ -48,14 +71,17 @@ function CrossPosting() {
                       <h3 className="font-medium">{post.title}</h3>
                       <div className="text-sm text-gray-500 mt-1 flex items-center gap-2">
                         <FaUsers className="w-3 h-3" />
-                        r/{post.community} • {format(new Date(post.scheduledFor), "MM/dd/yyyy")}
+                        r/{post.community} •{" "}
+                        {format(new Date(post.scheduledFor), "MM/dd/yyyy")}
                       </div>
                     </div>
-                    <div className={`px-2 py-1 rounded-full text-xs ${
-                      post.status === 'published' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
+                    <div
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        post.status === "published"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-yellow-100 text-yellow-800"
+                      }`}
+                    >
                       {post.status}
                     </div>
                   </div>
@@ -75,42 +101,42 @@ function CrossPosting() {
                 <button className="text-sm text-blue-600">Select All</button>
               </div>
 
-              <div className="max-h-60 overflow-y-auto space-y-2 border rounded-md p-2">
-                <div className="flex items-center p-2 hover:bg-gray-50 rounded">
-                  <input type="checkbox" id="sub1" className="mr-2" />
-                  <label htmlFor="sub1" className="flex-grow">
-                    r/SideProject
-                  </label>
-                  <span className="text-xs text-gray-500">12.5k members</span>
-                </div>
-                <div className="flex items-center p-2 hover:bg-gray-50 rounded">
-                  <input type="checkbox" id="sub2" className="mr-2" />
-                  <label htmlFor="sub2" className="flex-grow">
-                    r/startups
-                  </label>
-                  <span className="text-xs text-gray-500">1.2M members</span>
-                </div>
-                <div className="flex items-center p-2 hover:bg-gray-50 rounded">
-                  <input type="checkbox" id="sub3" className="mr-2" />
-                  <label htmlFor="sub3" className="flex-grow">
-                    r/Entrepreneur
-                  </label>
-                  <span className="text-xs text-gray-500">987k members</span>
-                </div>
-                <div className="flex items-center p-2 hover:bg-gray-50 rounded">
-                  <input type="checkbox" id="sub4" className="mr-2" />
-                  <label htmlFor="sub4" className="flex-grow">
-                    r/webdev
-                  </label>
-                  <span className="text-xs text-gray-500">756k members</span>
-                </div>
-                <div className="flex items-center p-2 hover:bg-gray-50 rounded">
-                  <input type="checkbox" id="sub5" className="mr-2" />
-                  <label htmlFor="sub5" className="flex-grow">
-                    r/programming
-                  </label>
-                  <span className="text-xs text-gray-500">5.4M members</span>
-                </div>
+              <div className="h-60 overflow-y-auto space-y-2 border rounded-md p-2">
+                {subredditsLoading ? (
+                  <div className="text-center p-4 text-gray-500">
+                    Loading...
+                  </div>
+                ) : subredditsError ? (
+                  <div className="text-center p-4 text-red-500">
+                    {subredditsError}
+                    <button
+                      onClick={fetchUserSubreddits}
+                      className="text-blue-600 hover:underline block mt-2"
+                    >
+                      Retry
+                    </button>
+                  </div>
+                ) : (
+                  subreddits.map((subreddit) => (
+                    <div
+                      key={subreddit.id}
+                      className="flex items-center p-2 hover:bg-gray-50 rounded"
+                    >
+                      <input
+                        type="checkbox"
+                        id={subreddit.id}
+                        className="mr-2"
+                      />
+                      <label htmlFor={subreddit.id} className="flex-grow">
+                        {subreddit.display_name_prefixed}
+                      </label>
+                      <span className="text-xs text-gray-500 flex items-center gap-1">
+                        {subreddit.subscribers.toLocaleString()}
+                        <FaUsers className="w-3 h-3" />
+                      </span>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 
@@ -126,7 +152,6 @@ function CrossPosting() {
                       className="w-full p-2 border rounded-md"
                       defaultValue="2025-04-02"
                     />
-                    <FiCalendar className="absolute right-3 top-3 text-gray-400" />
                   </div>
                 </div>
                 <div>
@@ -137,7 +162,6 @@ function CrossPosting() {
                       className="w-full p-2 border rounded-md"
                       defaultValue="15:30"
                     />
-                    <FiCalendar className="absolute right-3 top-3 text-gray-400" />
                   </div>
                 </div>
               </div>

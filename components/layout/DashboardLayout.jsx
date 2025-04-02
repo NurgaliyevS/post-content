@@ -10,18 +10,28 @@ function DashboardLayout({ children, loading }) {
 
   if (state.loading) {
     return (
-      <div className="flex min-h-screen bg-[#F3F4EF] items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block p-3 rounded-xl mb-3">
-            <Image
-              src="/logo.svg"
-              alt="Reddit Scheduler Logo"
-              width={32}
-              height={32}
-            />
+      <div className="flex min-h-screen bg-[#F3F4EF]">
+        <aside className="md:w-64 flex-shrink-0">
+          <div className="animate-pulse h-screen bg-gray-200" />
+        </aside>
+
+        <main className="flex-1 p-4 md:p-8">
+          <div className="max-w-3xl mx-auto">
+            <div className="animate-pulse space-y-4">
+              <div className="h-8 bg-gray-200 rounded w-1/4" />
+              <div className="space-y-3">
+                <div className="h-4 bg-gray-200 rounded" />
+                <div className="h-4 bg-gray-200 rounded w-5/6" />
+                <div className="h-4 bg-gray-200 rounded w-4/6" />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[1,2,3].map(i => (
+                  <div key={i} className="h-48 bg-gray-200 rounded" />
+                ))}
+              </div>
+            </div>
           </div>
-          <h1 className="text-xl font-bold">Loading...</h1>
-        </div>
+        </main>
       </div>
     );
   }

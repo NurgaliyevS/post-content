@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { FaArrowRight } from "react-icons/fa";
+import { FaArrowRight, FaInfoCircle } from "react-icons/fa";
 
 export default function PricingSection() {
   const [loading, setLoading] = useState(false);
+  const [activeTooltip, setActiveTooltip] = useState(null);
 
   const handleSubscription = async (plan) => {
     try {
@@ -70,8 +71,20 @@ export default function PricingSection() {
               <li className="flex items-center gap-2">
                 <span>✓</span> Cross-posting
               </li>
-              <li className="flex items-center gap-2">
-                <span>✓</span> Growth consultation
+              <li className="flex items-center gap-2 relative">
+                <span>✓</span> Growth consulting{" "}
+                <button 
+                  className="inline-flex"
+                  onMouseEnter={() => setActiveTooltip("starter")}
+                  onMouseLeave={() => setActiveTooltip(null)}
+                >
+                  <FaInfoCircle className="text-gray-400" />
+                </button>
+                {activeTooltip === "starter" && (
+                  <div className="absolute left-0 bottom-full mb-2 p-3 bg-gray-800 text-white text-sm rounded w-64 z-10">
+                    Direct communication to help you grow on Reddit (from 1M+ impressions)
+                  </div>
+                )}
               </li>
             </ul>
             <button
@@ -102,8 +115,20 @@ export default function PricingSection() {
               <li className="flex items-center gap-2">
                 <span>✓</span> Cross-posting
               </li>
-              <li className="flex items-center gap-2">
-                <span>✓</span> Growth consultation
+              <li className="flex items-center gap-2 relative">
+                <span>✓</span> Growth consulting{" "}
+                <button 
+                  className="inline-flex"
+                  onMouseEnter={() => setActiveTooltip("growth")}
+                  onMouseLeave={() => setActiveTooltip(null)}
+                >
+                  <FaInfoCircle className="text-gray-400" />
+                </button>
+                {activeTooltip === "growth" && (
+                  <div className="absolute left-0 bottom-full mb-2 p-3 bg-gray-800 text-white text-sm rounded w-64 z-10">
+                    Direct communication to help you grow on Reddit (from 1M+ impressions)
+                  </div>
+                )}
               </li>
             </ul>
             <button
@@ -134,8 +159,20 @@ export default function PricingSection() {
               <li className="flex items-center gap-2">
                 <span>✓</span> Cross-posting
               </li>
-              <li className="flex items-center gap-2">
-                <span>✓</span> Growth consultation
+              <li className="flex items-center gap-2 relative">
+                <span>✓</span> Growth consulting{" "}
+                <button 
+                  className="inline-flex"
+                  onMouseEnter={() => setActiveTooltip("scale")}
+                  onMouseLeave={() => setActiveTooltip(null)}
+                >
+                  <FaInfoCircle className="text-gray-400" />
+                </button>
+                {activeTooltip === "scale" && (
+                  <div className="absolute left-0 bottom-full mb-2 p-3 bg-gray-800 text-white text-sm rounded w-64 z-10">
+                    Direct communication to help you grow on Reddit (from 1M+ impressions)
+                  </div>
+                )}
               </li>
             </ul>
             <button

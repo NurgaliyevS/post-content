@@ -10,7 +10,6 @@ import Post from "@/components/ui/Post";
 
 function Scheduling() {
   const { data: session, status } = useSession();
-  const [loading, setLoading] = useState(false);
   const [subreddits, setSubreddits] = useState([]);
   const [subredditsLoading, setSubredditsLoading] = useState(false);
   const [subredditsError, setSubredditsError] = useState(null);
@@ -30,7 +29,6 @@ function Scheduling() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   if (status !== "loading" && !initialized) {
-    setLoading(false);
     setInitialized(true);
 
     // Get user's timezone
@@ -207,7 +205,7 @@ function Scheduling() {
   };
 
   return (
-    <DashboardLayout loading={loading}>
+    <DashboardLayout>
       <div className="max-w-4xl">
         <h1 className="text-2xl md:text-3xl font-bold mb-6">
           Schedule Reddit Posts

@@ -65,10 +65,13 @@ export default function PricingSection() {
                 <span>✓</span> 10 posts per month
               </li>
               <li className="flex items-center gap-2">
-                <span>✓</span> Viral hooks
+                <span>✓</span> Schedule posts
               </li>
               <li className="flex items-center gap-2">
-                <span>✓</span> Unlimited subreddits
+                <span>✓</span> Cross-posting
+              </li>
+              <li className="flex items-center gap-2">
+                <span>✓</span> Growth consultation
               </li>
             </ul>
             <button
@@ -94,10 +97,13 @@ export default function PricingSection() {
                 <span>✓</span> 50 posts per month
               </li>
               <li className="flex items-center gap-2">
-                <span>✓</span> Viral hooks
+                <span>✓</span> Schedule posts
               </li>
               <li className="flex items-center gap-2">
-                <span>✓</span> Unlimited subreddits
+                <span>✓</span> Cross-posting
+              </li>
+              <li className="flex items-center gap-2">
+                <span>✓</span> Growth consultation
               </li>
             </ul>
             <button
@@ -123,10 +129,13 @@ export default function PricingSection() {
                 <span>✓</span> 150 posts per month
               </li>
               <li className="flex items-center gap-2">
-                <span>✓</span> Viral hooks
+                <span>✓</span> Schedule posts
               </li>
               <li className="flex items-center gap-2">
-                <span>✓</span> Unlimited subreddits
+                <span>✓</span> Cross-posting
+              </li>
+              <li className="flex items-center gap-2">
+                <span>✓</span> Growth consultation
               </li>
             </ul>
             <button

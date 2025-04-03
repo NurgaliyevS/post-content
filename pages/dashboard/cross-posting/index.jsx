@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import withAuth from "@/components/withAuth";
-import { FiCheck, FiX } from "react-icons/fi";
 import axios from "axios";
 import { format, parse, setHours, setMinutes } from "date-fns";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import CrossPostingHistory from "@/components/ui/CrossPostingHistory";
 import SourcePostSelector from "@/components/cross-posting/SourcePostSelector";
 import SubredditSelector from "@/components/cross-posting/SubredditSelector";
 import SchedulingForm from "@/components/cross-posting/SchedulingForm";
+import { showNotification } from "@/components/cross-posting/ToastNotifications";
 
 function CrossPosting() {
   const { data: session } = useSession();
@@ -120,111 +120,6 @@ function CrossPosting() {
     }
   };
 
-  // Toast notification components
-  const SuccessToast = ({ successful }) => {
-    return (
-      <div className="flex flex-col">
-        <div className="space-y-1">
-          <div className="flex flex-col gap-2">
-            <span>Successfully scheduled for: </span>
-            {successful.map((item, index) => (
-              <div className="flex items-center gap-2" key={`success-${index}`}>
-                <div className="text-green-600 bg-green-100 rounded-full p-0.5">
-                  <FiCheck className="w-4 h-4" />
-                </div>
-                <span>{item.subreddit}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const WarningToast = ({ successful, failed }) => (
-    <div className="flex flex-col">
-      <div className="space-y-1">
-        <div className="flex flex-col gap-2">
-          <span>Successfully scheduled for: </span>
-          {successful.map((item, index) => (
-            <div className="flex items-center gap-2" key={`success-${index}`}>
-              <div className="text-green-600 bg-green-100 rounded-full p-0.5">
-                <FiCheck className="w-4 h-4" />
-              </div>
-              <span>{item.subreddit}</span>
-            </div>
-          ))}
-        </div>
-        <div className="flex flex-col gap-2 border-t pt-2">
-          <span>Failed to schedule for: </span>
-          {failed.map((item, index) => (
-            <div key={`failed-${index}`} className="flex items-center gap-2">
-              <div className="text-red-600 bg-red-100 rounded-full p-0.5">
-                <FiX className="w-4 h-4" />
-              </div>
-              <span>
-                {item.subreddit} - ({item.reason})
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
-  const ErrorToast = ({ failed }) => (
-    <div className="flex flex-col">
-      <div className="flex items-center gap-2 font-medium">
-        <span>Failed to schedule for: </span>
-      </div>
-      <div className="space-y-1">
-        {failed.map((item, index) => (
-          <div key={`failed-${index}`} className="flex items-center gap-2">
-            <div className="text-red-600 bg-red-100 rounded-full p-0.5">
-              <FiX className="w-4 h-4" />
-            </div>
-            <span>
-              {item.subreddit} - ({item.reason})
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  const showNotification = (type, results) => {
-    const { successful, failed } = results;
-
-    switch (type) {
-      case "success":
-        toast.success(<SuccessToast successful={successful} />, {
-          autoClose: 10000,
-          closeButton: true,
-          className: "bg-green-50 border-l-4 border-green-500",
-        });
-        break;
-      case "warning":
-        toast.warning(
-          <WarningToast successful={successful} failed={failed} />,
-          {
-            autoClose: 10000,
-            closeButton: true,
-            className: "bg-amber-50 border-l-4 border-amber-500",
-          }
-        );
-        break;
-      case "error":
-        toast.error(<ErrorToast failed={failed} />, {
-          autoClose: 10000,
-          closeButton: true,
-          className: "bg-red-50 border-l-4 border-red-500",
-        });
-        break;
-      default:
-        break;
-    }
-  };
-
   const schedulePost = async () => {
     if (
       !selectedPost ||
@@ -236,7 +131,7 @@ function CrossPosting() {
         successful: [],
         failed: [{ subreddit: "All", reason: "Missing required information" }],
         total: selectedSubreddits.length,
-      });
+      }, toast);
       return;
     }
 
@@ -323,20 +218,15 @@ function CrossPosting() {
 
       console.log(postingResults, "postingResults");
 
-      // Determine notification type based on results
+      // Update the notification calls to pass toast
       if (successful.length === 0) {
-        // All posts failed
-        showNotification("error", postingResults);
+        showNotification("error", postingResults, toast);
       } else if (failed.length === 0) {
-        // All posts succeeded
-        showNotification("success", postingResults);
-        // Reset selection after complete success
+        showNotification("success", postingResults, toast);
         setSelectedPost(null);
         setSelectedSubreddits([]);
       } else {
-        // Mixed results - some succeeded, some failed
-        showNotification("warning", postingResults);
-        // Keep selections for potential retry
+        showNotification("warning", postingResults, toast);
       }
     } catch (error) {
       console.error("Error scheduling post:", error);
@@ -346,7 +236,7 @@ function CrossPosting() {
           { subreddit: "All", reason: "Server error. Please try again." },
         ],
         total: selectedSubreddits.length,
-      });
+      }, toast);
     } finally {
       setIsLoadingForm(false);
     }

@@ -7,6 +7,7 @@ import {
 } from "react-icons/fa";
 import { FiTarget, FiSettings } from "react-icons/fi";
 import { AiOutlineCreditCard, AiOutlineLineChart } from "react-icons/ai";
+import { VscFeedback } from "react-icons/vsc";
 import { BiCalendarCheck } from "react-icons/bi";
 import { HiX } from "react-icons/hi";
 import Image from "next/image";
@@ -35,7 +36,8 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
   const bottomNavItems = [
     {
       name: "Feedback",
-      icon: FaRegCommentDots,
+      // can you add a different icon i don't like the current
+      icon: VscFeedback,
       href: "https://insigh.to/b/reddit-scheduler",
       target: "_blank",
     },

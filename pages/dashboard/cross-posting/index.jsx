@@ -405,11 +405,16 @@ function CrossPosting() {
                     </div>
                   </div>
 
-                  <div className="border-t border-gray-200 mt-2 pt-2 w-full">
+                  <div className="border-t border-gray-200 mt-2 pt-2 w-full flex items-center justify-between">
                     <span className="text-gray-500 text-sm flex gap-2 items-center">
                       <FaCalendar className="w-3 h-3" />
                       {format(new Date(post.scheduledFor), "MM/dd/yyyy HH:mm")}
                     </span>
+                    {post?.redditPostUrl && (
+                      <a href={post.redditPostUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm">
+                        View on Reddit
+                      </a>
+                    )}
                   </div>
                 </div>
               ))}

@@ -102,7 +102,7 @@ function CrossPosting() {
       setTimeout(() => setSaveStatus(""), 3000);
       return;
     }
-
+  
     setIsLoadingForm(true);
     try {
       const scheduledDate = parse(
@@ -111,18 +111,18 @@ function CrossPosting() {
         new Date()
       );
       const [hours, minutes] = formData.selectedTime.split(":");
-
+  
       let scheduledDateTime = setHours(scheduledDate, parseInt(hours, 10));
       scheduledDateTime = setMinutes(scheduledDateTime, parseInt(minutes, 10));
-
+  
       const scheduledDateTimeISO = format(
         scheduledDateTime,
         "yyyy-MM-dd'T'HH:mm:ssxxx"
       );
       const currentTimeISO = format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx");
-
-      const promises = selectedSubreddits.map(async (subreddit) => {
-        return await axios.post("/api/post/schedule-post", {
+  
+      const promises = selectedSubreddits.map((subreddit) => 
+        axios.post("/api/post/schedule-post", {
           community: subreddit.display_name_prefixed,
           title: selectedPost.title,
           text: selectedPost.text,
@@ -131,22 +131,24 @@ function CrossPosting() {
           type: selectedPost.type,
           currentClientTime: currentTimeISO,
           isCrossPosting: true,
-        });
-      });
-
-      setSaveStatus("Post scheduled successfully!");
-      setSelectedPost(null);
-      setSelectedSubreddits([]);
-      setTimeout(() => setSaveStatus(""), 3000);
-
-      if (!response.ok) {
-        throw new Error("Failed to schedule post");
+        })
+      );
+  
+      // Use Promise.allSettled to handle all promises even if some fail
+      const results = await Promise.allSettled(promises);
+      
+      // Check if any promises succeeded
+      const anySucceeded = results.some(result => result.status === 'fulfilled');
+      
+      if (anySucceeded) {
+        setSaveStatus("Posts scheduled successfully!");
+        setSelectedPost(null);
+        setSelectedSubreddits([]);
+      } else {
+        // All promises failed
+        setSaveStatus("Failed to schedule any posts. Please try again.");
       }
-
-      const data = await response.json();
-      setSaveStatus(data?.message || "Post scheduled successfully!");
-      setSelectedPost(null);
-      setSelectedSubreddits([]);
+      
       setTimeout(() => setSaveStatus(""), 3000);
     } catch (error) {
       console.error("Error scheduling post:", error);

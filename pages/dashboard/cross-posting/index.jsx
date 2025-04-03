@@ -25,7 +25,7 @@ function CrossPosting() {
     selectedDate: format(new Date(), "yyyy-MM-dd"),
     selectedTime: format(new Date(), "HH:mm"),
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    postingInterval: { value: 0, label: "Post all at once" }
+    postingInterval: { value: 0, label: "Post all at once" },
   });
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -50,7 +50,6 @@ function CrossPosting() {
     { value: 7200, label: "5 days" },
     { value: 8640, label: "6 days" },
     { value: 10080, label: "7 days" },
-    
   ];
 
   // Separate useEffect for initial load
@@ -132,38 +131,52 @@ function CrossPosting() {
   };
 
   const checkPostAvailability = async (requiredPosts) => {
-    const accessResponse = await fetch('/api/user/check-access');
+    const accessResponse = await fetch("/api/user/check-access");
     if (!accessResponse.ok) {
-      throw new Error('Failed to check post availability');
+      throw new Error("Failed to check post availability");
     }
     const accessData = await accessResponse.json();
-    
+
     if (accessData.post_available < requiredPosts) {
-      router.push('/#pricing');
-      throw new Error(`Not enough posts available. You need ${requiredPosts} posts but have ${accessData.post_available}.\nPlease upgrade your plan.`);
+      router.push("/#pricing");
+      throw new Error(
+        `Not enough posts available. You need ${requiredPosts} posts but have ${accessData.post_available}.\nPlease upgrade your plan.`
+      );
     }
 
     return true;
   };
 
-  const updatePostAvailability = async () => {
+  const updatePostAvailability = async (amountDecreased) => {
     try {
-      await fetch('/api/user/update-post-available', {
-        method: 'POST',
+      await fetch("/api/user/update-post-available", {
+        method: "POST",
+        body: JSON.stringify({ amountDecreased: amountDecreased }),
       });
       refreshData();
     } catch (updateError) {
-      console.error('Error updating post availability:', updateError);
+      console.error("Error updating post availability:", updateError);
     }
   };
 
   const schedulePost = async () => {
-    if (!selectedPost || !formData.selectedDate || !formData.selectedTime || selectedSubreddits.length === 0) {
-      showNotification("error", {
-        successful: [],
-        failed: [{ subreddit: "All", reason: "Missing required information" }],
-        total: selectedSubreddits.length,
-      }, toast);
+    if (
+      !selectedPost ||
+      !formData.selectedDate ||
+      !formData.selectedTime ||
+      selectedSubreddits.length === 0
+    ) {
+      showNotification(
+        "error",
+        {
+          successful: [],
+          failed: [
+            { subreddit: "All", reason: "Missing required information" },
+          ],
+          total: selectedSubreddits.length,
+        },
+        toast
+      );
       return;
     }
 
@@ -172,7 +185,11 @@ function CrossPosting() {
       // Check if user has enough posts available for all selected subreddits
       await checkPostAvailability(selectedSubreddits.length);
 
-      const scheduledDate = parse(formData.selectedDate, "yyyy-MM-dd", new Date());
+      const scheduledDate = parse(
+        formData.selectedDate,
+        "yyyy-MM-dd",
+        new Date()
+      );
       const [hours, minutes] = formData.selectedTime.split(":");
 
       let scheduledDateTime = setHours(scheduledDate, parseInt(hours, 10));
@@ -186,14 +203,15 @@ function CrossPosting() {
 
       const promises = selectedSubreddits.map(async (subreddit, index) => {
         try {
-          // Add interval time if not posting all at once
           let postTime = new Date(scheduledDateTime);
           if (formData.postingInterval.value > 0) {
-            postTime.setMinutes(postTime.getMinutes() + index * formData.postingInterval.value);
+            postTime.setMinutes(
+              postTime.getMinutes() + index * formData.postingInterval.value
+            );
           }
-          
+
           const postTimeISO = format(postTime, "yyyy-MM-dd'T'HH:mm:ssxxx");
-          
+
           const response = await axios.post("/api/post/schedule-post", {
             community: subreddit.display_name_prefixed,
             title: selectedPost.title,
@@ -204,10 +222,6 @@ function CrossPosting() {
             currentClientTime: currentTimeISO,
             isCrossPosting: true,
           });
-
-          // Update post availability after each successful post
-          await updatePostAvailability();
-          
           return {
             status: "fulfilled",
             subreddit: subreddit.display_name_prefixed,
@@ -225,11 +239,11 @@ function CrossPosting() {
       // Handle all promises
       const results = await Promise.allSettled(promises);
 
-      console.log(results, "results");
-
       const successful = results
         .filter((result) => result.value.status === "fulfilled")
         .map((result) => ({ subreddit: result.value.subreddit }));
+
+      await updatePostAvailability(successful.length);
 
       const failed = results
         .filter((result) => result.value.status === "rejected")
@@ -265,14 +279,23 @@ function CrossPosting() {
       }
     } catch (error) {
       console.error("Error scheduling post:", error);
-      showNotification("error", {
-        successful: [],
-        failed: [{ subreddit: "All", reason: error.message || "Server error. Please try again." }],
-        total: selectedSubreddits.length,
-      }, toast);
+      showNotification(
+        "error",
+        {
+          successful: [],
+          failed: [
+            {
+              subreddit: "All",
+              reason: error.message || "Server error. Please try again.",
+            },
+          ],
+          total: selectedSubreddits.length,
+        },
+        toast
+      );
     } finally {
       setIsLoadingForm(false);
-      setRefreshTrigger(prev => prev + 1);
+      setRefreshTrigger((prev) => prev + 1);
     }
   };
 

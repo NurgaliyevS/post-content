@@ -26,6 +26,7 @@ function CrossPosting() {
     postingInterval: { value: 0, label: "Post all at once" }
   });
   const [isLoadingForm, setIsLoadingForm] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Posting interval options
   const intervalOptions = [
@@ -47,10 +48,15 @@ function CrossPosting() {
     
   ];
 
+  // Separate useEffect for initial load
   useEffect(() => {
-    fetchPosts();
     fetchUserSubreddits();
   }, []);
+
+  // New useEffect to watch refreshTrigger and fetch posts
+  useEffect(() => {
+    fetchPosts();
+  }, [refreshTrigger]); // This will run fetchPosts whenever refreshTrigger changes
 
   const fetchUserSubreddits = async () => {
     try {
@@ -218,7 +224,7 @@ function CrossPosting() {
 
       console.log(postingResults, "postingResults");
 
-      // Update the notification calls to pass toast
+      // Update the notification calls and add refreshTrigger
       if (successful.length === 0) {
         showNotification("error", postingResults, toast);
       } else if (failed.length === 0) {
@@ -239,6 +245,7 @@ function CrossPosting() {
       }, toast);
     } finally {
       setIsLoadingForm(false);
+      setRefreshTrigger(prev => prev + 1);
     }
   };
 

@@ -10,6 +10,8 @@ import SourcePostSelector from "@/components/cross-posting/SourcePostSelector";
 import SubredditSelector from "@/components/cross-posting/SubredditSelector";
 import SchedulingForm from "@/components/cross-posting/SchedulingForm";
 import { showNotification } from "@/components/cross-posting/ToastNotifications";
+import { useRouter } from "next/router";
+import { useSidebar } from "@/context/SidebarContext";
 
 function CrossPosting() {
   const { data: session } = useSession();
@@ -27,6 +29,9 @@ function CrossPosting() {
   });
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const router = useRouter();
+  const { refreshData } = useSidebar();
 
   // Posting interval options
   const intervalOptions = [
@@ -126,13 +131,34 @@ function CrossPosting() {
     }
   };
 
+  const checkPostAvailability = async (requiredPosts) => {
+    const accessResponse = await fetch('/api/user/check-access');
+    if (!accessResponse.ok) {
+      throw new Error('Failed to check post availability');
+    }
+    const accessData = await accessResponse.json();
+    
+    if (accessData.post_available < requiredPosts) {
+      router.push('/#pricing');
+      throw new Error(`Not enough posts available. You need ${requiredPosts} posts but have ${accessData.post_available}.\nPlease upgrade your plan.`);
+    }
+
+    return true;
+  };
+
+  const updatePostAvailability = async () => {
+    try {
+      await fetch('/api/user/update-post-available', {
+        method: 'POST',
+      });
+      refreshData();
+    } catch (updateError) {
+      console.error('Error updating post availability:', updateError);
+    }
+  };
+
   const schedulePost = async () => {
-    if (
-      !selectedPost ||
-      !formData.selectedDate ||
-      !formData.selectedTime ||
-      selectedSubreddits.length === 0
-    ) {
+    if (!selectedPost || !formData.selectedDate || !formData.selectedTime || selectedSubreddits.length === 0) {
       showNotification("error", {
         successful: [],
         failed: [{ subreddit: "All", reason: "Missing required information" }],
@@ -143,11 +169,10 @@ function CrossPosting() {
 
     setIsLoadingForm(true);
     try {
-      const scheduledDate = parse(
-        formData.selectedDate,
-        "yyyy-MM-dd",
-        new Date()
-      );
+      // Check if user has enough posts available for all selected subreddits
+      await checkPostAvailability(selectedSubreddits.length);
+
+      const scheduledDate = parse(formData.selectedDate, "yyyy-MM-dd", new Date());
       const [hours, minutes] = formData.selectedTime.split(":");
 
       let scheduledDateTime = setHours(scheduledDate, parseInt(hours, 10));
@@ -159,19 +184,17 @@ function CrossPosting() {
       );
       const currentTimeISO = format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx");
 
-      const promises = selectedSubreddits.map((subreddit, index) => {
-        // Add interval time if not posting all at once
-        let postTime = new Date(scheduledDateTime);
-        if (formData.postingInterval.value > 0) {
-          postTime.setMinutes(
-            postTime.getMinutes() + index * formData.postingInterval.value
-          );
-        }
-        
-        const postTimeISO = format(postTime, "yyyy-MM-dd'T'HH:mm:ssxxx");
-        
-        return axios
-          .post("/api/post/schedule-post", {
+      const promises = selectedSubreddits.map(async (subreddit, index) => {
+        try {
+          // Add interval time if not posting all at once
+          let postTime = new Date(scheduledDateTime);
+          if (formData.postingInterval.value > 0) {
+            postTime.setMinutes(postTime.getMinutes() + index * formData.postingInterval.value);
+          }
+          
+          const postTimeISO = format(postTime, "yyyy-MM-dd'T'HH:mm:ssxxx");
+          
+          const response = await axios.post("/api/post/schedule-post", {
             community: subreddit.display_name_prefixed,
             title: selectedPost.title,
             text: selectedPost.text,
@@ -180,17 +203,23 @@ function CrossPosting() {
             type: selectedPost.type,
             currentClientTime: currentTimeISO,
             isCrossPosting: true,
-          })
-          .then((response) => ({
+          });
+
+          // Update post availability after each successful post
+          await updatePostAvailability();
+          
+          return {
             status: "fulfilled",
             subreddit: subreddit.display_name_prefixed,
             value: response,
-          }))
-          .catch((error) => ({
+          };
+        } catch (error) {
+          return {
             status: "rejected",
             subreddit: subreddit.display_name_prefixed,
             reason: error.response?.data?.message || "Unknown error",
-          }));
+          };
+        }
       });
 
       // Handle all promises
@@ -238,9 +267,7 @@ function CrossPosting() {
       console.error("Error scheduling post:", error);
       showNotification("error", {
         successful: [],
-        failed: [
-          { subreddit: "All", reason: "Server error. Please try again." },
-        ],
+        failed: [{ subreddit: "All", reason: error.message || "Server error. Please try again." }],
         total: selectedSubreddits.length,
       }, toast);
     } finally {

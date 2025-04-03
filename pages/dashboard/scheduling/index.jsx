@@ -9,6 +9,7 @@ import { format, parse, setHours, setMinutes, add, sub } from "date-fns";
 import Post from "@/components/ui/Post";
 import { toast } from "react-toastify";
 import { showNotification } from "@/components/cross-posting/ToastNotifications";
+import { useRouter } from "next/router";
 
 function Scheduling() {
   const { data: session, status } = useSession();
@@ -28,7 +29,8 @@ function Scheduling() {
   const [initialized, setInitialized] = useState(false);
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-
+  const router = useRouter();
+  
   if (status !== "loading" && !initialized) {
     setInitialized(true);
 
@@ -124,13 +126,33 @@ function Scheduling() {
     }));
   };
 
+  const checkPostAvailability = async () => {
+    const accessResponse = await fetch('/api/user/check-access');
+    if (!accessResponse.ok) {
+      throw new Error('Failed to check post availability');
+    }
+    const accessData = await accessResponse.json();
+    
+    if (accessData.post_available <= 0) {
+      router.push('/#pricing');
+      throw new Error('No posts available. \nPlease upgrade your plan.');
+    }
+
+    return true;
+  };
+
+  const updatePostAvailability = async () => {
+    try {
+      await fetch('/api/user/update-post-available', {
+        method: 'POST',
+      });
+    } catch (updateError) {
+      console.error('Error updating post availability:', updateError);
+    }
+  };
+
   const schedulePost = async () => {
-    if (
-      !formData.community ||
-      !formData.title ||
-      !formData.selectedDate ||
-      !formData.selectedTime
-    ) {
+    if (!formData.community || !formData.title || !formData.selectedDate || !formData.selectedTime) {
       showNotification("error", {
         successful: [],
         failed: [{ subreddit: "All", reason: "Please fill in all required fields" }],
@@ -141,12 +163,11 @@ function Scheduling() {
 
     setIsLoadingForm(true);
     try {
+      // Check post availability first
+      await checkPostAvailability();
+
       // Parse the date string
-      const scheduledDate = parse(
-        formData.selectedDate,
-        "yyyy-MM-dd",
-        new Date()
-      );
+      const scheduledDate = parse(formData.selectedDate, "yyyy-MM-dd", new Date());
 
       // Parse the time string (now in 24-hour format)
       const [hours, minutes] = formData.selectedTime.split(":");
@@ -197,11 +218,12 @@ function Scheduling() {
       }, toast);
       
       setRefreshTrigger((prev) => prev + 1);
+      updatePostAvailability();
     } catch (error) {
       console.error("Error scheduling post:", error);
       showNotification("error", {
         successful: [],
-        failed: [{ subreddit: formData.community, reason: "Error scheduling post. Please try again." }],
+        failed: [{ subreddit: formData.community, reason: error.message || "Error scheduling post. Please try again." }],
         total: 1,
       }, toast);
     } finally {

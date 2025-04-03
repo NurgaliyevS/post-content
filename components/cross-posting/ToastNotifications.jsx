@@ -42,7 +42,7 @@ export const WarningToast = ({ successful, failed }) => (
               <FiX className="w-4 h-4" />
             </div>
             <span>
-              {item.subreddit} - ({item.reason})
+              {item.subreddit} ~ ({item.reason})
             </span>
           </div>
         ))}
@@ -63,7 +63,7 @@ export const ErrorToast = ({ failed }) => (
             <FiX className="w-4 h-4" />
           </div>
           <span>
-            {item.subreddit} - ({item.reason})
+            {item.subreddit} ~ ({item.reason})
           </span>
         </div>
       ))}

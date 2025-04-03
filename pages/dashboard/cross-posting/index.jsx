@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import withAuth from "@/components/withAuth";
-import { FiArrowRight, FiCheck, FiX } from "react-icons/fi";
-import { FaUsers, FaCheckCircle, FaSpinner, FaCalendar, FaClock } from "react-icons/fa";
+import { FiCheck, FiX } from "react-icons/fi";
 import axios from "axios";
 import { format, parse, setHours, setMinutes } from "date-fns";
 import { toast, ToastContainer } from "react-toastify";
-import Select from 'react-select';
 import CrossPostingHistory from "@/components/ui/CrossPostingHistory";
+import SourcePostSelector from "@/components/cross-posting/SourcePostSelector";
+import SubredditSelector from "@/components/cross-posting/SubredditSelector";
+import SchedulingForm from "@/components/cross-posting/SchedulingForm";
 
 function CrossPosting() {
   const { data: session } = useSession();
@@ -31,18 +32,18 @@ function CrossPosting() {
     { value: 0, label: "Post all at once" },
     { value: 15, label: "15 minutes" },
     { value: 30, label: "30 minutes" },
-    { value: 60, label: "60 minutes" },
+    { value: 60, label: "1 hour" },
     { value: 120, label: "2 hours" },
     { value: 240, label: "4 hours" },
     { value: 480, label: "8 hours" },
     { value: 720, label: "12 hours" },
-    { value: 1440, label: "24 hours" },
-    { value: 2880, label: "48 hours" },
-    { value: 4320, label: "72 hours" },
-    { value: 5760, label: "96 hours" },
-    { value: 7200, label: "120 hours" },
-    { value: 8640, label: "144 hours" },
-    { value: 10080, label: "168 hours" },
+    { value: 1440, label: "1 day" },
+    { value: 2880, label: "2 days" },
+    { value: 4320, label: "3 days" },
+    { value: 5760, label: "4 days" },
+    { value: 7200, label: "5 days" },
+    { value: 8640, label: "6 days" },
+    { value: 10080, label: "7 days" },
     
   ];
 
@@ -356,187 +357,32 @@ function CrossPosting() {
       <div className="mb-10 min-h-screen">
         <h1 className="text-2xl md:text-3xl font-bold mb-6">Cross-Posting</h1>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col">
-            <h2 className="text-lg font-semibold">Source Post</h2>
-
-            <div className="space-y-3 mt-4 flex-grow overflow-y-auto h-[510px]">
-              {posts.map((post) => (
-                <div
-                  key={post._id}
-                  className={`border rounded-lg p-3 cursor-pointer hover:bg-gray-50 ${
-                    selectedPost?._id === post._id
-                      ? "bg-blue-50 border-blue-200"
-                      : ""
-                  }`}
-                  onClick={() => handlePostSelect(post)}
-                >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <div className="text-sm text-gray-500 mt-1 flex items-center gap-2">
-                        <FaUsers className="w-3 h-3" />
-                        r/{post.community}
-                      </div>
-                      <h3 className="font-medium">{post.title}</h3>
-                    </div>
-                    <div
-                      className={`px-2 py-1 rounded-full text-xs flex items-center gap-1 ${
-                        post.status === "published"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {post.status === "published" ? (
-                        <FaCheckCircle className="w-3 h-3" />
-                      ) : (
-                        <FaSpinner className="w-3 h-3" />
-                      )}
-                      {post.status}
-                    </div>
-                  </div>
-
-                  <div className="border-t border-gray-200 mt-2 pt-2 w-full flex items-center justify-between">
-                    <span className="text-gray-500 text-sm flex gap-2 items-center">
-                      <FaCalendar className="w-3 h-3" />
-                      {format(new Date(post.scheduledFor), "MM/dd/yyyy HH:mm")}
-                    </span>
-                    {post?.redditPostUrl && (
-                      <a href={post.redditPostUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm">
-                        View on Reddit
-                      </a>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <SourcePostSelector
+            posts={posts}
+            selectedPost={selectedPost}
+            onPostSelect={handlePostSelect}
+          />
 
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold mb-4">Target Subreddits</h2>
-              <button
-                className="text-sm text-blue-600"
-                onClick={handleSelectAll}
-              >
-                {selectedSubreddits.length === subreddits.length
-                  ? "Deselect All"
-                  : "Select All"}
-              </button>
-            </div>
+            <SubredditSelector
+              subreddits={subreddits}
+              selectedSubreddits={selectedSubreddits}
+              subredditsLoading={subredditsLoading}
+              subredditsError={subredditsError}
+              onSubredditSelect={handleSubredditSelect}
+              onSelectAll={handleSelectAll}
+              onRetry={fetchUserSubreddits}
+            />
 
-            <div className="h-60 overflow-y-auto space-y-2 border rounded-md p-2">
-              {subredditsLoading ? (
-                <div className="text-center p-4 text-gray-500">Loading...</div>
-              ) : subredditsError ? (
-                <div className="text-center p-4 text-red-500">
-                  {subredditsError}
-                  <button
-                    onClick={fetchUserSubreddits}
-                    className="text-blue-600 hover:underline block mt-2"
-                  >
-                    Retry
-                  </button>
-                </div>
-              ) : (
-                subreddits.map((subreddit) => (
-                  <div
-                    key={subreddit.id}
-                    className="flex items-center p-2 hover:bg-gray-50 rounded"
-                  >
-                    <input
-                      type="checkbox"
-                      id={subreddit.id}
-                      className="mr-2"
-                      checked={selectedSubreddits.some(
-                        (s) => s.id === subreddit.id
-                      )}
-                      onChange={() => handleSubredditSelect(subreddit)}
-                    />
-                    <label htmlFor={subreddit.id} className="flex-grow">
-                      {subreddit.display_name_prefixed}
-                    </label>
-                    <span className="text-xs text-gray-500 flex items-center gap-1">
-                      {subreddit.subscribers.toLocaleString()}
-                      <FaUsers className="w-3 h-3" />
-                    </span>
-                  </div>
-                ))
-              )}
-            </div>
-
-            <div className="border-t pt-4 mt-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Date</label>
-                  <div className="relative">
-                    <input
-                      type="date"
-                      name="selectedDate"
-                      value={formData.selectedDate}
-                      onChange={handleDateTimeChange}
-                      min={format(new Date(), "yyyy-MM-dd")}
-                      className="w-full p-2 border rounded-md"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Time</label>
-                  <div className="relative">
-                    <input
-                      type="time"
-                      name="selectedTime"
-                      value={formData.selectedTime}
-                      onChange={handleDateTimeChange}
-                      className="w-full p-2 border rounded-md"
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              {/* Posting Interval Selector */}
-              <div className="mb-4">
-                <label className="text-sm font-medium mb-1 flex items-center gap-1">
-                  Posting Interval (minutes)
-                </label>
-                <div className="relative">
-                  <Select
-                    options={intervalOptions}
-                    value={formData.postingInterval}
-                    onChange={handleIntervalChange}
-                    className="react-select-container"
-                    classNamePrefix="react-select"
-                    isSearchable={false}
-                    placeholder="Select interval..."
-                  />
-                  {formData.postingInterval.value > 0 && selectedSubreddits.length > 1 ? (
-                    <div className="mt-2 text-xs text-gray-500">
-                      Posts will be scheduled {formData.postingInterval.value} minutes apart. 
-                      Total duration: {(selectedSubreddits.length - 1) * formData.postingInterval.value} minutes.
-                    </div>
-                  ) : (
-                    <div className="mt-2 text-xs text-gray-500">
-                      Posts will be scheduled all at once.
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex justify-end">
-                <button
-                  className="btn btn-primary px-4 py-2 rounded-md flex items-center"
-                  onClick={schedulePost}
-                  disabled={
-                    !selectedPost ||
-                    !formData.selectedDate ||
-                    !formData.selectedTime ||
-                    selectedSubreddits.length === 0 ||
-                    isLoadingForm
-                  }
-                >
-                  {isLoadingForm ? "Scheduling..." : "Schedule Cross-Posts"}
-                  <FiArrowRight className="w-3 h-3" />
-                </button>
-              </div>
-            </div>
+            <SchedulingForm
+              formData={formData}
+              intervalOptions={intervalOptions}
+              selectedSubreddits={selectedSubreddits}
+              isLoadingForm={isLoadingForm}
+              onDateTimeChange={handleDateTimeChange}
+              onIntervalChange={handleIntervalChange}
+              onSchedulePost={schedulePost}
+            />
           </div>
         </div>
 

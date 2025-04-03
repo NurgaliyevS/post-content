@@ -44,7 +44,7 @@ function DashboardLayout({ children }) {
 
       <main className="flex-1 p-4 md:p-8 overflow-auto">
         {/* Mobile menu button */}
-        <div className="md:hidden fixed right-4 bottom-4 z-50">
+        <div className="md:hidden fixed left-4 bottom-4 z-50">
           <button
             onClick={() => {
               setShowSidebar((showSidebar) => !showSidebar);

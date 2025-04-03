@@ -369,7 +369,7 @@ function CrossPosting() {
           <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col">
             <h2 className="text-lg font-semibold">Source Post</h2>
 
-            <div className="space-y-3 mt-4 flex-grow overflow-y-auto h-[500px]">
+            <div className="space-y-3 mt-4 flex-grow overflow-y-auto h-[510px]">
               {posts.map((post) => (
                 <div
                   key={post._id}
@@ -512,10 +512,14 @@ function CrossPosting() {
                     isSearchable={false}
                     placeholder="Select interval..."
                   />
-                  {formData.postingInterval.value > 0 && selectedSubreddits.length > 1 && (
+                  {formData.postingInterval.value > 0 && selectedSubreddits.length > 1 ? (
                     <div className="mt-2 text-xs text-gray-500">
                       Posts will be scheduled {formData.postingInterval.value} minutes apart. 
                       Total duration: {(selectedSubreddits.length - 1) * formData.postingInterval.value} minutes.
+                    </div>
+                  ) : (
+                    <div className="mt-2 text-xs text-gray-500">
+                      Posts will be scheduled all at once.
                     </div>
                   )}
                 </div>

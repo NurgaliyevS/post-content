@@ -5,14 +5,15 @@ import { BiPoll } from "react-icons/bi";
 
 const PostTypeTabs = ({ type, onTypeChange }) => {
   return (
-    <div className="tabs mb-4">
+    // on mobile, add overflow-x-auto
+    <div className="tabs mb-4 overflow-x-auto">
       <button
         className={`tab relative ${type === "text" ? "after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary" : ""} flex items-center gap-2`}
         onClick={() => onTypeChange("text")}
       >
         <RiFileTextLine /> Text
       </button>
-      <button
+      {/* <button
         disabled
         className="tab flex items-center gap-2 opacity-50"
       >
@@ -29,7 +30,7 @@ const PostTypeTabs = ({ type, onTypeChange }) => {
         className="tab flex items-center gap-2 opacity-50"
       >
         <BiPoll /> Poll
-      </button>
+      </button> */}
     </div>
   );
 };

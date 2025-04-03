@@ -2,13 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import withAuth from "@/components/withAuth";
-import {
-  FiArrowRight,
-  FiCheck,
-  FiX,
-  FiAlertTriangle,
-  FiXCircle,
-} from "react-icons/fi";
+import { FiArrowRight, FiCheck, FiX } from "react-icons/fi";
 import { FaUsers, FaCheckCircle, FaSpinner, FaCalendar } from "react-icons/fa";
 import axios from "axios";
 import { format, parse, setHours, setMinutes } from "date-fns";
@@ -96,58 +90,62 @@ function CrossPosting() {
   };
 
   // Toast notification components
-  const SuccessToast = ({ message, successful }) => {
+  const SuccessToast = ({ successful }) => {
     return (
       <div className="flex flex-col">
-        <p className="mt-2 mb-3">{message}</p>
         <div className="space-y-1">
-          {successful.map((item, index) => (
-            <div key={`success-${index}`} className="">
-              <span>Successfully scheduled for {item.subreddit}</span>
-            </div>
-          ))}
+          <div className="flex flex-col gap-2">
+            <span>Successfully scheduled for: </span>
+            {successful.map((item, index) => (
+              <div className="flex items-center gap-2" key={`success-${index}`}>
+                <div className="text-green-600 bg-green-100 rounded-full p-0.5">
+                  <FiCheck className="w-4 h-4" />
+                </div>
+                <span>{item.subreddit}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
   };
 
-  const WarningToast = ({ message, successful, failed }) => (
+  const WarningToast = ({ successful, failed }) => (
     <div className="flex flex-col">
-      <div className="flex items-center gap-2 font-medium">
-        <FiAlertTriangle className="w-5 h-5 text-amber-600" />
-        <span>Scheduling Completed with Warnings</span>
-      </div>
-      <p className="mt-2 mb-3">{message}</p>
       <div className="space-y-1">
-        {successful.map((item, index) => (
-          <div key={`success-${index}`} className="flex items-center gap-2">
-            <div className="text-green-600 bg-green-100 rounded-full p-0.5">
-              <FiCheck className="w-4 h-4" />
+        <div className="flex flex-col gap-2">
+          <span>Successfully scheduled for: </span>
+          {successful.map((item, index) => (
+            <div className="flex items-center gap-2" key={`success-${index}`}>
+              <div className="text-green-600 bg-green-100 rounded-full p-0.5">
+                <FiCheck className="w-4 h-4" />
+              </div>
+              <span>{item.subreddit}</span>
             </div>
-            <span>Successfully scheduled for {item.subreddit}</span>
-          </div>
-        ))}
-        {failed.map((item, index) => (
-          <div key={`failed-${index}`} className="flex items-center gap-2">
-            <div className="text-red-600 bg-red-100 rounded-full p-0.5">
-              <FiX className="w-4 h-4" />
+          ))}
+        </div>
+        <div className="flex flex-col gap-2 border-t pt-2">
+          <span>Failed to schedule for: </span>
+          {failed.map((item, index) => (
+            <div key={`failed-${index}`} className="flex items-center gap-2">
+              <div className="text-red-600 bg-red-100 rounded-full p-0.5">
+                <FiX className="w-4 h-4" />
+              </div>
+              <span>
+                {item.subreddit} - ({item.reason})
+              </span>
             </div>
-            <span>
-              Failed for {item.subreddit} ({item.reason})
-            </span>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
 
-  const ErrorToast = ({ message, failed }) => (
+  const ErrorToast = ({ failed }) => (
     <div className="flex flex-col">
       <div className="flex items-center gap-2 font-medium">
-        <FiXCircle className="w-5 h-5 text-red-600" />
-        <span>Scheduling Failed</span>
+        <span>Failed to schedule for: </span>
       </div>
-      <p className="mt-2 mb-3">{message}</p>
       <div className="space-y-1">
         {failed.map((item, index) => (
           <div key={`failed-${index}`} className="flex items-center gap-2">
@@ -155,7 +153,7 @@ function CrossPosting() {
               <FiX className="w-4 h-4" />
             </div>
             <span>
-              Failed for {item.subreddit} ({item.reason})
+              {item.subreddit} - ({item.reason})
             </span>
           </div>
         ))}
@@ -164,48 +162,32 @@ function CrossPosting() {
   );
 
   const showNotification = (type, results) => {
-    const { successful, failed, total } = results;
+    const { successful, failed } = results;
 
     switch (type) {
       case "success":
-        toast.success(
-          <SuccessToast
-            message={`All posts have been successfully scheduled for ${successful.length} subreddits.`}
-            successful={successful}
-          />,
-          {
-            autoClose: false,
-            closeButton: true,
-            className: "bg-green-50 border-l-4 border-green-500",
-          }
-        );
+        toast.success(<SuccessToast successful={successful} />, {
+          autoClose: 10000,
+          closeButton: true,
+          className: "bg-green-50 border-l-4 border-green-500",
+        });
         break;
       case "warning":
         toast.warning(
-          <WarningToast
-            message={`Your posts have been scheduled for ${successful.length} out of ${total} selected subreddits.`}
-            successful={successful}
-            failed={failed}
-          />,
+          <WarningToast successful={successful} failed={failed} />,
           {
-            autoClose: false,
+            autoClose: 10000,
             closeButton: true,
             className: "bg-amber-50 border-l-4 border-amber-500",
           }
         );
         break;
       case "error":
-        toast.error(
-          <ErrorToast
-            message="Failed to schedule any posts."
-            failed={failed}
-          />,
-          {
-            autoClose: false,
-            closeButton: true,
-            className: "bg-red-50 border-l-4 border-red-500",
-          }
-        );
+        toast.error(<ErrorToast failed={failed} />, {
+          autoClose: 10000,
+          closeButton: true,
+          className: "bg-red-50 border-l-4 border-red-500",
+        });
         break;
       default:
         break;
@@ -341,7 +323,7 @@ function CrossPosting() {
           pauseOnFocusLoss
           draggable={false}
           pauseOnHover
-          autoClose={false}
+          icon={false}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">

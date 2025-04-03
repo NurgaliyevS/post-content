@@ -8,6 +8,7 @@ import axios from "axios";
 import { format, parse, setHours, setMinutes } from "date-fns";
 import { toast, ToastContainer } from "react-toastify";
 import Select from 'react-select';
+import CrossPostingHistory from "@/components/ui/CrossPostingHistory";
 
 function CrossPosting() {
   const { data: session } = useSession();
@@ -352,7 +353,7 @@ function CrossPosting() {
 
   return (
     <DashboardLayout>
-      <div className="">
+      <div className="mb-10 min-h-screen">
         <h1 className="text-2xl md:text-3xl font-bold mb-6">Cross-Posting</h1>
 
         <ToastContainer
@@ -544,6 +545,8 @@ function CrossPosting() {
             </div>
           </div>
         </div>
+
+        <CrossPostingHistory posts={posts} />
       </div>
     </DashboardLayout>
   );

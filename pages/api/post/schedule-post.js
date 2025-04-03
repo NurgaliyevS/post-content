@@ -51,7 +51,8 @@ export default async function handler(req, res) {
       scheduledDateTime, // ISO formatted date-time string
       timeZone, 
       currentClientTime, // ISO formatted current client time
-      type = "text" 
+      type = "text",
+      isCrossPosting = false
     } = req.body;
 
     console.log(req.body, 'req.body');
@@ -148,7 +149,8 @@ export default async function handler(req, res) {
         redditAccessToken: session.accessToken,
         redditRefreshToken: session.refreshToken,
         postedAt: currentClientTime,
-        redditPostUrl: redditData?.json?.data?.url || null
+        redditPostUrl: redditData?.json?.data?.url || null,
+        isCrossPosting: isCrossPosting
       });
       
       const savedPost = await postedPost.save();
@@ -163,7 +165,8 @@ export default async function handler(req, res) {
           postedAt: currentClientTime,
           redditPostId: redditData?.json?.data?.id || null,
           redditFullname: redditData?.json?.data?.name || null,
-          redditPostUrl: redditData?.json?.data?.url || null
+          redditPostUrl: redditData?.json?.data?.url || null,
+          isCrossPosting: isCrossPosting
         }
       });
       
@@ -186,7 +189,8 @@ export default async function handler(req, res) {
         userTimeZone: timeZone, // Store the user's timezone for reference
         status: 'scheduled',
         redditAccessToken: session.accessToken,
-        redditRefreshToken: session.refreshToken
+        redditRefreshToken: session.refreshToken,
+        isCrossPosting: isCrossPosting
       });
       
       const savedPost = await scheduledPost.save();
@@ -199,7 +203,8 @@ export default async function handler(req, res) {
           title,
           scheduledFor: scheduledDateTime,
           timeZone,
-          createdAt: currentClientTime
+          createdAt: currentClientTime,
+          isCrossPosting: isCrossPosting
         }
       });
     }

@@ -61,6 +61,10 @@ const ScheduledPostSchema = new mongoose.Schema({
   },
   redditPostId: {
     type: String
+  },
+  isCrossPosting: {
+    type: Boolean,
+    default: false
   }
 });
 

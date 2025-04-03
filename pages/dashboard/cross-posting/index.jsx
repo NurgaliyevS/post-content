@@ -2,10 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import withAuth from "@/components/withAuth";
-import { FiArrowRight, FiCalendar, FiCheck } from "react-icons/fi";
+import {
+  FiArrowRight,
+  FiCheck,
+  FiX,
+  FiAlertTriangle,
+  FiXCircle,
+} from "react-icons/fi";
 import { FaUsers, FaCheckCircle, FaSpinner, FaCalendar } from "react-icons/fa";
 import axios from "axios";
 import { format, parse, setHours, setMinutes } from "date-fns";
+import { toast, ToastContainer } from "react-toastify";
 
 function CrossPosting() {
   const { data: session } = useSession();
@@ -20,7 +27,6 @@ function CrossPosting() {
     selectedTime: format(new Date(), "HH:mm"),
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   });
-  const [saveStatus, setSaveStatus] = useState("");
   const [isLoadingForm, setIsLoadingForm] = useState(false);
 
   useEffect(() => {
@@ -89,6 +95,123 @@ function CrossPosting() {
     }
   };
 
+  // Toast notification components
+  const SuccessToast = ({ message, successful }) => {
+    return (
+      <div className="flex flex-col">
+        <p className="mt-2 mb-3">{message}</p>
+        <div className="space-y-1">
+          {successful.map((item, index) => (
+            <div key={`success-${index}`} className="">
+              <span>Successfully scheduled for {item.subreddit}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const WarningToast = ({ message, successful, failed }) => (
+    <div className="flex flex-col">
+      <div className="flex items-center gap-2 font-medium">
+        <FiAlertTriangle className="w-5 h-5 text-amber-600" />
+        <span>Scheduling Completed with Warnings</span>
+      </div>
+      <p className="mt-2 mb-3">{message}</p>
+      <div className="space-y-1">
+        {successful.map((item, index) => (
+          <div key={`success-${index}`} className="flex items-center gap-2">
+            <div className="text-green-600 bg-green-100 rounded-full p-0.5">
+              <FiCheck className="w-4 h-4" />
+            </div>
+            <span>Successfully scheduled for {item.subreddit}</span>
+          </div>
+        ))}
+        {failed.map((item, index) => (
+          <div key={`failed-${index}`} className="flex items-center gap-2">
+            <div className="text-red-600 bg-red-100 rounded-full p-0.5">
+              <FiX className="w-4 h-4" />
+            </div>
+            <span>
+              Failed for {item.subreddit} ({item.reason})
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const ErrorToast = ({ message, failed }) => (
+    <div className="flex flex-col">
+      <div className="flex items-center gap-2 font-medium">
+        <FiXCircle className="w-5 h-5 text-red-600" />
+        <span>Scheduling Failed</span>
+      </div>
+      <p className="mt-2 mb-3">{message}</p>
+      <div className="space-y-1">
+        {failed.map((item, index) => (
+          <div key={`failed-${index}`} className="flex items-center gap-2">
+            <div className="text-red-600 bg-red-100 rounded-full p-0.5">
+              <FiX className="w-4 h-4" />
+            </div>
+            <span>
+              Failed for {item.subreddit} ({item.reason})
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const showNotification = (type, results) => {
+    const { successful, failed, total } = results;
+
+    switch (type) {
+      case "success":
+        toast.success(
+          <SuccessToast
+            message={`All posts have been successfully scheduled for ${successful.length} subreddits.`}
+            successful={successful}
+          />,
+          {
+            autoClose: false,
+            closeButton: true,
+            className: "bg-green-50 border-l-4 border-green-500",
+          }
+        );
+        break;
+      case "warning":
+        toast.warning(
+          <WarningToast
+            message={`Your posts have been scheduled for ${successful.length} out of ${total} selected subreddits.`}
+            successful={successful}
+            failed={failed}
+          />,
+          {
+            autoClose: false,
+            closeButton: true,
+            className: "bg-amber-50 border-l-4 border-amber-500",
+          }
+        );
+        break;
+      case "error":
+        toast.error(
+          <ErrorToast
+            message="Failed to schedule any posts."
+            failed={failed}
+          />,
+          {
+            autoClose: false,
+            closeButton: true,
+            className: "bg-red-50 border-l-4 border-red-500",
+          }
+        );
+        break;
+      default:
+        break;
+    }
+  };
+
   const schedulePost = async () => {
     if (
       !selectedPost ||
@@ -96,13 +219,14 @@ function CrossPosting() {
       !formData.selectedTime ||
       selectedSubreddits.length === 0
     ) {
-      setSaveStatus(
-        "Please select a post, target subreddits, and schedule time"
-      );
-      setTimeout(() => setSaveStatus(""), 3000);
+      showNotification("error", {
+        successful: [],
+        failed: [{ subreddit: "All", reason: "Missing required information" }],
+        total: selectedSubreddits.length,
+      });
       return;
     }
-  
+
     setIsLoadingForm(true);
     try {
       const scheduledDate = parse(
@@ -111,49 +235,95 @@ function CrossPosting() {
         new Date()
       );
       const [hours, minutes] = formData.selectedTime.split(":");
-  
+
       let scheduledDateTime = setHours(scheduledDate, parseInt(hours, 10));
       scheduledDateTime = setMinutes(scheduledDateTime, parseInt(minutes, 10));
-  
+
       const scheduledDateTimeISO = format(
         scheduledDateTime,
         "yyyy-MM-dd'T'HH:mm:ssxxx"
       );
       const currentTimeISO = format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx");
-  
-      const promises = selectedSubreddits.map((subreddit) => 
-        axios.post("/api/post/schedule-post", {
-          community: subreddit.display_name_prefixed,
-          title: selectedPost.title,
-          text: selectedPost.text,
-          scheduledDateTime: scheduledDateTimeISO,
-          timeZone: formData.timeZone,
-          type: selectedPost.type,
-          currentClientTime: currentTimeISO,
-          isCrossPosting: true,
-        })
+
+      const promises = selectedSubreddits.map((subreddit) =>
+        axios
+          .post("/api/post/schedule-post", {
+            community: subreddit.display_name_prefixed,
+            title: selectedPost.title,
+            text: selectedPost.text,
+            scheduledDateTime: scheduledDateTimeISO,
+            timeZone: formData.timeZone,
+            type: selectedPost.type,
+            currentClientTime: currentTimeISO,
+            isCrossPosting: true,
+          })
+          .then((response) => ({
+            status: "fulfilled",
+            subreddit: subreddit.display_name_prefixed,
+            value: response,
+          }))
+          .catch((error) => ({
+            status: "rejected",
+            subreddit: subreddit.display_name_prefixed,
+            reason: error.response?.data?.message || "Unknown error",
+          }))
       );
-  
-      // Use Promise.allSettled to handle all promises even if some fail
+
+      // Handle all promises
       const results = await Promise.allSettled(promises);
-      
-      // Check if any promises succeeded
-      const anySucceeded = results.some(result => result.status === 'fulfilled');
-      
-      if (anySucceeded) {
-        setSaveStatus("Posts scheduled successfully!");
+
+      console.log(results, "results");
+
+      const successful = results
+        .filter((result) => result.value.status === "fulfilled")
+        .map((result) => ({ subreddit: result.value.subreddit }));
+
+      const failed = results
+        .filter((result) => result.value.status === "rejected")
+        .map((result) => ({
+          subreddit: result.value.subreddit,
+          reason:
+            result.value?.reason === "Unknown error"
+              ? "Unknown error"
+              : result.value?.reason.includes("karma")
+                ? "karma requirement not met"
+                : result.value?.reason.includes("7 days")
+                  ? "already posted within 7 days"
+                  : result.value?.reason,
+        }));
+
+      const postingResults = {
+        successful,
+        failed,
+        total: selectedSubreddits.length,
+      };
+
+      console.log(postingResults, "postingResults");
+
+      // Determine notification type based on results
+      if (successful.length === 0) {
+        // All posts failed
+        showNotification("error", postingResults);
+      } else if (failed.length === 0) {
+        // All posts succeeded
+        showNotification("success", postingResults);
+        // Reset selection after complete success
         setSelectedPost(null);
         setSelectedSubreddits([]);
       } else {
-        // All promises failed
-        setSaveStatus("Failed to schedule any posts. Please try again.");
+        // Mixed results - some succeeded, some failed
+        showNotification("warning", postingResults);
+        // Keep selections for potential retry
       }
-      
-      setTimeout(() => setSaveStatus(""), 3000);
     } catch (error) {
       console.error("Error scheduling post:", error);
-      setSaveStatus("Error scheduling post. Please try again.");
-      setTimeout(() => setSaveStatus(""), 3000);
+      showNotification("error", {
+        successful: [],
+        failed: [
+          { subreddit: "All", reason: "Server error. Please try again." },
+        ],
+        total: selectedSubreddits.length,
+      });
     } finally {
       setIsLoadingForm(false);
     }
@@ -164,11 +334,15 @@ function CrossPosting() {
       <div className="">
         <h1 className="text-2xl md:text-3xl font-bold mb-6">Cross-Posting</h1>
 
-        {saveStatus && (
-          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-800">
-            {saveStatus}
-          </div>
-        )}
+        <ToastContainer
+          position="top-right"
+          hideProgressBar={false}
+          newestOnTop
+          pauseOnFocusLoss
+          draggable={false}
+          pauseOnHover
+          autoClose={false}
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col">
@@ -304,7 +478,7 @@ function CrossPosting() {
 
               <div className="flex justify-end">
                 <button
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center"
+                  className="btn btn-primary px-4 py-2 rounded-md flex items-center"
                   onClick={schedulePost}
                   disabled={
                     !selectedPost ||
@@ -315,7 +489,7 @@ function CrossPosting() {
                   }
                 >
                   {isLoadingForm ? "Scheduling..." : "Schedule Cross-Posts"}
-                  <FiArrowRight className="ml-2" />
+                  <FiArrowRight className="w-3 h-3" />
                 </button>
               </div>
             </div>

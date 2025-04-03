@@ -85,10 +85,10 @@ export default function OnboardingChecklist() {
   };
 
   const getScheduledPosts = async () => {
-    const response = await fetch("/api/post/get-post");
+    const response = await fetch("/api/post/get-last-post");
     const scheduledPosts = await response.json();
-    if (scheduledPosts?.scheduledPosts?.length > 0) {
-      setAmountOfScheduledPosts(scheduledPosts?.scheduledPosts?.length);
+    if (scheduledPosts?.lastPost) {
+      setAmountOfScheduledPosts(1);
     }
   };
 

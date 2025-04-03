@@ -10,6 +10,7 @@ import Post from "@/components/ui/Post";
 import { toast } from "react-toastify";
 import { showNotification } from "@/components/cross-posting/ToastNotifications";
 import { useRouter } from "next/router";
+import { useSidebar } from "@/context/SidebarContext";
 
 function Scheduling() {
   const { data: session, status } = useSession();
@@ -30,6 +31,7 @@ function Scheduling() {
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const router = useRouter();
+  const { refreshData } = useSidebar();
   
   if (status !== "loading" && !initialized) {
     setInitialized(true);
@@ -146,6 +148,7 @@ function Scheduling() {
       await fetch('/api/user/update-post-available', {
         method: 'POST',
       });
+      refreshData();
     } catch (updateError) {
       console.error('Error updating post availability:', updateError);
     }

@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { IoHomeOutline } from "react-icons/io5";
-import { FaRegUserCircle, FaRegCalendarAlt } from "react-icons/fa";
+import {
+  FaRegUserCircle,
+  FaRegCalendarAlt,
+  FaRegCommentDots,
+} from "react-icons/fa";
 import { FiTarget, FiSettings } from "react-icons/fi";
 import { AiOutlineCreditCard, AiOutlineLineChart } from "react-icons/ai";
 import { BiCalendarCheck } from "react-icons/bi";
@@ -26,21 +30,20 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
       href: "/dashboard/scheduling",
     },
     { name: "Cross-Posting", icon: FiTarget, href: "/dashboard/cross-posting" },
-    // {
-    //   name: "Hook Generator",
-    //   icon: AiOutlineLineChart,
-    //   href: "/dashboard/hook-generator",
-    // },
   ];
 
   const bottomNavItems = [
-    // { name: "Support", icon: BiSupport, href: "/dashboard/support" },
+    {
+      name: "Feedback",
+      icon: FaRegCommentDots,
+      href: "https://insigh.to/b/reddit-scheduler",
+      target: "_blank",
+    },
     {
       name: "Billing",
       icon: AiOutlineCreditCard,
       href: billingUrl || "/#pricing",
     },
-    // { name: "Settings", icon: FiSettings, href: "/dashboard/settings" },
   ];
 
   const formatDate = () => {
@@ -171,6 +174,7 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
                   <Link
                     href={item.href}
                     key={index}
+                    target={item.target}
                     className={`flex items-center mx-3 px-4 py-3 rounded-lg ${
                       currentPath === item.href
                         ? "bg-blue-500 text-white"

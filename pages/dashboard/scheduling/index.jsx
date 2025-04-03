@@ -300,7 +300,7 @@ function Scheduling() {
             </div>
           </div>
         </div>
-        <Post key={refreshTrigger} />
+        <Post refreshTrigger={refreshTrigger} />
       </div>
     </DashboardLayout>
   );

@@ -3,13 +3,13 @@ import axios from "axios";
 import { format } from "date-fns";
 import { FaCalendar, FaCheckCircle, FaSpinner, FaUsers } from "react-icons/fa";
 
-function Post() {
+function Post({ refreshTrigger }) {
   const [posts, setPosts] = useState([]);
   const [expandedPosts, setExpandedPosts] = useState({});
 
   useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [refreshTrigger]);
 
   const fetchPosts = async () => {
     try {

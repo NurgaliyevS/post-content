@@ -7,6 +7,8 @@ import FormattingToolbar from "@/components/scheduling/FormattingToolbar";
 import SubredditSelector from "@/components/scheduling/SubredditSelector";
 import { format, parse, setHours, setMinutes, add, sub } from "date-fns";
 import Post from "@/components/ui/Post";
+import { toast } from "react-toastify";
+import { showNotification } from "@/components/cross-posting/ToastNotifications";
 
 function Scheduling() {
   const { data: session, status } = useSession();
@@ -23,7 +25,6 @@ function Scheduling() {
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   });
   const [userTimezone, setUserTimezone] = useState("");
-  const [saveStatus, setSaveStatus] = useState(""); // For displaying save notifications
   const [initialized, setInitialized] = useState(false);
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -130,8 +131,11 @@ function Scheduling() {
       !formData.selectedDate ||
       !formData.selectedTime
     ) {
-      setSaveStatus("Please fill in all required fields");
-      setTimeout(() => setSaveStatus(""), 3000);
+      showNotification("error", {
+        successful: [],
+        failed: [{ subreddit: "All", reason: "Please fill in all required fields" }],
+        total: 1,
+      }, toast);
       return;
     }
 
@@ -186,19 +190,20 @@ function Scheduling() {
       });
 
       const data = await response.json();
-      if (data?.message) {
-        setSaveStatus(data?.message);
-        setRefreshTrigger((prev) => prev + 1);
-        setTimeout(() => setSaveStatus(""), 3000);
-      } else {
-        setSaveStatus("Post scheduled successfully!");
-        setRefreshTrigger((prev) => prev + 1);
-        setTimeout(() => setSaveStatus(""), 3000);
-      }
+      showNotification("success", {
+        successful: [{ subreddit: formData.community }],
+        failed: [],
+        total: 1,
+      }, toast);
+      
+      setRefreshTrigger((prev) => prev + 1);
     } catch (error) {
       console.error("Error scheduling post:", error);
-      setSaveStatus("Error scheduling post. Please try again.");
-      setTimeout(() => setSaveStatus(""), 3000);
+      showNotification("error", {
+        successful: [],
+        failed: [{ subreddit: formData.community, reason: "Error scheduling post. Please try again." }],
+        total: 1,
+      }, toast);
     } finally {
       setIsLoadingForm(false);
     }
@@ -211,12 +216,6 @@ function Scheduling() {
           <h1 className="text-2xl md:text-3xl font-bold mb-6">
             Schedule Reddit Posts
           </h1>
-
-          {saveStatus && (
-            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-800">
-              {saveStatus}
-            </div>
-          )}
 
           <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
             <SubredditSelector

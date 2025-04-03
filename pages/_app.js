@@ -19,14 +19,14 @@ export default function App({
           <Component {...pageProps} />
           <ToastContainer
             position="top-right"
-            autoClose={2000}
+            autoClose={5000}
             hideProgressBar={false}
-            newestOnTop={false}
+            newestOnTop
             closeOnClick
-            rtl={false}
             pauseOnFocusLoss
-            draggable
+            draggable={false}
             pauseOnHover
+            icon={false}
           />
           <CrispChat websiteId={process.env.NEXT_PUBLIC_CRISP_WEBSITE_ID} />
         </SessionProvider>

@@ -355,17 +355,6 @@ function CrossPosting() {
     <DashboardLayout>
       <div className="mb-10 min-h-screen">
         <h1 className="text-2xl md:text-3xl font-bold mb-6">Cross-Posting</h1>
-
-        <ToastContainer
-          position="top-right"
-          hideProgressBar={false}
-          newestOnTop
-          pauseOnFocusLoss
-          draggable={false}
-          pauseOnHover
-          icon={false}
-        />
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col">
             <h2 className="text-lg font-semibold">Source Post</h2>

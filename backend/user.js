@@ -16,6 +16,7 @@ const UserSchema = new mongoose.Schema(
     has_received_first_subscription_email: { type: Boolean, default: false },
     is_in_trial: { type: Boolean, default: false },
     trial_ends_at: { type: String, default: null },
+    is_cross_posting: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

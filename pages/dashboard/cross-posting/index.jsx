@@ -3,10 +3,11 @@ import { useSession } from "next-auth/react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import withAuth from "@/components/withAuth";
 import { FiArrowRight, FiCheck, FiX } from "react-icons/fi";
-import { FaUsers, FaCheckCircle, FaSpinner, FaCalendar } from "react-icons/fa";
+import { FaUsers, FaCheckCircle, FaSpinner, FaCalendar, FaClock } from "react-icons/fa";
 import axios from "axios";
 import { format, parse, setHours, setMinutes } from "date-fns";
 import { toast, ToastContainer } from "react-toastify";
+import Select from 'react-select';
 
 function CrossPosting() {
   const { data: session } = useSession();
@@ -20,8 +21,29 @@ function CrossPosting() {
     selectedDate: format(new Date(), "yyyy-MM-dd"),
     selectedTime: format(new Date(), "HH:mm"),
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    postingInterval: { value: 0, label: "Post all at once" }
   });
   const [isLoadingForm, setIsLoadingForm] = useState(false);
+
+  // Posting interval options
+  const intervalOptions = [
+    { value: 0, label: "Post all at once" },
+    { value: 15, label: "15 minutes" },
+    { value: 30, label: "30 minutes" },
+    { value: 60, label: "60 minutes" },
+    { value: 120, label: "2 hours" },
+    { value: 240, label: "4 hours" },
+    { value: 480, label: "8 hours" },
+    { value: 720, label: "12 hours" },
+    { value: 1440, label: "24 hours" },
+    { value: 2880, label: "48 hours" },
+    { value: 4320, label: "72 hours" },
+    { value: 5760, label: "96 hours" },
+    { value: 7200, label: "120 hours" },
+    { value: 8640, label: "144 hours" },
+    { value: 10080, label: "168 hours" },
+    
+  ];
 
   useEffect(() => {
     fetchPosts();
@@ -65,6 +87,13 @@ function CrossPosting() {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
+    }));
+  };
+
+  const handleIntervalChange = (selectedOption) => {
+    setFormData((prev) => ({
+      ...prev,
+      postingInterval: selectedOption,
     }));
   };
 
@@ -227,13 +256,23 @@ function CrossPosting() {
       );
       const currentTimeISO = format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx");
 
-      const promises = selectedSubreddits.map((subreddit) =>
-        axios
+      const promises = selectedSubreddits.map((subreddit, index) => {
+        // Add interval time if not posting all at once
+        let postTime = new Date(scheduledDateTime);
+        if (formData.postingInterval.value > 0) {
+          postTime.setMinutes(
+            postTime.getMinutes() + index * formData.postingInterval.value
+          );
+        }
+        
+        const postTimeISO = format(postTime, "yyyy-MM-dd'T'HH:mm:ssxxx");
+        
+        return axios
           .post("/api/post/schedule-post", {
             community: subreddit.display_name_prefixed,
             title: selectedPost.title,
             text: selectedPost.text,
-            scheduledDateTime: scheduledDateTimeISO,
+            scheduledDateTime: postTimeISO,
             timeZone: formData.timeZone,
             type: selectedPost.type,
             currentClientTime: currentTimeISO,
@@ -248,8 +287,8 @@ function CrossPosting() {
             status: "rejected",
             subreddit: subreddit.display_name_prefixed,
             reason: error.response?.data?.message || "Unknown error",
-          }))
-      );
+          }));
+      });
 
       // Handle all promises
       const results = await Promise.allSettled(promises);
@@ -455,6 +494,30 @@ function CrossPosting() {
                       className="w-full p-2 border rounded-md"
                     />
                   </div>
+                </div>
+              </div>
+              
+              {/* Posting Interval Selector */}
+              <div className="mb-4">
+                <label className="text-sm font-medium mb-1 flex items-center gap-1">
+                  Posting Interval (minutes)
+                </label>
+                <div className="relative">
+                  <Select
+                    options={intervalOptions}
+                    value={formData.postingInterval}
+                    onChange={handleIntervalChange}
+                    className="react-select-container"
+                    classNamePrefix="react-select"
+                    isSearchable={false}
+                    placeholder="Select interval..."
+                  />
+                  {formData.postingInterval.value > 0 && selectedSubreddits.length > 1 && (
+                    <div className="mt-2 text-xs text-gray-500">
+                      Posts will be scheduled {formData.postingInterval.value} minutes apart. 
+                      Total duration: {(selectedSubreddits.length - 1) * formData.postingInterval.value} minutes.
+                    </div>
+                  )}
                 </div>
               </div>
 

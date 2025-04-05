@@ -12,11 +12,11 @@ export default async function handler(req, res) {
   }
 
   // Instead of using cookies() from next/headers, access cookies from the request
-  const visitorId = req.cookies.datafast_visitor_id;
-  const sessionId = req.cookies.datafast_session_id;
+  const visitorId = req?.cookies?.datafast_visitor_id;
+  const sessionId = req?.cookies?.datafast_session_id;
 
   console.log("visitorId", visitorId);
-
+  console.log("sessionId", sessionId);
   await connectMongoDB();
   try {
     const session = await getServerSession(req, res, authOptions);

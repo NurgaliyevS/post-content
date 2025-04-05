@@ -11,8 +11,13 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: "Method not allowed" });
   }
 
-  await connectMongoDB();
+  // Instead of using cookies() from next/headers, access cookies from the request
+  const visitorId = req.cookies.datafast_visitor_id;
+  const sessionId = req.cookies.datafast_session_id;
 
+  console.log("visitorId", visitorId);
+
+  await connectMongoDB();
   try {
     const session = await getServerSession(req, res, authOptions);
 
@@ -55,10 +60,12 @@ export default async function handler(req, res) {
       metadata: {
         plan,
         post_available: planDetails.post_available,
+        visitorId,
+        sessionId,
       },
       subscription_data: {
-        trial_period_days: 7
-      }
+        trial_period_days: 7,
+      },
     };
 
     if (session?.user?.name) {

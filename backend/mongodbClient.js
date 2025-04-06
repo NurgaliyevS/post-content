@@ -13,6 +13,12 @@ const options = {
   serverSelectionTimeoutMS: 30000,
   socketTimeoutMS: 45000,
   connectTimeoutMS: 30000,
+  retryWrites: true,
+  retryReads: true,
+  maxPoolSize: 10,
+  minPoolSize: 5,
+  heartbeatFrequencyMS: 10000,
+  maxIdleTimeMS: 60000,
 };
 
 let client;
@@ -26,7 +32,7 @@ const connectWithRetry = async (retries = 5) => {
     return client;
   } catch (error) {
     if (retries > 0) {
-      console.log(`MongoDB connection failed. Retrying... (${retries} attempts left)`);
+      console.error(`MongoDB connection failed. Retrying... (${retries} attempts left)`, error);
       await new Promise(resolve => setTimeout(resolve, 5000)); // Wait for 5 seconds before retrying
       return connectWithRetry(retries - 1);
     }

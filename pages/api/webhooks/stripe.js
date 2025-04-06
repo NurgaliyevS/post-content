@@ -3,6 +3,7 @@ import { buffer } from "micro";
 import User from "@/backend/user";
 import connectMongoDB from "@/backend/mongodb";
 import sendFirstSubscriptionEmail from "@/utils/sendFirstSubscriptionEmail";
+import sendTelegramNotification from "@/utils/sendTelegramNotification";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -73,6 +74,18 @@ export default async function handler(req, res) {
 
     if (session?.customer_email) {
       payload.email = session.customer_email;
+    }
+
+    if (isInTrial) {
+      let message;
+      message = `🎉 New Trial Started!
+
+👤 Customer ID: ${subscription.customer}
+📧 Email: ${payload?.email}
+⭐ Plan: ${payload?.variant_name}
+📝 Posts Available: ${payload?.post_available}
+👋 Customer Name: ${payload?.customer_name}`;
+      await sendTelegramNotification(message);
     }
 
     console.log(payload, "payload in checkout.session.completed");
@@ -193,18 +206,19 @@ export default async function handler(req, res) {
 
   if (event.type === "customer.subscription.deleted") {
     const subscription = event.data.object;
-    
+
     const payload = {
       variant_name: "free", // Reset to free plan
       subscription_renews_at: null,
       ends_at: new Date().toISOString(), // Set to current date since it's canceled immediately
       subscription_id: null, // Optional: Clear the subscription ID
       is_in_trial: false,
-      trial_ends_at: null
+      trial_ends_at: null,
+      post_available: 0,
     };
-  
+
     console.log(payload, "payload in customer.subscription.deleted");
-  
+
     await User.findOneAndUpdate(
       { customer_id: subscription.customer },
       { $set: payload }

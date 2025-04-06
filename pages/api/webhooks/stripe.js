@@ -61,7 +61,6 @@ export default async function handler(req, res) {
       ).toISOString(),
       ends_at: new Date(subscription.current_period_end * 1000).toISOString(),
       customer_id: session.customer,
-      subscription_id: session.subscription,
       customer_name: session.customer_details.name,
       post_available: parseInt(metadata.post_available),
       is_in_trial: isInTrial,

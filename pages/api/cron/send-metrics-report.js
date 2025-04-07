@@ -25,10 +25,10 @@ export default async function handler(req, res) {
 
     // Get current time
     const currentTime = new Date();
-    
+
     // Determine if this is a weekly report
     const isWeeklyReport = req.query.type === "weekly";
-    
+
     // Set the time range and query based on report type
     let dateQuery;
     if (isWeeklyReport) {
@@ -36,8 +36,8 @@ export default async function handler(req, res) {
       dateQuery = {
         scheduledFor: {
           $gte: lastWeek,
-          $lte: currentTime
-        }
+          $lte: currentTime,
+        },
       };
     } else {
       // For early report, find posts that:
@@ -46,35 +46,35 @@ export default async function handler(req, res) {
       const sixHoursAgo = subHours(currentTime, 6);
       dateQuery = {
         scheduledFor: {
-          $lte: sixHoursAgo // Posts scheduled at least 6 hours ago
-        }
+          $lte: sixHoursAgo, // Posts scheduled at least 6 hours ago
+        },
       };
     }
 
     // Find metrics within the date range
     const metrics = await PostMetrics.find({
       ...dateQuery,
-      ...(isWeeklyReport 
-        ? {} 
-        : { isEarlyEmailSent: false })
+      ...(isWeeklyReport ? {} : { isEarlyEmailSent: false }),
     })
-    .sort({ upvotes: -1 })
-    .limit(5);
+      .sort({ upvotes: -1 })
+      .limit(5);
 
-    console.log('Found metrics:', {
+    console.log("Found metrics:", {
       count: metrics.length,
       currentTime: currentTime.toISOString(),
       isWeeklyReport,
-      metrics: metrics.map(m => ({
+      metrics: metrics.map((m) => ({
         title: m.title,
         scheduledFor: m.scheduledFor,
-        isEarlyEmailSent: m.isEarlyEmailSent
-      }))
+        isEarlyEmailSent: m.isEarlyEmailSent,
+      })),
     });
 
     if (metrics.length === 0) {
-      return res.status(200).json({ 
-        message: isWeeklyReport ? "No metrics for weekly report" : "No new metrics to report" 
+      return res.status(200).json({
+        message: isWeeklyReport
+          ? "No metrics for weekly report"
+          : "No new metrics to report",
       });
     }
 
@@ -129,14 +129,21 @@ export default async function handler(req, res) {
             try {
               // Double check the 6-hour condition with user's timezone
               const scheduledTime = new Date(metric.scheduledFor);
-              const userCurrentTime = user.timeZone 
-                ? new Date(new Date().toLocaleString('en-US', { timeZone: user.timeZone }))
+              const userCurrentTime = user.timeZone
+                ? new Date(
+                    new Date().toLocaleString("en-US", {
+                      timeZone: user.timeZone,
+                    })
+                  )
                 : new Date();
-              
-              const timeSinceScheduled = (userCurrentTime - scheduledTime) / (1000 * 60 * 60); // hours
+
+              const timeSinceScheduled =
+                (userCurrentTime - scheduledTime) / (1000 * 60 * 60); // hours
 
               if (timeSinceScheduled < 6) {
-                console.log(`Skipping email for post ${metric.postId} - only ${timeSinceScheduled.toFixed(1)} hours since scheduled`);
+                console.log(
+                  `Skipping email for post ${metric.postId} - only ${timeSinceScheduled.toFixed(1)} hours since scheduled`
+                );
                 continue;
               }
 
@@ -213,14 +220,15 @@ async function weeklyEmail(user, metrics) {
   const today = new Date();
   // Get last Monday by using startOfWeek with weekStartsOn: 1 (Monday)
   // If today is Monday, get the previous Monday
-  const lastMonday = today.getDay() === 1 
-    ? startOfWeek(subDays(today, 7), { weekStartsOn: 1 })
-    : startOfWeek(today, { weekStartsOn: 1 });
+  const lastMonday =
+    today.getDay() === 1
+      ? startOfWeek(subDays(today, 7), { weekStartsOn: 1 })
+      : startOfWeek(today, { weekStartsOn: 1 });
 
-  console.log('Date range:', {
-    lastMonday: format(lastMonday, 'MMM dd'),
-    today: format(today, 'MMM dd, yyyy'),
-    todayDay: today.getDay()
+  console.log("Date range:", {
+    lastMonday: format(lastMonday, "MMM dd"),
+    today: format(today, "MMM dd, yyyy"),
+    todayDay: today.getDay(),
   });
 
   // Sort metrics by impressions for top performers
@@ -245,7 +253,7 @@ async function weeklyEmail(user, metrics) {
     const { data, error } = await resend.emails.send({
       from: "RedditScheduler <updates@redditscheduler.com>",
       to: user.email,
-      subject: `Weekly Digest: Highlights from ${format(lastMonday, 'MMM dd')} - ${format(today, 'MMM dd, yyyy')}`,
+      subject: `Weekly Digest: Highlights from ${format(lastMonday, "MMM dd")} - ${format(today, "MMM dd, yyyy")}`,
       html: `
       <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="border:1px solid #ececec;border-radius:10px;padding:24px;max-width:600px" width="100%">
         <tbody>
@@ -318,7 +326,7 @@ async function weeklyEmail(user, metrics) {
                         ? `
                     <tr>
                       <td style="color:#4b5563;font-size:14px;">Upvote Ratio:</td>
-                      <td style="color:#3b82f6;font-weight:600;text-align:right">${post.upvoteRatio}%</td>
+                      <td style="color:#3b82f6;font-weight:600;text-align:right">${(post.upvoteRatio * 100).toFixed(0)}%</td>
                     </tr>
                     `
                         : ""

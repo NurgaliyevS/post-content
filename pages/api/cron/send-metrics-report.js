@@ -7,9 +7,6 @@ import { DateTime } from "luxon";
 // Initialize Resend with API key
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Add delay between email sends to avoid rate limits
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
 // This endpoint will be called by Vercel Cron
 export default async function handler(req, res) {
   if (req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -99,9 +96,6 @@ export default async function handler(req, res) {
               postId: metric.postId,
               status: "sent",
             });
-
-            // Add 1 second delay between emails to avoid rate limits
-            await delay(1000);
           } catch (error) {
             console.error(
               `Error sending email for post ${metric.postId}:`,

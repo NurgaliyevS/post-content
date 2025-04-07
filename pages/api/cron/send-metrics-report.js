@@ -8,7 +8,7 @@ import { DateTime } from "luxon";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Add delay between email sends to avoid rate limits
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // This endpoint will be called by Vercel Cron
 export default async function handler(req, res) {
@@ -36,7 +36,7 @@ export default async function handler(req, res) {
       createdAt: {
         $gte: currentTimeUTC.minus(timeRange).toJSDate(),
       },
-      isEarlyEmailSent: false // Only get metrics where early email hasn't been sent
+      isEarlyEmailSent: false, // Only get metrics where early email hasn't been sent
     })
       .sort({ impressions: -1 })
       .limit(5);
@@ -73,14 +73,17 @@ export default async function handler(req, res) {
         for (const metric of userMetrics) {
           try {
             const { data, error } = await earlyEmail(user, metric);
-            
+
             if (error) {
-              console.error(`Failed to send email for post ${metric.postId}:`, error);
+              console.error(
+                `Failed to send email for post ${metric.postId}:`,
+                error
+              );
               results.push({
                 userId,
                 postId: metric.postId,
                 status: "error",
-                error: error
+                error: error,
               });
               continue;
             }
@@ -88,28 +91,30 @@ export default async function handler(req, res) {
             // Update the metric to mark email as sent
             await PostMetrics.findByIdAndUpdate(metric._id, {
               isEarlyEmailSent: true,
-              lastUpdated: new Date()
+              lastUpdated: new Date(),
             });
 
             results.push({
               userId,
               postId: metric.postId,
-              status: "sent"
+              status: "sent",
             });
 
             // Add 1 second delay between emails to avoid rate limits
             await delay(1000);
           } catch (error) {
-            console.error(`Error sending email for post ${metric.postId}:`, error);
+            console.error(
+              `Error sending email for post ${metric.postId}:`,
+              error
+            );
             results.push({
               userId,
               postId: metric.postId,
               status: "error",
-              error: error.message
+              error: error.message,
             });
           }
         }
-
       } catch (error) {
         console.error(`Error processing user ${userId}:`, error);
         results.push({
@@ -153,7 +158,7 @@ async function earlyEmail(user, metric) {
   console.log("Sending email for:", {
     to: user.email,
     postId: metric.postId,
-    title: metric.title
+    title: metric.title,
   });
 
   try {
@@ -166,7 +171,7 @@ async function earlyEmail(user, metric) {
         <tbody>
           <tr>
             <td style="padding-bottom:20px;text-align:center">
-              <img alt="RedditScheduler" src="https://redditscheduler.com/logoAndName.png" style="width:100%;max-width:125px;margin:auto;text-align:center" width="220">
+              <img alt="RedditScheduler" src="https://redditscheduler.com/logoAndName.png" style="display:block;width:auto;height:40px;margin:0 auto;" />
             </td>
           </tr>
           <tr>

@@ -32,17 +32,23 @@ export default async function handler(req, res) {
     // Set the time range and query based on report type
     let dateQuery;
     if (isWeeklyReport) {
-      const lastWeek = subDays(currentTime, 7);
+      // Get exact previous week's range (Monday to Sunday)
+      const today = new Date();
+      const lastMonday = startOfWeek(subDays(today, 7), { weekStartsOn: 1 }); // Last Monday
+      const lastSunday = subDays(startOfWeek(today, { weekStartsOn: 1 }), 1); // Last Sunday
+
+      console.log('Weekly date range:', {
+        from: format(lastMonday, 'MMM dd'),
+        to: format(lastSunday, 'MMM dd'),
+      });
+
       dateQuery = {
         scheduledFor: {
-          $gte: lastWeek,
-          $lte: currentTime,
+          $gte: lastMonday,
+          $lte: lastSunday,
         },
       };
     } else {
-      // For early report, find posts that:
-      // 1. Were scheduled more than 6 hours ago
-      // 2. Haven't had their early email sent yet
       const sixHoursAgo = subHours(currentTime, 6);
       dateQuery = {
         scheduledFor: {
@@ -56,8 +62,8 @@ export default async function handler(req, res) {
       ...dateQuery,
       ...(isWeeklyReport ? {} : { isEarlyEmailSent: false }),
     })
-      .sort({ upvotes: -1 })
-      .limit(5);
+    .sort({ upvotes: -1 })
+    .limit(5);
 
     console.log("Found metrics:", {
       count: metrics.length,

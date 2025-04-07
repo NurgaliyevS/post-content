@@ -34,7 +34,7 @@ export default async function handler(req, res) {
 
     // Find metrics from the specified time range
     const metrics = await PostMetrics.find({
-      createdAt: {
+      publishedFor: {
         $gte: new Date(currentTimeUTC.getTime() - timeRange.hours * 60 * 60 * 1000),
       },
       ...(isWeeklyReport

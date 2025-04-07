@@ -15,6 +15,7 @@ export default async function handler(req, res) {
   try {
     const { type, payload } = req.body;
 
+    console.log(req.body, "req.body");
     console.log(type, "type");
     console.log(payload, "payload");
 

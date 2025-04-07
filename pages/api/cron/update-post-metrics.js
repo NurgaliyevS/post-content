@@ -103,10 +103,11 @@ export default async function handler(req, res) {
 
         console.log(aboutData, "aboutData");
 
-        const postAboutData = aboutData.data.children[0]?.data;
+        const postAboutData = aboutData.data?.children[0];
+        const postAboutData2 = aboutData.data?.children[1];
 
         console.log(postAboutData, "postAboutData");
-
+        console.log(postAboutData2, "postAboutData2");
         console.log(analyticsPostData, "analyticsPostData");
 
         // Calculate impressions from various possible sources

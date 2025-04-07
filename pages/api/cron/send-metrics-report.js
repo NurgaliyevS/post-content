@@ -169,9 +169,10 @@ export default async function handler(req, res) {
 }
 
 async function weeklyEmail(user, metrics) {
-  const beginningOfWeek = DateTime.now().startOf("week").toUTC();
-  const endOfWeek = DateTime.now().endOf("week").toUTC();
-
+  // Calculate the date range for the current week (Monday to today)
+  const today = DateTime.now().toUTC();
+  const lastMonday = today.minus({ days: today.weekday - 1 }); // Get last Monday (weekday 1 is Monday)
+  
   // Sort metrics by impressions for top performers
   const sortedMetrics = [...metrics].sort((a, b) => b.upvotes - a.upvotes);
   const topPerformers = sortedMetrics.slice(0, 5); // Top 5 posts
@@ -194,7 +195,7 @@ async function weeklyEmail(user, metrics) {
     const { data, error } = await resend.emails.send({
       from: "RedditScheduler <updates@redditscheduler.com>",
       to: user.email,
-      subject: `Weekly Digest: Highlights from ${beginningOfWeek.toFormat("MMM dd")} - ${endOfWeek.toFormat("MMM dd, yyyy")}`,
+      subject: `Weekly Digest: Highlights from ${lastMonday.toFormat("MMM dd")} - ${today.toFormat("MMM dd, yyyy")}`,
       html: `
       <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="border:1px solid #ececec;border-radius:10px;padding:24px;max-width:600px" width="100%">
         <tbody>

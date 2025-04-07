@@ -1,5 +1,6 @@
 import connectMongoDB from "@/backend/mongodb";
 import PostMetrics from "@/backend/PostMetricsSchema";
+import User from "@/backend/user";
 import { Resend } from 'resend';
 import { DateTime } from "luxon";
 
@@ -33,7 +34,7 @@ export default async function handler(req, res) {
       createdAt: {
         $gte: currentTimeUTC.minus(timeRange).toJSDate()
       }
-    }).sort({ impressions: -1 });
+    }).sort({ impressions: -1 }).limit(5);
 
     if (metrics.length === 0) {
       return res.status(200).json({ message: 'No metrics to report' });
@@ -53,6 +54,15 @@ export default async function handler(req, res) {
     // Send report to each user
     for (const [userId, userMetrics] of Object.entries(metricsByUser)) {
       try {
+        // Get user email
+        const user = await User.findById(userId);
+        if (!user?.email) {
+          console.log(`No email found for user ${userId}`);
+          continue;
+        }
+
+        console.log(user, 'user');
+
         // Generate HTML for metrics table
         const metricsHtml = userMetrics.map(metric => `
           <tr>
@@ -72,9 +82,9 @@ export default async function handler(req, res) {
         }), { impressions: 0, upvotes: 0, comments: 0 });
 
         // Send email using Resend
-        const emailResponse = await resend.emails.send({
+        await resend.emails.send({
           from: 'RedditScheduler <noreply@mg.redditscheduler.com>',
-          to: userId,
+          to: user.email,
           subject: isWeeklyReport ? 
             'Your Weekly Reddit Post Performance Report' : 
             'Early Performance Report for Your Recent Reddit Posts',
@@ -116,6 +126,7 @@ export default async function handler(req, res) {
 
         results.push({
           userId,
+          email: user.email,
           status: 'sent',
           posts: userMetrics.length
         });
@@ -131,7 +142,7 @@ export default async function handler(req, res) {
     }
 
     return res.status(200).json({
-      message: `Sent ${isWeeklyReport ? 'weekly' : 'early'} reports to ${results.length} users`,
+      message: `Sent reports to ${results.length} users`,
       results
     });
 

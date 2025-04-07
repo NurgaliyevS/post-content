@@ -37,15 +37,19 @@ export default async function handler(req, res) {
       createdAt: {
         $gte: currentTimeUTC.minus(timeRange).toJSDate(),
       },
-      ...(isWeeklyReport 
+      ...(isWeeklyReport
         ? {} // No isEarlyEmailSent filter for weekly reports
-        : { isEarlyEmailSent: false }) // Only for early reports
+        : { isEarlyEmailSent: false }), // Only for early reports
     })
       .sort({ impressions: -1 })
       .limit(5);
 
     if (metrics.length === 0) {
-      return res.status(200).json({ message: isWeeklyReport ? "No metrics for weekly report" : "No new metrics to report" });
+      return res.status(200).json({
+        message: isWeeklyReport
+          ? "No metrics for weekly report"
+          : "No new metrics to report",
+      });
     }
 
     // Group metrics by userId
@@ -76,18 +80,21 @@ export default async function handler(req, res) {
           // Send weekly digest
           const { data, error } = await weeklyEmail(user, userMetrics);
           if (error) {
-            console.error(`Failed to send weekly email to user ${userId}:`, error);
+            console.error(
+              `Failed to send weekly email to user ${userId}:`,
+              error
+            );
             results.push({
               userId,
               status: "error",
-              error: error
+              error: error,
             });
           } else {
             results.push({
               userId,
               status: "sent",
               type: "weekly",
-              postsCount: userMetrics.length
+              postsCount: userMetrics.length,
             });
           }
         } else {
@@ -95,14 +102,17 @@ export default async function handler(req, res) {
           for (const metric of userMetrics) {
             try {
               const { data, error } = await earlyEmail(user, metric);
-              
+
               if (error) {
-                console.error(`Failed to send email for post ${metric.postId}:`, error);
+                console.error(
+                  `Failed to send email for post ${metric.postId}:`,
+                  error
+                );
                 results.push({
                   userId,
                   postId: metric.postId,
                   status: "error",
-                  error: error
+                  error: error,
                 });
                 continue;
               }
@@ -110,24 +120,27 @@ export default async function handler(req, res) {
               // Update the metric to mark email as sent
               await PostMetrics.findByIdAndUpdate(metric._id, {
                 isEarlyEmailSent: true,
-                lastUpdated: new Date()
+                lastUpdated: new Date(),
               });
 
               results.push({
                 userId,
                 postId: metric.postId,
-                status: "sent"
+                status: "sent",
               });
 
               // Add 1 second delay between emails to avoid rate limits
               await delay(1000);
             } catch (error) {
-              console.error(`Error sending email for post ${metric.postId}:`, error);
+              console.error(
+                `Error sending email for post ${metric.postId}:`,
+                error
+              );
               results.push({
                 userId,
                 postId: metric.postId,
                 status: "error",
-                error: error.message
+                error: error.message,
               });
             }
           }
@@ -164,12 +177,15 @@ async function weeklyEmail(user, metrics) {
   const topPerformers = sortedMetrics.slice(0, 5); // Top 5 posts
 
   // Calculate total stats
-  const totalStats = metrics.reduce((acc, metric) => {
-    acc.impressions += metric.impressions || 0;
-    acc.upvotes += metric.upvotes || 0;
-    acc.comments += metric.comments || 0;
-    return acc;
-  }, { impressions: 0, upvotes: 0, comments: 0 });
+  const totalStats = metrics.reduce(
+    (acc, metric) => {
+      acc.impressions += metric.impressions || 0;
+      acc.upvotes += metric.upvotes || 0;
+      acc.comments += metric.comments || 0;
+      return acc;
+    },
+    { impressions: 0, upvotes: 0, comments: 0 }
+  );
 
   console.log(totalStats, "totalStats");
   console.log(topPerformers, "topPerformers");
@@ -187,12 +203,7 @@ async function weeklyEmail(user, metrics) {
               <table cellpadding="0" cellspacing="0" style="margin:0 auto;">
                 <tr>
                   <td style="text-align:center;">
-                    <img alt="RedditScheduler" src="https://redditscheduler.com/logo.png" style="display:block;width:auto;height:40px;margin:0 auto;" />
-                  </td>
-                </tr>
-                <tr>
-                  <td style="text-align:center;padding-top:8px;">
-                    <span style="color:#4b5563;font-size:18px;font-weight:600;">RedditScheduler.com</span>
+              <img alt="RedditScheduler" src="https://redditscheduler.com/logoAndName.png" style="display:block;width:auto;height:40px;margin:0 auto;" />
                   </td>
                 </tr>
               </table>
@@ -237,14 +248,12 @@ async function weeklyEmail(user, metrics) {
           <tr>
             <td style="padding-bottom:24px;">
               <h2 style="color:#1f2937;font-size:18px;margin:0 0 16px 0">Top Performing Posts</h2>
-              ${topPerformers.map((post, index) => `
-                <div style="margin-bottom:${index === topPerformers.length - 1 ? '0' : '16px'};padding:16px;border:1px solid #e5e7eb;border-radius:8px;">
+              ${topPerformers
+                .map(
+                  (post, index) => `
+                <div style="margin-bottom:${index === topPerformers.length - 1 ? "0" : "16px"};padding:16px;border:1px solid #e5e7eb;border-radius:8px;">
                   <h3 style="color:#1f2937;font-size:16px;margin:0 0 12px 0">${post.title}</h3>
-                  <table width="100%" cellpadding="4" cellspacing="0">
-                    <tr>
-                      <td style="color:#4b5563;font-size:14px;">Impressions:</td>
-                      <td style="color:#3b82f6;font-weight:600;text-align:right">${post.impressions.toLocaleString()}</td>
-                    </tr>
+                  <table width="100%" cellpadding="3" cellspacing="0">
                     <tr>
                       <td style="color:#4b5563;font-size:14px;">Upvotes:</td>
                       <td style="color:#3b82f6;font-weight:600;text-align:right">${post.upvotes.toLocaleString()}</td>
@@ -253,18 +262,24 @@ async function weeklyEmail(user, metrics) {
                       <td style="color:#4b5563;font-size:14px;">Comments:</td>
                       <td style="color:#3b82f6;font-weight:600;text-align:right">${post.comments.toLocaleString()}</td>
                     </tr>
-                    ${post.upvoteRatio ? `
+                    ${
+                      post.upvoteRatio
+                        ? `
                     <tr>
                       <td style="color:#4b5563;font-size:14px;">Upvote Ratio:</td>
                       <td style="color:#3b82f6;font-weight:600;text-align:right">${(post.upvoteRatio * 100).toFixed(0)}%</td>
                     </tr>
-                    ` : ''}
+                    `
+                        : ""
+                    }
                   </table>
                   <div style="margin-top:12px;">
-                    <a href="${post.postUrl}" style="color:#3b82f6;text-decoration:none;font-size:14px;display:inline-block;">View Post →</a>
+                    <a href="${post.postUrl}" style="background-color:#3b82f6;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;font-weight:600;display:inline-block">View Post →</a>
                   </div>
                 </div>
-              `).join('')}
+              `
+                )
+                .join("")}
             </td>
           </tr>
 

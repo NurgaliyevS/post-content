@@ -47,6 +47,10 @@ const PostMetricsSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  upvoteRatio: {
+    type: Number,
+    default: 0
+  }
 });
 
 export default mongoose.models.PostMetrics || mongoose.model("PostMetrics", PostMetricsSchema); 

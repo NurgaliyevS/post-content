@@ -195,12 +195,12 @@ async function earlyEmail(user, metric) {
             </td>
           </tr>
   
-          <!-- Impressions -->
+          <!-- Upvotes -->
           <tr>
             <td>
-              <p style="color:#4b5563;font-weight:800;margin:0;font-size:12px;letter-spacing:0.05em;margin-bottom:8px">IMPRESSIONS</p>
-              <p style="color:#3b82f6;font-weight:900;margin:0;font-size:48px;line-height:1;font-family:Helvetica,sans-serif">
-                ${metric.impressions}
+              <p style="color:#4b5563;font-weight:800;margin:0;font-size:12px;letter-spacing:0.05em;margin-bottom:8px">UPVOTES</p>
+              <p style="margin:0;font-size:0px;line-height:1;font-family:Helvetica,sans-serif">
+                <span style="font-size:48px;color:#3b82f6;font-weight:900">${metric.upvotes}</span>
               </p>
             </td>
           </tr>
@@ -209,13 +209,13 @@ async function earlyEmail(user, metric) {
               <div style="border-bottom:1px solid #e5e7eb"></div>
             </td>
           </tr>
-  
-          <!-- Upvotes -->
+
+          <!-- Upvote Ratio -->
           <tr>
             <td>
-              <p style="color:#4b5563;font-weight:800;margin:0;font-size:12px;letter-spacing:0.05em;margin-bottom:8px">UPVOTES</p>
+              <p style="color:#4b5563;font-weight:800;margin:0;font-size:12px;letter-spacing:0.05em;margin-bottom:8px">UPVOTE RATIO</p>
               <p style="margin:0;font-size:0px;line-height:1;font-family:Helvetica,sans-serif">
-                <span style="font-size:48px;color:#3b82f6;font-weight:900">${metric.upvotes}</span>
+                <span style="font-size:48px;color:#3b82f6;font-weight:900">${metric.upvoteRatio}</span>
               </p>
             </td>
           </tr>

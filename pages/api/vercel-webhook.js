@@ -27,34 +27,8 @@ export default async function handler(req, res) {
     let message = "";
 
     message = `
-🚨 <b>Error Alert</b>
-Type: ${type}
-Project: ${payload.project?.name || "Unknown"}
-Environment: ${payload?.target || "Unknown"}
-Error: ${payload.error?.message || "Unknown error"}
+🚨 Error Alert
 `;
-
-    //     if (type.includes('firewall')) {
-    //       message = `
-    // ⚠️ <b>Security Alert: Attack Detected</b>
-    // Project: ${payload.project?.name || 'Unknown'}
-    // Source IP: ${payload.source || 'Unknown'}
-    // Attack Type: ${payload.attackType || 'Unknown'}
-    // Region: ${payload.region || 'Unknown'}
-    // URL Path: ${payload.path || 'Unknown'}
-    // Timestamp: ${new Date().toISOString()}`;
-    //     } else {
-    //       message = `
-    // 🚨 <b>Error Alert</b>
-    // Type: ${type}
-    // Project: ${payload.project?.name || 'Unknown'}
-    // Environment: ${payload.target || 'Unknown'}
-    // Error: ${payload.error?.message || 'Unknown error'}
-    // Stack: ${payload.error?.stack || 'No stack trace'}
-    // URL: ${payload.url || 'N/A'}
-    // Timestamp: ${new Date().toISOString()}
-    // ${payload.error?.context ? `\nContext: ${JSON.stringify(payload.error.context)}` : ''}`;
-    //     }
 
     // Send notification to Telegram
     await sendTelegramNotification(message);

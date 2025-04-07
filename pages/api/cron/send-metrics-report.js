@@ -4,6 +4,10 @@ import User from "@/backend/user";
 import { Resend } from "resend";
 import { DateTime } from "luxon";
 
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 // Initialize Resend with API key
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -68,50 +72,64 @@ export default async function handler(req, res) {
         console.log(user, "user");
         console.log(isWeeklyReport, "isWeeklyReport");
 
-        // Send individual email for each metric with delay between sends
-        for (const metric of userMetrics) {
-          try {
-            const { data, error } = await earlyEmail(user, metric);
+        if (isWeeklyReport) {
+          // Send weekly digest
+          const { data, error } = await weeklyEmail(user, userMetrics);
+          if (error) {
+            console.error(`Failed to send weekly email to user ${userId}:`, error);
+            results.push({
+              userId,
+              status: "error",
+              error: error
+            });
+          } else {
+            results.push({
+              userId,
+              status: "sent",
+              type: "weekly",
+              postsCount: userMetrics.length
+            });
+          }
+        } else {
+          // Send individual email for each metric with delay between sends
+          for (const metric of userMetrics) {
+            try {
+              const { data, error } = await earlyEmail(user, metric);
+              
+              if (error) {
+                console.error(`Failed to send email for post ${metric.postId}:`, error);
+                results.push({
+                  userId,
+                  postId: metric.postId,
+                  status: "error",
+                  error: error
+                });
+                continue;
+              }
 
-            if (error) {
-              console.error(
-                `Failed to send email for post ${metric.postId}:`,
-                error
-              );
+              // Update the metric to mark email as sent
+              await PostMetrics.findByIdAndUpdate(metric._id, {
+                isEarlyEmailSent: true,
+                lastUpdated: new Date()
+              });
+
+              results.push({
+                userId,
+                postId: metric.postId,
+                status: "sent"
+              });
+
+              // Add 1 second delay between emails to avoid rate limits
+              await delay(1000);
+            } catch (error) {
+              console.error(`Error sending email for post ${metric.postId}:`, error);
               results.push({
                 userId,
                 postId: metric.postId,
                 status: "error",
-                error: error,
+                error: error.message
               });
-              continue;
             }
-
-            // Add delay between email sends to avoid rate limiting
-            await new Promise(resolve => setTimeout(resolve, 600)); // 600ms delay = ~1.6 requests/second
-
-            // Update the metric to mark email as sent
-            await PostMetrics.findByIdAndUpdate(metric._id, {
-              isEarlyEmailSent: true,
-              lastUpdated: new Date(),
-            });
-
-            results.push({
-              userId,
-              postId: metric.postId,
-              status: "sent",
-            });
-          } catch (error) {
-            console.error(
-              `Error sending email for post ${metric.postId}:`,
-              error
-            );
-            results.push({
-              userId,
-              postId: metric.postId,
-              status: "error",
-              error: error.message,
-            });
           }
         }
       } catch (error) {

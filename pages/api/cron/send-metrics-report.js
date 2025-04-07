@@ -153,7 +153,7 @@ async function earlyEmail(user, metric) {
         <tbody>
           <tr>
             <td style="padding-bottom:20px;text-align:center">
-              <img alt="RedditScheduler" src="https://redditscheduler.com/company_related/og-image.jpg" style="width:100%;max-width:125px;margin:auto;text-align:center" width="220">
+              <img alt="RedditScheduler" src="https://redditscheduler.com/logo.svg" style="width:100%;max-width:125px;margin:auto;text-align:center" width="220">
             </td>
           </tr>
           <tr>
@@ -166,7 +166,7 @@ async function earlyEmail(user, metric) {
               </p>
               <p style="color:#6b7280;font-size:16px;line-height:20px;margin:0">
                 You can also
-                <a style="color:#ec4899;text-decoration:underline;text-decoration-color:#ec4899" href="${metric.postUrl}">view live post</a>
+                <a style="color:#3b82f6;text-decoration:underline;text-decoration-color:#3b82f6" href="${metric.postUrl}">view live post</a>
                 for the most up-to-date metrics.
               </p>
             </td>
@@ -181,7 +181,7 @@ async function earlyEmail(user, metric) {
           <tr>
             <td>
               <p style="color:#4b5563;font-weight:800;margin:0;font-size:12px;letter-spacing:0.05em;margin-bottom:8px">IMPRESSIONS</p>
-              <p style="color:#ec4899;font-weight:900;margin:0;font-size:48px;line-height:1;font-family:Helvetica,sans-serif">
+              <p style="color:#3b82f6;font-weight:900;margin:0;font-size:48px;line-height:1;font-family:Helvetica,sans-serif">
                 ${metric.impressions}
               </p>
             </td>
@@ -197,7 +197,7 @@ async function earlyEmail(user, metric) {
             <td>
               <p style="color:#4b5563;font-weight:800;margin:0;font-size:12px;letter-spacing:0.05em;margin-bottom:8px">UPVOTES</p>
               <p style="margin:0;font-size:0px;line-height:1;font-family:Helvetica,sans-serif">
-                <span style="font-size:48px;color:#ec4899;font-weight:900">${metric.upvotes}</span>
+                <span style="font-size:48px;color:#3b82f6;font-weight:900">${metric.upvotes}</span>
               </p>
             </td>
           </tr>
@@ -212,7 +212,7 @@ async function earlyEmail(user, metric) {
             <td>
               <p style="color:#4b5563;font-weight:800;margin:0;font-size:12px;letter-spacing:0.05em;margin-bottom:8px">COMMENTS</p>
               <p style="margin:0;font-size:0px;line-height:1;font-family:Helvetica,sans-serif">
-                <span style="font-size:48px;color:#ec4899;font-weight:900">${metric.comments}</span>
+                <span style="font-size:48px;color:#3b82f6;font-weight:900">${metric.comments}</span>
               </p>
             </td>
           </tr>
@@ -234,7 +234,7 @@ async function earlyEmail(user, metric) {
   
           <tr>
             <td style="padding-top:40px;text-align:center">
-              <a href="${metric.postUrl}" style="background-color:#ec4899;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;font-weight:600;display:inline-block">View Post on Reddit</a>
+              <a href="${metric.postUrl}" style="background-color:#3b82f6;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;font-weight:600;display:inline-block">View Post on Reddit</a>
             </td>
           </tr>
   

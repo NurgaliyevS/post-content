@@ -2,7 +2,7 @@ import connectMongoDB from "@/backend/mongodb";
 import PostMetrics from "@/backend/PostMetricsSchema";
 import User from "@/backend/user";
 import { Resend } from "resend";
-import { startOfWeek, format, subHours, subDays } from "date-fns";
+import { startOfWeek, format, subHours, subDays, addHours } from "date-fns";
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -40,11 +40,13 @@ export default async function handler(req, res) {
         }
       };
     } else {
+      // For early report, find posts that:
+      // 1. Were scheduled more than 6 hours ago
+      // 2. Haven't had their early email sent yet
       const sixHoursAgo = subHours(currentTime, 6);
       dateQuery = {
         scheduledFor: {
-          $gte: sixHoursAgo,
-          $lte: currentTime
+          $lte: sixHoursAgo // Posts scheduled at least 6 hours ago
         }
       };
     }
@@ -58,6 +60,17 @@ export default async function handler(req, res) {
     })
     .sort({ upvotes: -1 })
     .limit(5);
+
+    console.log('Found metrics:', {
+      count: metrics.length,
+      currentTime: currentTime.toISOString(),
+      isWeeklyReport,
+      metrics: metrics.map(m => ({
+        title: m.title,
+        scheduledFor: m.scheduledFor,
+        isEarlyEmailSent: m.isEarlyEmailSent
+      }))
+    });
 
     if (metrics.length === 0) {
       return res.status(200).json({ 
@@ -79,7 +92,7 @@ export default async function handler(req, res) {
     // Send report to each user
     for (const [userId, userMetrics] of Object.entries(metricsByUser)) {
       try {
-        // Get user email
+        // Get user email and timezone
         const user = await User.findById(userId);
         if (!user?.email) {
           console.log(`No email found for user ${userId}`);
@@ -114,6 +127,19 @@ export default async function handler(req, res) {
           // Send individual email for each metric with delay between sends
           for (const metric of userMetrics) {
             try {
+              // Double check the 6-hour condition with user's timezone
+              const scheduledTime = new Date(metric.scheduledFor);
+              const userCurrentTime = user.timeZone 
+                ? new Date(new Date().toLocaleString('en-US', { timeZone: user.timeZone }))
+                : new Date();
+              
+              const timeSinceScheduled = (userCurrentTime - scheduledTime) / (1000 * 60 * 60); // hours
+
+              if (timeSinceScheduled < 6) {
+                console.log(`Skipping email for post ${metric.postId} - only ${timeSinceScheduled.toFixed(1)} hours since scheduled`);
+                continue;
+              }
+
               const { data, error } = await earlyEmail(user, metric);
 
               if (error) {
@@ -140,6 +166,7 @@ export default async function handler(req, res) {
                 userId,
                 postId: metric.postId,
                 status: "sent",
+                type: "early",
               });
 
               // Add 1 second delay between emails to avoid rate limits

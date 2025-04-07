@@ -211,11 +211,16 @@ export default async function handler(req, res) {
 async function weeklyEmail(user, metrics) {
   // Calculate the date range for the current week
   const today = new Date();
-  const lastMonday = startOfWeek(today, { weekStartsOn: 1 }); // 1 = Monday
+  // Get last Monday by using startOfWeek with weekStartsOn: 1 (Monday)
+  // If today is Monday, get the previous Monday
+  const lastMonday = today.getDay() === 1 
+    ? startOfWeek(subDays(today, 7), { weekStartsOn: 1 })
+    : startOfWeek(today, { weekStartsOn: 1 });
 
   console.log('Date range:', {
     lastMonday: format(lastMonday, 'MMM dd'),
-    today: format(today, 'MMM dd, yyyy')
+    today: format(today, 'MMM dd, yyyy'),
+    todayDay: today.getDay()
   });
 
   // Sort metrics by impressions for top performers

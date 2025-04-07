@@ -159,7 +159,7 @@ async function earlyEmail(user, metric) {
         <tbody>
           <tr>
             <td style="padding-bottom:20px;text-align:center">
-              <img alt="RedditScheduler" src="https://redditscheduler.com/logo.svg" style="width:100%;max-width:125px;margin:auto;text-align:center" width="220">
+              <img alt="RedditScheduler" src="https://redditscheduler.com/logoAndName200x50.png" style="width:100%;max-width:125px;margin:auto;text-align:center" width="220">
             </td>
           </tr>
           <tr>

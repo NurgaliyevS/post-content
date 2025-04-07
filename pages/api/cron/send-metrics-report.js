@@ -2,7 +2,7 @@ import connectMongoDB from "@/backend/mongodb";
 import PostMetrics from "@/backend/PostMetricsSchema";
 import User from "@/backend/user";
 import { Resend } from "resend";
-import { startOfWeek, format } from "date-fns";
+import { startOfWeek, format, subHours, subDays } from "date-fns";
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -23,32 +23,45 @@ export default async function handler(req, res) {
     // Connect to MongoDB
     await connectMongoDB();
 
-    // Get current time in UTC
-    const currentTimeUTC = new Date();
-
+    // Get current time
+    const currentTime = new Date();
+    
     // Determine if this is a weekly report
     const isWeeklyReport = req.query.type === "weekly";
+    
+    // Set the time range and query based on report type
+    let dateQuery;
+    if (isWeeklyReport) {
+      const lastWeek = subDays(currentTime, 7);
+      dateQuery = {
+        scheduledFor: {
+          $gte: lastWeek,
+          $lte: currentTime
+        }
+      };
+    } else {
+      const sixHoursAgo = subHours(currentTime, 6);
+      dateQuery = {
+        scheduledFor: {
+          $gte: sixHoursAgo,
+          $lte: currentTime
+        }
+      };
+    }
 
-    // Set the time range based on report type
-    const timeRange = isWeeklyReport ? { days: 7 } : { hours: 6 };
-
-    // Find metrics from the specified time range
+    // Find metrics within the date range
     const metrics = await PostMetrics.find({
-      publishedFor: {
-        $gte: new Date(currentTimeUTC.getTime() - timeRange.hours * 60 * 60 * 1000),
-      },
-      ...(isWeeklyReport
-        ? {} // No isEarlyEmailSent filter for weekly reports
-        : { isEarlyEmailSent: false }), // Only for early reports
+      ...dateQuery,
+      ...(isWeeklyReport 
+        ? {} 
+        : { isEarlyEmailSent: false })
     })
-      .sort({ impressions: -1 })
-      .limit(5);
+    .sort({ upvotes: -1 })
+    .limit(5);
 
     if (metrics.length === 0) {
-      return res.status(200).json({
-        message: isWeeklyReport
-          ? "No metrics for weekly report"
-          : "No new metrics to report",
+      return res.status(200).json({ 
+        message: isWeeklyReport ? "No metrics for weekly report" : "No new metrics to report" 
       });
     }
 

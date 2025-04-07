@@ -54,6 +54,10 @@ const PostMetricsSchema = new mongoose.Schema({
   scheduledFor: {
     type: Date,
     default: null
+  },
+  userTimeZone: {
+    type: String,
+    default: null
   }
 });
 

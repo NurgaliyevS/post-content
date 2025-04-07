@@ -36,12 +36,13 @@ export default async function handler(req, res) {
       createdAt: {
         $gte: currentTimeUTC.minus(timeRange).toJSDate(),
       },
+      isEarlyEmailSent: false // Only get metrics where early email hasn't been sent
     })
       .sort({ impressions: -1 })
       .limit(5);
 
     if (metrics.length === 0) {
-      return res.status(200).json({ message: "No metrics to report" });
+      return res.status(200).json({ message: "No new metrics to report" });
     }
 
     // Group metrics by userId
@@ -83,6 +84,12 @@ export default async function handler(req, res) {
               });
               continue;
             }
+
+            // Update the metric to mark email as sent
+            await PostMetrics.findByIdAndUpdate(metric._id, {
+              isEarlyEmailSent: true,
+              lastUpdated: new Date()
+            });
 
             results.push({
               userId,

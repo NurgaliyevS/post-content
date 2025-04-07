@@ -42,7 +42,11 @@ const PostMetricsSchema = new mongoose.Schema({
   lastUpdated: {
     type: Date,
     default: Date.now
-  }
+  },
+  isEarlyEmailSent: {
+    type: Boolean,
+    default: false
+  },
 });
 
 export default mongoose.models.PostMetrics || mongoose.model("PostMetrics", PostMetricsSchema); 

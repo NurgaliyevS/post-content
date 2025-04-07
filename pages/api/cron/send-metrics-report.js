@@ -313,7 +313,7 @@ async function weeklyEmail(user, metrics) {
                         ? `
                     <tr>
                       <td style="color:#4b5563;font-size:14px;">Upvote Ratio:</td>
-                      <td style="color:#3b82f6;font-weight:600;text-align:right">${(post.upvoteRatio * 100).toFixed(0)}%</td>
+                      <td style="color:#3b82f6;font-weight:600;text-align:right">${post.upvoteRatio}%</td>
                     </tr>
                     `
                         : ""

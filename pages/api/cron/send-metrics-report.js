@@ -2,7 +2,7 @@ import connectMongoDB from "@/backend/mongodb";
 import PostMetrics from "@/backend/PostMetricsSchema";
 import User from "@/backend/user";
 import { Resend } from "resend";
-import { DateTime } from "luxon";
+import { startOfWeek, format } from "date-fns";
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -24,7 +24,7 @@ export default async function handler(req, res) {
     await connectMongoDB();
 
     // Get current time in UTC
-    const currentTimeUTC = DateTime.now().toUTC();
+    const currentTimeUTC = new Date();
 
     // Determine if this is a weekly report
     const isWeeklyReport = req.query.type === "weekly";
@@ -35,7 +35,7 @@ export default async function handler(req, res) {
     // Find metrics from the specified time range
     const metrics = await PostMetrics.find({
       createdAt: {
-        $gte: currentTimeUTC.minus(timeRange).toJSDate(),
+        $gte: new Date(currentTimeUTC.getTime() - timeRange.hours * 60 * 60 * 1000),
       },
       ...(isWeeklyReport
         ? {} // No isEarlyEmailSent filter for weekly reports
@@ -169,10 +169,15 @@ export default async function handler(req, res) {
 }
 
 async function weeklyEmail(user, metrics) {
-  // Calculate the date range for the current week (Monday to today)
-  const today = DateTime.now().toUTC();
-  const lastMonday = today.minus({ days: today.weekday - 1 }); // Get last Monday (weekday 1 is Monday)
-  
+  // Calculate the date range for the current week
+  const today = new Date();
+  const lastMonday = startOfWeek(today, { weekStartsOn: 1 }); // 1 = Monday
+
+  console.log('Date range:', {
+    lastMonday: format(lastMonday, 'MMM dd'),
+    today: format(today, 'MMM dd, yyyy')
+  });
+
   // Sort metrics by impressions for top performers
   const sortedMetrics = [...metrics].sort((a, b) => b.upvotes - a.upvotes);
   const topPerformers = sortedMetrics.slice(0, 5); // Top 5 posts
@@ -195,7 +200,7 @@ async function weeklyEmail(user, metrics) {
     const { data, error } = await resend.emails.send({
       from: "RedditScheduler <updates@redditscheduler.com>",
       to: user.email,
-      subject: `Weekly Digest: Highlights from ${lastMonday.toFormat("MMM dd")} - ${today.toFormat("MMM dd, yyyy")}`,
+      subject: `Weekly Digest: Highlights from ${format(lastMonday, 'MMM dd')} - ${format(today, 'MMM dd, yyyy')}`,
       html: `
       <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="border:1px solid #ececec;border-radius:10px;padding:24px;max-width:600px" width="100%">
         <tbody>

@@ -100,7 +100,7 @@ export default async function handler(req, res) {
 }
 
 async function weeklyEmail(user, metrics) {
-  await resend.emails.send({
+  const { data, error } = await resend.emails.send({
     from: "RedditScheduler <updates@mg.redditscheduler.com>",
     to: user.email,
     subject: "Your Weekly Reddit Post Performance Report",
@@ -110,112 +110,119 @@ async function weeklyEmail(user, metrics) {
 }
 
 async function earlyEmail(user, metric) {
-  console.log(metric, "metric");
+  console.log(metric, "metric inside earlyEmail");
+  console.log(user, "user inside earlyEmail");
 
-  await resend.emails.send({
-    from: "RedditScheduler <updates@mg.redditscheduler.com>",
-    to: user.email,
-    subject: `Performance Report - ${metric.title}`,
-    html: `
-    <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="border:1px solid #ececec;border-radius:10px;padding:24px;max-width:540px" width="100%">
-      <tbody>
-        <tr>
-          <td style="padding-bottom:20px;text-align:center">
-            <img alt="RedditScheduler" src="https://redditscheduler.com/company_related/og-image.jpg" style="width:100%;max-width:125px;margin:auto;text-align:center" width="220">
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <h1 style="color:#1f2937;text-decoration:none;font-size:22px;margin:0">
-              ${metric.title}
-            </h1>
-            <p style="color:#6b7280;font-size:16px;line-height:20px">
-              It has been a few hours since you published your post. Check out these metrics to get a snapshot of how it's doing.
-            </p>
-            <p style="color:#6b7280;font-size:16px;line-height:20px;margin:0">
-              You can also
-              <a style="color:#ec4899;text-decoration:underline;text-decoration-color:#ec4899" href="${metric.postUrl}">view live post</a>
-              for the most up-to-date metrics.
-            </p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding-bottom:20px;padding-top:40px">
-            <div style="border-bottom:1px solid #e5e7eb"></div>
-          </td>
-        </tr>
-
-        <!-- Impressions -->
-        <tr>
-          <td>
-            <p style="color:#4b5563;font-weight:800;margin:0;font-size:12px;letter-spacing:0.05em;margin-bottom:8px">IMPRESSIONS</p>
-            <p style="color:#ec4899;font-weight:900;margin:0;font-size:48px;line-height:1;font-family:Helvetica,sans-serif">
-              ${metric.impressions}
-            </p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding-bottom:20px;padding-top:20px">
-            <div style="border-bottom:1px solid #e5e7eb"></div>
-          </td>
-        </tr>
-
-        <!-- Upvotes -->
-        <tr>
-          <td>
-            <p style="color:#4b5563;font-weight:800;margin:0;font-size:12px;letter-spacing:0.05em;margin-bottom:8px">UPVOTES</p>
-            <p style="margin:0;font-size:0px;line-height:1;font-family:Helvetica,sans-serif">
-              <span style="font-size:48px;color:#ec4899;font-weight:900">${metric.upvotes}</span>
-            </p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding-bottom:20px;padding-top:20px">
-            <div style="border-bottom:1px solid #e5e7eb"></div>
-          </td>
-        </tr>
-
-        <!-- Comments -->
-        <tr>
-          <td>
-            <p style="color:#4b5563;font-weight:800;margin:0;font-size:12px;letter-spacing:0.05em;margin-bottom:8px">COMMENTS</p>
-            <p style="margin:0;font-size:0px;line-height:1;font-family:Helvetica,sans-serif">
-              <span style="font-size:48px;color:#ec4899;font-weight:900">${metric.comments}</span>
-            </p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding-bottom:20px;padding-top:20px">
-            <div style="border-bottom:1px solid #e5e7eb"></div>
-          </td>
-        </tr>
-
-        <!-- Community -->
-        <tr>
-          <td>
-            <p style="color:#4b5563;font-weight:800;margin:0;font-size:12px;letter-spacing:0.05em;margin-bottom:8px">POSTED IN</p>
-            <p style="margin:0;font-size:0px;line-height:1;font-family:Helvetica,sans-serif">
-              <span style="font-size:24px;color:#4b5563;font-weight:900">r/${metric.community}</span>
-            </p>
-          </td>
-        </tr>
-
-        <tr>
-          <td style="padding-top:40px;text-align:center">
-            <a href="${metric.postUrl}" style="background-color:#ec4899;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;font-weight:600;display:inline-block">View Post on Reddit</a>
-          </td>
-        </tr>
-
-        <tr>
-          <td style="padding-top:40px">
-            <hr style="background-color:#ececec;border:0;height:1px;margin:0">
-            <p style="color:gray;font-size:12px;text-align:center;margin-top:20px">
-              © ${new Date().getFullYear()} RedditScheduler, All rights reserved.
-            </p>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    `,
-  });
+  try {
+    const { data, error } = await resend.emails.send({
+      from: "RedditScheduler <updates@mg.redditscheduler.com>",
+      to: user.email,
+      subject: `Performance Report - ${metric.title}`,
+      html: `
+      <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="border:1px solid #ececec;border-radius:10px;padding:24px;max-width:540px" width="100%">
+        <tbody>
+          <tr>
+            <td style="padding-bottom:20px;text-align:center">
+              <img alt="RedditScheduler" src="https://redditscheduler.com/company_related/og-image.jpg" style="width:100%;max-width:125px;margin:auto;text-align:center" width="220">
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <h1 style="color:#1f2937;text-decoration:none;font-size:22px;margin:0">
+                ${metric.title}
+              </h1>
+              <p style="color:#6b7280;font-size:16px;line-height:20px">
+                It has been a few hours since you published your post. Check out these metrics to get a snapshot of how it's doing.
+              </p>
+              <p style="color:#6b7280;font-size:16px;line-height:20px;margin:0">
+                You can also
+                <a style="color:#ec4899;text-decoration:underline;text-decoration-color:#ec4899" href="${metric.postUrl}">view live post</a>
+                for the most up-to-date metrics.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding-bottom:20px;padding-top:40px">
+              <div style="border-bottom:1px solid #e5e7eb"></div>
+            </td>
+          </tr>
+  
+          <!-- Impressions -->
+          <tr>
+            <td>
+              <p style="color:#4b5563;font-weight:800;margin:0;font-size:12px;letter-spacing:0.05em;margin-bottom:8px">IMPRESSIONS</p>
+              <p style="color:#ec4899;font-weight:900;margin:0;font-size:48px;line-height:1;font-family:Helvetica,sans-serif">
+                ${metric.impressions}
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding-bottom:20px;padding-top:20px">
+              <div style="border-bottom:1px solid #e5e7eb"></div>
+            </td>
+          </tr>
+  
+          <!-- Upvotes -->
+          <tr>
+            <td>
+              <p style="color:#4b5563;font-weight:800;margin:0;font-size:12px;letter-spacing:0.05em;margin-bottom:8px">UPVOTES</p>
+              <p style="margin:0;font-size:0px;line-height:1;font-family:Helvetica,sans-serif">
+                <span style="font-size:48px;color:#ec4899;font-weight:900">${metric.upvotes}</span>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding-bottom:20px;padding-top:20px">
+              <div style="border-bottom:1px solid #e5e7eb"></div>
+            </td>
+          </tr>
+  
+          <!-- Comments -->
+          <tr>
+            <td>
+              <p style="color:#4b5563;font-weight:800;margin:0;font-size:12px;letter-spacing:0.05em;margin-bottom:8px">COMMENTS</p>
+              <p style="margin:0;font-size:0px;line-height:1;font-family:Helvetica,sans-serif">
+                <span style="font-size:48px;color:#ec4899;font-weight:900">${metric.comments}</span>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding-bottom:20px;padding-top:20px">
+              <div style="border-bottom:1px solid #e5e7eb"></div>
+            </td>
+          </tr>
+  
+          <!-- Community -->
+          <tr>
+            <td>
+              <p style="color:#4b5563;font-weight:800;margin:0;font-size:12px;letter-spacing:0.05em;margin-bottom:8px">POSTED IN</p>
+              <p style="margin:0;font-size:0px;line-height:1;font-family:Helvetica,sans-serif">
+                <span style="font-size:24px;color:#4b5563;font-weight:900">r/${metric.community}</span>
+              </p>
+            </td>
+          </tr>
+  
+          <tr>
+            <td style="padding-top:40px;text-align:center">
+              <a href="${metric.postUrl}" style="background-color:#ec4899;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;font-weight:600;display:inline-block">View Post on Reddit</a>
+            </td>
+          </tr>
+  
+          <tr>
+            <td style="padding-top:40px">
+              <hr style="background-color:#ececec;border:0;height:1px;margin:0">
+              <p style="color:gray;font-size:12px;text-align:center;margin-top:20px">
+                © ${new Date().getFullYear()} RedditScheduler, All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      `,
+    });
+    return { data, error };
+  } catch (error) {
+    console.error("Error sending early email:", error);
+    return { data: null, error: error.message };
+  }
 }

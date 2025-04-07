@@ -45,7 +45,7 @@ export default async function handler(req, res) {
         await post.save();
         
         // Fetch post data from Reddit API with sr_detail parameter
-        const redditResponse = await fetch(`https://oauth.reddit.com/by_id/t3_${post.redditPostId}?sr_detail=true`, {
+        const redditResponse = await fetch(`https://oauth.reddit.com/by_id/t3_1jsxv5h?sr_detail=true`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'User-Agent': 'RedditScheduler/1.0.0'
@@ -69,7 +69,7 @@ export default async function handler(req, res) {
         }
 
         // Get post analytics using the /api/info endpoint with rawjson=1
-        const analyticsResponse = await fetch(`https://oauth.reddit.com/api/info?id=t3_${post.redditPostId}&rawjson=1`, {
+        const analyticsResponse = await fetch(`https://oauth.reddit.com/api/info?id=t3_1jsxv5h&rawjson=1`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'User-Agent': 'RedditScheduler/1.0.0'

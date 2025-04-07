@@ -25,7 +25,7 @@ export default async function handler(req, res) {
         $gte: currentTimeUTC.minus({ days: 7 }).toJSDate() 
       },
       userId: '67e41eeeca8b6cf686633b6f'
-    });
+    }).limit(5);
     
     console.log(`Found ${publishedPosts.length} published posts to update metrics for`);
     
@@ -72,7 +72,7 @@ export default async function handler(req, res) {
               postUrl: post.redditPostUrl,
               lastUpdated: currentTimeUTC.toJSDate()
             },
-            { upsert: true, new: true }
+            { upsert: true }
           );
           
           results.push({

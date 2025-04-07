@@ -59,6 +59,7 @@ export default async function handler(req, res) {
         const redditData = await redditResponse.json();
 
         console.log(redditData, 'redditData');
+        console.log(redditData.data.children[0], 'redditData.data.children[0]');
 
         const postData = redditData.data.children[0]?.data;
         

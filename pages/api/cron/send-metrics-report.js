@@ -61,13 +61,24 @@ export default async function handler(req, res) {
           continue;
         }
 
-        console.log(userMetrics, "userMetrics");
+        const metric = userMetrics.map((metric) => {
+          return {
+            title: metric.title,
+            impressions: metric.impressions,
+            upvotes: metric.upvotes,
+            comments: metric.comments,
+            community: metric.community,
+            postUrl: metric.postUrl,
+          };
+        });
+
+        console.log(metric, "metric");
         console.log(user, "user");
 
         if (isWeeklyReport) {
-          await weeklyEmail(user, userMetrics);
+          await weeklyEmail(user, metric);
         } else {
-          await earlyEmail(user, userMetrics);
+          await earlyEmail(user, metric);
         }
 
         results.push({

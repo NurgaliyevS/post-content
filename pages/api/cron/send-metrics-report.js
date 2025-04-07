@@ -61,81 +61,14 @@ export default async function handler(req, res) {
           continue;
         }
 
+        console.log(userMetrics, "userMetrics");
         console.log(user, "user");
 
-        // Generate HTML for metrics table
-        const metricsHtml = userMetrics
-          .map(
-            (metric) => `
-          <tr>
-            <td style="padding: 10px; border: 1px solid #ddd;">${metric.title}</td>
-            <td style="padding: 10px; border: 1px solid #ddd;">${metric.impressions.toLocaleString()}</td>
-            <td style="padding: 10px; border: 1px solid #ddd;">${metric.upvotes.toLocaleString()}</td>
-            <td style="padding: 10px; border: 1px solid #ddd;">${metric.comments.toLocaleString()}</td>
-            <td style="padding: 10px; border: 1px solid #ddd;"><a href="${metric.postUrl}" style="color: #0066cc;">View Post</a></td>
-          </tr>
-        `
-          )
-          .join("");
-
-        // Calculate totals
-        const totals = userMetrics.reduce(
-          (acc, metric) => ({
-            impressions: acc.impressions + metric.impressions,
-            upvotes: acc.upvotes + metric.upvotes,
-            comments: acc.comments + metric.comments,
-          }),
-          { impressions: 0, upvotes: 0, comments: 0 }
-        );
-
         if (isWeeklyReport) {
-          await weeklyEmail(user, metrics);
+          await weeklyEmail(user, userMetrics);
         } else {
-          await earlyEmail(user, metrics);
+          await earlyEmail(user, userMetrics);
         }
-
-        // Send email using Resend
-        // await resend.emails.send({
-        //   from: 'RedditScheduler <updates@mg.redditscheduler.com>',
-        //   to: user.email,
-        //   subject: isWeeklyReport ?
-        //     'Your Weekly Reddit Post Performance Report' :
-        //     'Early Performance Report for Your Recent Reddit Posts',
-        //   html: `
-        //     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        //       <h2 style="color: #333;">${isWeeklyReport ? 'Weekly' : 'Early'} Performance Report</h2>
-
-        //       <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
-        //         <h3 style="margin: 0 0 10px 0;">Summary</h3>
-        //         <p style="margin: 5px 0;">Total Impressions: ${totals.impressions.toLocaleString()}</p>
-        //         <p style="margin: 5px 0;">Total Upvotes: ${totals.upvotes.toLocaleString()}</p>
-        //         <p style="margin: 5px 0;">Total Comments: ${totals.comments.toLocaleString()}</p>
-        //       </div>
-
-        //       <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-        //         <thead>
-        //           <tr style="background: #f8f9fa;">
-        //             <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Post Title</th>
-        //             <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Impressions</th>
-        //             <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Upvotes</th>
-        //             <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Comments</th>
-        //             <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Link</th>
-        //           </tr>
-        //         </thead>
-        //         <tbody>
-        //           ${metricsHtml}
-        //         </tbody>
-        //       </table>
-
-        //       <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
-        //         <p style="color: #666; font-size: 14px;">
-        //           View more detailed analytics in your
-        //           <a href="https://redditscheduler.com/dashboard/analytics" style="color: #0066cc;">dashboard</a>.
-        //         </p>
-        //       </div>
-        //     </div>
-        //   `
-        // });
 
         results.push({
           userId,
@@ -176,18 +109,113 @@ async function weeklyEmail(user, metrics) {
   });
 }
 
-async function earlyEmail(user, metrics) {
+async function earlyEmail(user, userMetrics) {
+  console.log(userMetrics, "userMetrics");
+
   await resend.emails.send({
     from: "RedditScheduler <updates@mg.redditscheduler.com>",
     to: user.email,
-    subject: "Performance Report - ",
+    subject: `Performance Report - ${userMetrics.title}`,
     html: `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; line-height: 1.6;">
-    <p>Hi ${user?.customer_name || user?.name},</p>
-    <h2 style="color: #333;">Performance Report</h2>
+    <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="border:1px solid #ececec;border-radius:10px;padding:24px;max-width:540px" width="100%">
+      <tbody>
+        <tr>
+          <td style="padding-bottom:20px;text-align:center">
+            <img alt="RedditScheduler" src="https://redditscheduler.com/company_related/og-image.jpg" style="width:100%;max-width:125px;margin:auto;text-align:center" width="220">
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <h1 style="color:#1f2937;text-decoration:none;font-size:22px;margin:0">
+              ${userMetrics.title}
+            </h1>
+            <p style="color:#6b7280;font-size:16px;line-height:20px">
+              It has been a few hours since you published your post. Check out these metrics to get a snapshot of how it's doing.
+            </p>
+            <p style="color:#6b7280;font-size:16px;line-height:20px;margin:0">
+              You can also
+              <a style="color:#ec4899;text-decoration:underline;text-decoration-color:#ec4899" href="${userMetrics.postUrl}">view live post</a>
+              for the most up-to-date metrics.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding-bottom:20px;padding-top:40px">
+            <div style="border-bottom:1px solid #e5e7eb"></div>
+          </td>
+        </tr>
 
-    
-    </div>
-  `,
+        <!-- Impressions -->
+        <tr>
+          <td>
+            <p style="color:#4b5563;font-weight:800;margin:0;font-size:12px;letter-spacing:0.05em;margin-bottom:8px">IMPRESSIONS</p>
+            <p style="color:#ec4899;font-weight:900;margin:0;font-size:48px;line-height:1;font-family:Helvetica,sans-serif">
+              ${userMetrics.impressions}
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding-bottom:20px;padding-top:20px">
+            <div style="border-bottom:1px solid #e5e7eb"></div>
+          </td>
+        </tr>
+
+        <!-- Upvotes -->
+        <tr>
+          <td>
+            <p style="color:#4b5563;font-weight:800;margin:0;font-size:12px;letter-spacing:0.05em;margin-bottom:8px">UPVOTES</p>
+            <p style="margin:0;font-size:0px;line-height:1;font-family:Helvetica,sans-serif">
+              <span style="font-size:48px;color:#ec4899;font-weight:900">${userMetrics.upvotes}</span>
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding-bottom:20px;padding-top:20px">
+            <div style="border-bottom:1px solid #e5e7eb"></div>
+          </td>
+        </tr>
+
+        <!-- Comments -->
+        <tr>
+          <td>
+            <p style="color:#4b5563;font-weight:800;margin:0;font-size:12px;letter-spacing:0.05em;margin-bottom:8px">COMMENTS</p>
+            <p style="margin:0;font-size:0px;line-height:1;font-family:Helvetica,sans-serif">
+              <span style="font-size:48px;color:#ec4899;font-weight:900">${userMetrics.comments}</span>
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding-bottom:20px;padding-top:20px">
+            <div style="border-bottom:1px solid #e5e7eb"></div>
+          </td>
+        </tr>
+
+        <!-- Community -->
+        <tr>
+          <td>
+            <p style="color:#4b5563;font-weight:800;margin:0;font-size:12px;letter-spacing:0.05em;margin-bottom:8px">POSTED IN</p>
+            <p style="margin:0;font-size:0px;line-height:1;font-family:Helvetica,sans-serif">
+              <span style="font-size:24px;color:#4b5563;font-weight:900">r/${userMetrics.community}</span>
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding-top:40px;text-align:center">
+            <a href="${userMetrics.postUrl}" style="background-color:#ec4899;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;font-weight:600;display:inline-block">View Post on Reddit</a>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding-top:40px">
+            <hr style="background-color:#ececec;border:0;height:1px;margin:0">
+            <p style="color:gray;font-size:12px;text-align:center;margin-top:20px">
+              © ${new Date().getFullYear()} RedditScheduler, All rights reserved.
+            </p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    `,
   });
 }

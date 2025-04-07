@@ -33,13 +33,15 @@ export default async function handler(req, res) {
       createdAt: {
         $gte: currentTimeUTC.minus(timeRange).toJSDate(),
       },
-      isEarlyEmailSent: false, // Only get metrics where early email hasn't been sent
+      ...(isWeeklyReport 
+        ? {} // No isEarlyEmailSent filter for weekly reports
+        : { isEarlyEmailSent: false }) // Only for early reports
     })
       .sort({ impressions: -1 })
       .limit(5);
 
     if (metrics.length === 0) {
-      return res.status(200).json({ message: "No new metrics to report" });
+      return res.status(200).json({ message: isWeeklyReport ? "No metrics for weekly report" : "No new metrics to report" });
     }
 
     // Group metrics by userId
@@ -139,16 +141,137 @@ async function weeklyEmail(user, metrics) {
   const beginningOfWeek = DateTime.now().startOf("week").toUTC();
   const endOfWeek = DateTime.now().endOf("week").toUTC();
 
-  console.log(beginningOfWeek, "beginningOfWeek");
-  console.log(endOfWeek, "endOfWeek");
+  // Sort metrics by impressions for top performers
+  const sortedMetrics = [...metrics].sort((a, b) => b.upvotes - a.upvotes);
+  const topPerformers = sortedMetrics.slice(0, 5); // Top 5 posts
 
-  const { data, error } = await resend.emails.send({
-    from: "RedditScheduler <updates@redditscheduler.com>",
-    to: user.email,
-    subject: `Weekly Digest: Highlights from ${beginningOfWeek.toFormat("MMM dd")} - ${endOfWeek.toFormat("MMM dd, yyyy")}`,
-    html: `
-    `,
-  });
+  // Calculate total stats
+  const totalStats = metrics.reduce((acc, metric) => {
+    acc.impressions += metric.impressions || 0;
+    acc.upvotes += metric.upvotes || 0;
+    acc.comments += metric.comments || 0;
+    return acc;
+  }, { impressions: 0, upvotes: 0, comments: 0 });
+
+  console.log(totalStats, "totalStats");
+  console.log(topPerformers, "topPerformers");
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: "RedditScheduler <updates@redditscheduler.com>",
+      to: user.email,
+      subject: `Weekly Digest: Highlights from ${beginningOfWeek.toFormat("MMM dd")} - ${endOfWeek.toFormat("MMM dd, yyyy")}`,
+      html: `
+      <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="border:1px solid #ececec;border-radius:10px;padding:24px;max-width:600px" width="100%">
+        <tbody>
+          <tr>
+            <td style="padding-bottom:20px;text-align:center">
+              <table cellpadding="0" cellspacing="0" style="margin:0 auto;">
+                <tr>
+                  <td style="text-align:center;">
+                    <img alt="RedditScheduler" src="https://redditscheduler.com/logo.png" style="display:block;width:auto;height:40px;margin:0 auto;" />
+                  </td>
+                </tr>
+                <tr>
+                  <td style="text-align:center;padding-top:8px;">
+                    <span style="color:#4b5563;font-size:18px;font-weight:600;">RedditScheduler.com</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <h1 style="color:#1f2937;text-decoration:none;font-size:24px;margin:0;text-align:center">
+                Your Weekly Performance Report
+              </h1>
+              <p style="color:#6b7280;font-size:16px;line-height:24px;text-align:center;margin-top:12px">
+                Here's how your Reddit posts performed this week
+              </p>
+            </td>
+          </tr>
+
+          <!-- Weekly Summary -->
+          <tr>
+            <td style="padding:24px 0;">
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                <tr>
+                  <td style="padding:16px;background-color:#f9fafb;border-radius:8px;">
+                    <h2 style="color:#1f2937;font-size:18px;margin:0 0 16px 0">Weekly Summary</h2>
+                    <table width="100%" cellpadding="8" cellspacing="0">
+                      <tr>
+                        <td style="color:#4b5563;font-size:14px;">Total Upvotes:</td>
+                        <td style="color:#3b82f6;font-weight:600;text-align:right">${totalStats.upvotes.toLocaleString()}</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#4b5563;font-size:14px;">Total Comments:</td>
+                        <td style="color:#3b82f6;font-weight:600;text-align:right">${totalStats.comments.toLocaleString()}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Top Performing Posts -->
+          <tr>
+            <td style="padding-bottom:24px;">
+              <h2 style="color:#1f2937;font-size:18px;margin:0 0 16px 0">Top Performing Posts</h2>
+              ${topPerformers.map((post, index) => `
+                <div style="margin-bottom:${index === topPerformers.length - 1 ? '0' : '16px'};padding:16px;border:1px solid #e5e7eb;border-radius:8px;">
+                  <h3 style="color:#1f2937;font-size:16px;margin:0 0 12px 0">${post.title}</h3>
+                  <table width="100%" cellpadding="4" cellspacing="0">
+                    <tr>
+                      <td style="color:#4b5563;font-size:14px;">Impressions:</td>
+                      <td style="color:#3b82f6;font-weight:600;text-align:right">${post.impressions.toLocaleString()}</td>
+                    </tr>
+                    <tr>
+                      <td style="color:#4b5563;font-size:14px;">Upvotes:</td>
+                      <td style="color:#3b82f6;font-weight:600;text-align:right">${post.upvotes.toLocaleString()}</td>
+                    </tr>
+                    <tr>
+                      <td style="color:#4b5563;font-size:14px;">Comments:</td>
+                      <td style="color:#3b82f6;font-weight:600;text-align:right">${post.comments.toLocaleString()}</td>
+                    </tr>
+                    ${post.upvoteRatio ? `
+                    <tr>
+                      <td style="color:#4b5563;font-size:14px;">Upvote Ratio:</td>
+                      <td style="color:#3b82f6;font-weight:600;text-align:right">${(post.upvoteRatio * 100).toFixed(0)}%</td>
+                    </tr>
+                    ` : ''}
+                  </table>
+                  <div style="margin-top:12px;">
+                    <a href="${post.postUrl}" style="color:#3b82f6;text-decoration:none;font-size:14px;display:inline-block;">View Post →</a>
+                  </div>
+                </div>
+              `).join('')}
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding-top:24px;border-top:1px solid #e5e7eb;">
+              <p style="color:gray;font-size:12px;text-align:center;margin:0">
+                © ${new Date().getFullYear()} RedditScheduler, All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      `,
+    });
+
+    if (error) {
+      console.error("Error sending weekly email:", error);
+      return { data: null, error };
+    }
+
+    return { data, error: null };
+  } catch (error) {
+    console.error("Error sending weekly email:", error);
+    return { data: null, error: error.message };
+  }
 }
 
 async function earlyEmail(user, metric) {

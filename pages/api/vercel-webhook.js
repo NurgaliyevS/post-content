@@ -19,15 +19,14 @@ export default async function handler(req, res) {
     console.log(type, "type");
     console.log(payload, "payload");
 
-    // Process both error events and firewall attacks
-    // if (!type.includes('error') && !type.includes('failed') && !type.includes('firewall')) {
-    //   return res.status(200).json({ success: true });
-    // }
-
     let message = "";
 
     message = `
 🚨 Error Alert
+Type: ${type}
+Project: ${payload.project?.name || "Unknown"}
+Environment: ${payload?.target || "Unknown"}
+Error: ${payload.error?.message || "Unknown error"}
 `;
 
     // Send notification to Telegram

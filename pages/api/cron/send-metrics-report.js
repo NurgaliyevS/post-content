@@ -128,7 +128,7 @@ export default async function handler(req, res) {
 
 async function weeklyEmail(user, metrics) {
   const { data, error } = await resend.emails.send({
-    from: "RedditScheduler <updates@mg.redditscheduler.com>",
+    from: "RedditScheduler <updates@redditscheduler.com>",
     to: user.email,
     subject: "Your Weekly Reddit Post Performance Report",
     html: `
@@ -145,7 +145,7 @@ async function earlyEmail(user, metric) {
 
   try {
     const { data, error } = await resend.emails.send({
-      from: "RedditScheduler <updates@mg.redditscheduler.com>",
+      from: "RedditScheduler <updates@redditscheduler.com>",
       to: user.email,
       subject: `Performance Report - ${metric.title}`,
       html: `

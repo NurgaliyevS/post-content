@@ -85,6 +85,9 @@ export default async function handler(req, res) {
               continue;
             }
 
+            // Add delay between email sends to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 600)); // 600ms delay = ~1.6 requests/second
+
             // Update the metric to mark email as sent
             await PostMetrics.findByIdAndUpdate(metric._id, {
               isEarlyEmailSent: true,

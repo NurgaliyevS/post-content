@@ -273,8 +273,8 @@ async function weeklyEmail(user, metrics) {
                         : ""
                     }
                   </table>
-                  <div style="margin-top:12px;">
-                    <a href="${post.postUrl}" style="background-color:#3b82f6;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;font-weight:600;display:inline-block">View Post →</a>
+                  <div style="margin-top:12px;text-align:center">
+                    <a href="${post.postUrl}" style="background-color:#3b82f6;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;font-weight:600;display:inline-block">View Post</a>
                   </div>
                 </div>
               `

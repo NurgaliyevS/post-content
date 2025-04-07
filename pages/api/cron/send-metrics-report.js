@@ -314,6 +314,10 @@ async function weeklyEmail(user, metrics) {
                   <h3 style="color:#1f2937;font-size:16px;margin:0 0 12px 0">${post.title}</h3>
                   <table width="100%" cellpadding="3" cellspacing="0">
                     <tr>
+                      <td style="color:#4b5563;font-size:14px;">Community:</td>
+                      <td style="color:#3b82f6;font-weight:600;text-align:right">r/${post.community}</td>
+                    </tr>
+                    <tr>
                       <td style="color:#4b5563;font-size:14px;">Upvotes:</td>
                       <td style="color:#3b82f6;font-weight:600;text-align:right">${post.upvotes.toLocaleString()}</td>
                     </tr>

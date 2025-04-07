@@ -103,8 +103,8 @@ export default async function handler(req, res) {
 
         console.log(aboutData, "aboutData");
 
-        const postAboutData = aboutData.data?.children[0];
-        const postAboutData2 = aboutData.data?.children[1];
+        const postAboutData = aboutData[0]?.data?.children;
+        const postAboutData2 = aboutData[1]?.data?.children;
 
         console.log(postAboutData, "postAboutData");
         console.log(postAboutData2, "postAboutData2");

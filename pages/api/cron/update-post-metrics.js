@@ -44,8 +44,8 @@ export default async function handler(req, res) {
         }
         await post.save();
         
-        // Fetch post data from Reddit API
-        const redditResponse = await fetch(`https://oauth.reddit.com/api/info?id=t3_${post.redditPostId}`, {
+        // Fetch post data from Reddit API with sr_detail parameter
+        const redditResponse = await fetch(`https://oauth.reddit.com/by_id/t3_${post.redditPostId}?sr_detail=true`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'User-Agent': 'RedditScheduler/1.0.0'
@@ -53,13 +53,23 @@ export default async function handler(req, res) {
         });
         
         const redditData = await redditResponse.json();
-
-        console.log(redditData, 'redditData');
-        console.log(redditData.data.children[0], 'redditData.data.children[0]');
+        console.log('Full Reddit response:', redditData);
 
         const postData = redditData.data.children[0]?.data;
 
-        const analyticsResponse = await fetch(`https://oauth.reddit.com/r/${post.community}/api/v1/link_post_analytics/${post.redditPostId}`, {
+        console.log(postData, 'postData');
+        
+        if (!postData) {
+          console.log(`No data found for post ${post.redditPostId}`);
+          results.push({
+            postId: post.redditPostId,
+            status: 'not_found'
+          });
+          continue;
+        }
+
+        // Get post analytics using the /api/info endpoint with rawjson=1
+        const analyticsResponse = await fetch(`https://oauth.reddit.com/api/info?id=t3_${post.redditPostId}&rawjson=1`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'User-Agent': 'RedditScheduler/1.0.0'
@@ -67,48 +77,46 @@ export default async function handler(req, res) {
         });
 
         const analyticsData = await analyticsResponse.json();
+        console.log('Analytics data:', analyticsData);
 
-        console.log(analyticsData, 'analyticsData');
-        console.log(analyticsData?.data, 'analyticsData.data');
-
-        console.log(analyticsData?.data?.total_views, 'analyticsData.data.total_views');
+        const analyticsPostData = analyticsData.data?.children[0]?.data;
         
-        if (postData) {
-          // Create or update metrics
-          const metrics = await PostMetrics.findOneAndUpdate(
-            { postId: post.redditPostId },
-            {
-              userId: post.userId,
-              title: post.title,
-              community: post.community,
-              impressions: postData.view_count || analyticsData?.data?.total_views || 0,
-              upvotes: postData.ups,
-              comments: postData.num_comments,
-              postUrl: post.redditPostUrl,
-              lastUpdated: currentTimeUTC.toJSDate(),
-              isEarlyEmailSent: false
-            },
-            { upsert: true }
-          );
-          
-          results.push({
-            postId: post.redditPostId,
-            status: 'updated',
-            metrics: {
-              impressions: metrics.impressions,
-              upvotes: metrics.upvotes,
-              comments: metrics.comments
-            }
-          });
-          
-          console.log(`Updated metrics for post ${post.redditPostId}`);
-        } else {
-          console.log(`No data found for post ${post.redditPostId}`);
-          results.push({
-            postId: post.redditPostId,
-            status: 'not_found'
-          });
-        }
+        // Calculate impressions from various possible sources
+        const impressions = postData?.view_count || 
+                          analyticsPostData?.view_count || 
+                          postData?.all_awardings?.reduce((total, award) => total + award.count, 0) || 
+                          0;
+
+        console.log('Calculated impressions:', impressions);
+        
+        // Create or update metrics
+        const metrics = await PostMetrics.findOneAndUpdate(
+          { postId: post.redditPostId },
+          {
+            userId: post.userId,
+            title: post.title,
+            community: post.community,
+            impressions: impressions,
+            upvotes: postData.ups,
+            comments: postData.num_comments,
+            postUrl: post.redditPostUrl,
+            lastUpdated: currentTimeUTC.toJSDate(),
+            isEarlyEmailSent: false
+          },
+          { upsert: true, new: true }
+        );
+        
+        results.push({
+          postId: post.redditPostId,
+          status: 'updated',
+          metrics: {
+            impressions: metrics.impressions,
+            upvotes: metrics.upvotes,
+            comments: metrics.comments
+          }
+        });
+        
+        console.log(`Updated metrics for post ${post.redditPostId}`);
       } catch (error) {
         console.error(`Error updating metrics for post ${post.redditPostId}:`, error);
         results.push({

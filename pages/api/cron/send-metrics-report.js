@@ -127,10 +127,16 @@ export default async function handler(req, res) {
 }
 
 async function weeklyEmail(user, metrics) {
+  const beginningOfWeek = DateTime.now().startOf("week").toUTC();
+  const endOfWeek = DateTime.now().endOf("week").toUTC();
+
+  console.log(beginningOfWeek, "beginningOfWeek");
+  console.log(endOfWeek, "endOfWeek");
+
   const { data, error } = await resend.emails.send({
     from: "RedditScheduler <updates@redditscheduler.com>",
     to: user.email,
-    subject: "Your Weekly Reddit Post Performance Report",
+    subject: `Weekly Digest: Highlights from ${beginningOfWeek.toFormat("MMM dd")} - ${endOfWeek.toFormat("MMM dd, yyyy")}`,
     html: `
     `,
   });
@@ -147,7 +153,7 @@ async function earlyEmail(user, metric) {
     const { data, error } = await resend.emails.send({
       from: "RedditScheduler <updates@redditscheduler.com>",
       to: user.email,
-      subject: `Performance Report - ${metric.title}`,
+      subject: `Metrics Report - ${metric.title}`,
       html: `
       <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="border:1px solid #ececec;border-radius:10px;padding:24px;max-width:540px" width="100%">
         <tbody>

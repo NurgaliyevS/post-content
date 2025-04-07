@@ -28,8 +28,6 @@ export default async function handler(req, res) {
     }).limit(5);
     
     console.log(`Found ${publishedPosts.length} published posts to update metrics for`);
-
-    console.log(publishedPosts, 'publishedPosts');
     
     const results = [];
     
@@ -45,8 +43,6 @@ export default async function handler(req, res) {
           post.redditRefreshToken = refreshResult.refresh_token;
         }
         await post.save();
-
-        console.log(post, 'post');
         
         // Fetch post data from Reddit API
         const redditResponse = await fetch(`https://oauth.reddit.com/api/info?id=t3_${post.redditPostId}`, {

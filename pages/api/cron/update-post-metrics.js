@@ -80,6 +80,8 @@ export default async function handler(req, res) {
         console.log('Analytics data:', analyticsData);
 
         const analyticsPostData = analyticsData.data?.children[0]?.data;
+
+        console.log(analyticsPostData, 'analyticsPostData');
         
         // Calculate impressions from various possible sources
         const impressions = postData?.view_count || 

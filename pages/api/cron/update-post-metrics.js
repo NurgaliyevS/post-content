@@ -74,7 +74,8 @@ export default async function handler(req, res) {
               upvotes: postData.ups,
               comments: postData.num_comments,
               postUrl: post.redditPostUrl,
-              lastUpdated: currentTimeUTC.toJSDate()
+              lastUpdated: currentTimeUTC.toJSDate(),
+              isEarlyEmailSent: false
             },
             { upsert: true }
           );

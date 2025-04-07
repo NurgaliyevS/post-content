@@ -50,6 +50,10 @@ const PostMetricsSchema = new mongoose.Schema({
   upvoteRatio: {
     type: Number,
     default: 0
+  },
+  scheduledFor: {
+    type: Date,
+    default: null
   }
 });
 

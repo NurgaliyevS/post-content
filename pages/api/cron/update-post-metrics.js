@@ -22,7 +22,7 @@ export default async function handler(req, res) {
     const publishedPosts = await ScheduledPost.find({ 
       status: 'published',
       publishedAt: { 
-        $gte: currentTimeUTC.minus({ days: 7 }).toJSDate() 
+        $gte: currentTimeUTC.minus({ days: 2 }).toJSDate() 
       },
       userId: '67e41eeeca8b6cf686633b6f'
     }).limit(5);
@@ -71,6 +71,7 @@ export default async function handler(req, res) {
               lastUpdated: currentTimeUTC.toJSDate(),
               isEarlyEmailSent: false,
               upvoteRatio: postData.upvote_ratio,
+              scheduledFor: post.scheduledFor,
             },
             { upsert: true }
           );

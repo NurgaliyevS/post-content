@@ -58,6 +58,19 @@ export default async function handler(req, res) {
         console.log(redditData.data.children[0], 'redditData.data.children[0]');
 
         const postData = redditData.data.children[0]?.data;
+
+        const analyticsResponse = await fetch(`https://oauth.reddit.com/r/${post.community}/api/v1/link_post_analytics/${post.redditPostId}`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'User-Agent': 'RedditScheduler/1.0.0'
+          }
+        });
+
+        const analyticsData = await analyticsResponse.json();
+
+        console.log(analyticsData, 'analyticsData');
+
+        console.log(analyticsData?.data?.total_views, 'analyticsData.data.total_views');
         
         if (postData) {
           // Create or update metrics
@@ -67,7 +80,7 @@ export default async function handler(req, res) {
               userId: post.userId,
               title: post.title,
               community: post.community,
-              impressions: postData.view_count || 0,
+              impressions: postData.view_count || analyticsData?.data?.total_views || 0,
               upvotes: postData.ups,
               comments: postData.num_comments,
               postUrl: post.redditPostUrl,

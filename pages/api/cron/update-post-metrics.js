@@ -69,6 +69,7 @@ export default async function handler(req, res) {
         const analyticsData = await analyticsResponse.json();
 
         console.log(analyticsData, 'analyticsData');
+        console.log(analyticsData?.data, 'analyticsData.data');
 
         console.log(analyticsData?.data?.total_views, 'analyticsData.data.total_views');
         

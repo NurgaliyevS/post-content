@@ -4,7 +4,11 @@ import User from "@/backend/user";
 import { Resend } from "resend";
 import { DateTime } from "luxon";
 
+// Initialize Resend with API key
 const resend = new Resend(process.env.RESEND_API_KEY);
+
+// Add delay between email sends to avoid rate limits
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // This endpoint will be called by Vercel Cron
 export default async function handler(req, res) {
@@ -64,20 +68,43 @@ export default async function handler(req, res) {
         console.log(user, "user");
         console.log(isWeeklyReport, "isWeeklyReport");
 
-        // Send individual email for each metric
+        // Send individual email for each metric with delay between sends
         for (const metric of userMetrics) {
-          console.log(metric, "metric");
-          await earlyEmail(user, metric);
+          try {
+            const { data, error } = await earlyEmail(user, metric);
+            
+            if (error) {
+              console.error(`Failed to send email for post ${metric.postId}:`, error);
+              results.push({
+                userId,
+                postId: metric.postId,
+                status: "error",
+                error: error
+              });
+              continue;
+            }
+
+            results.push({
+              userId,
+              postId: metric.postId,
+              status: "sent"
+            });
+
+            // Add 1 second delay between emails to avoid rate limits
+            await delay(1000);
+          } catch (error) {
+            console.error(`Error sending email for post ${metric.postId}:`, error);
+            results.push({
+              userId,
+              postId: metric.postId,
+              status: "error",
+              error: error.message
+            });
+          }
         }
 
-        results.push({
-          userId,
-          email: user.email,
-          status: "sent",
-          posts: userMetrics.length,
-        });
       } catch (error) {
-        console.error(`Error sending report to user ${userId}:`, error);
+        console.error(`Error processing user ${userId}:`, error);
         results.push({
           userId,
           status: "error",
@@ -87,7 +114,7 @@ export default async function handler(req, res) {
     }
 
     return res.status(200).json({
-      message: `Sent reports to ${results.length} users`,
+      message: `Processed ${results.length} emails`,
       results,
     });
   } catch (error) {
@@ -110,8 +137,11 @@ async function weeklyEmail(user, metrics) {
 }
 
 async function earlyEmail(user, metric) {
-  console.log(metric, "metric inside earlyEmail");
-  console.log(user, "user inside earlyEmail");
+  console.log("Sending email for:", {
+    to: user.email,
+    postId: metric.postId,
+    title: metric.title
+  });
 
   try {
     const { data, error } = await resend.emails.send({
@@ -220,7 +250,13 @@ async function earlyEmail(user, metric) {
       </table>
       `,
     });
-    return { data, error };
+
+    if (error) {
+      console.error("Resend API error:", error);
+      return { data: null, error };
+    }
+
+    return { data, error: null };
   } catch (error) {
     console.error("Error sending early email:", error);
     return { data: null, error: error.message };

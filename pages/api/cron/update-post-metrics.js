@@ -57,36 +57,51 @@ export default async function handler(req, res) {
         const postData = redditData.data.children[0]?.data;
         
         if (postData) {
-          // Create or update metrics
-          const metrics = await PostMetrics.findOneAndUpdate(
-            { postId: post.redditPostId },
-            {
-              userId: post.userId,
-              title: post.title,
-              community: post.community,
-              impressions: postData.view_count || 0,
-              upvotes: postData.ups,
-              comments: postData.num_comments,
-              postUrl: post.redditPostUrl,
-              lastUpdated: currentTimeUTC.toJSDate(),
-              isEarlyEmailSent: false,
-              upvoteRatio: postData.upvote_ratio,
-              scheduledFor: post.scheduledFor,
-            },
-            { upsert: true }
-          );
+          console.log(post.redditPostId, "post.redditPostId that came from the database");
+          // First check if metrics exist and get current values
+          const existingMetrics = await PostMetrics.findOne({ postId: post.redditPostId });
+
+          console.log(existingMetrics, "existingMetrics if it exists");
           
-          results.push({
-            postId: post.redditPostId,
-            status: 'updated',
-            metrics: {
-              impressions: metrics.impressions,
-              upvotes: metrics.upvotes,
-              comments: metrics.comments
-            }
-          });
-          
-          console.log(`Updated metrics for post ${post.redditPostId}`);
+          // Only update if metrics don't exist
+          if (!existingMetrics) {
+            
+            const metrics = await PostMetrics.findOneAndUpdate(
+              { postId: post.redditPostId },
+              {
+                userId: post.userId,
+                title: post.title,
+                community: post.community,
+                impressions: postData.view_count || 0,
+                upvotes: postData.ups,
+                comments: postData.num_comments,
+                postUrl: post.redditPostUrl,
+                lastUpdated: currentTimeUTC.toJSDate(),
+                isEarlyEmailSent: false,
+                upvoteRatio: postData.upvote_ratio,
+                scheduledFor: post.scheduledFor,
+              },
+              { upsert: true, new: true }
+            );
+            
+            results.push({
+              postId: post.redditPostId,
+              status: 'updated',
+              metrics: {
+                impressions: metrics.impressions,
+                upvotes: metrics.upvotes,
+                comments: metrics.comments
+              }
+            });
+            
+            console.log(`Updated metrics for post ${post.redditPostId}`);
+          } else {
+            console.log(`Metrics for post ${post.redditPostId} exist, skipping update`);
+            results.push({
+              postId: post.redditPostId,
+              status: 'unchanged'
+            });
+          }
         } else {
           console.log(`No data found for post ${post.redditPostId}`);
           results.push({

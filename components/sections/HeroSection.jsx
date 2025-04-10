@@ -1,12 +1,16 @@
 import ResultsSection from "./ResultsSection";
-import CTAButton from "../CTAButton";
 import VideoModal from '../VideoModal';
-import { FiPlay } from "react-icons/fi";
+import { FiPlay, FiCalendar } from "react-icons/fi";
 
 export default function HeroSection() {
   const openVideoModal = () => {
     const modal = document.getElementById('video_modal');
     modal.showModal();
+  };
+
+  const handleDemoBooking = () => {
+    // TODO: Implement demo booking functionality
+    window.open('https://cal.com/sabyr-nurgaliyev/15min', '_blank');
   };
 
   return (
@@ -20,12 +24,17 @@ export default function HeroSection() {
         Turn Reddit into your traffic machine without the headache
       </p>
       <div className="flex justify-center gap-4">
-        <CTAButton className="btn btn-primary" />
+        <button 
+          onClick={handleDemoBooking}
+          className="btn btn-primary w-48"
+        >
+          <FiCalendar className="w-4 h-4" /> Book a demo call
+        </button>
         <button 
           onClick={openVideoModal} 
-          className="btn btn-secondary"
+          className="btn btn-secondary w-48"
         >
-          <FiPlay className="w-4 h-4" /> Demo
+          <FiPlay className="w-4 h-4" /> Watch how it works
         </button>
       </div>
       <ResultsSection />

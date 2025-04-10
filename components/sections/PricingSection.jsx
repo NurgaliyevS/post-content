@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaArrowRight, FaInfoCircle } from "react-icons/fa";
+import { FaArrowRight, FaInfoCircle, FaShieldAlt } from "react-icons/fa";
 
 export default function PricingSection() {
   const [loading, setLoading] = useState(false);
@@ -53,6 +53,12 @@ export default function PricingSection() {
   return (
     <section id="pricing" className="py-16 px-4 mx-auto">
       <h2 className="text-3xl font-bold text-center mb-12">Pricing</h2>
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-6 py-3 rounded-full">
+          <FaShieldAlt className="text-xl" />
+          <span className="font-semibold">30-Day Money-Back Guarantee</span>
+        </div>
+      </div>
       <div className="grid md:grid-cols-3 gap-8 mx-auto">
         {/* Starter Plan */}
         <div className="card bg-base-100 border">
@@ -92,7 +98,7 @@ export default function PricingSection() {
               disabled={loading}
               className="btn btn-outline mt-4 w-full"
             >
-              {loading ? "Loading..." : "Start 7 day free trial"}
+              {loading ? "Loading..." : "Get Started"}
               <FaArrowRight className="w-3 h-3" />
             </button>
           </div>
@@ -136,7 +142,7 @@ export default function PricingSection() {
               disabled={loading}
               className="btn btn-primary mt-4 w-full"
             >
-              {loading ? "Loading..." : "Start 7 day free trial"}
+              {loading ? "Loading..." : "Get Started"}
               <FaArrowRight className="w-3 h-3" />
             </button>
           </div>
@@ -180,7 +186,7 @@ export default function PricingSection() {
               disabled={loading}
               className="btn btn-outline mt-4 w-full"
             >
-              {loading ? "Loading..." : "Start 7 day free trial"}
+              {loading ? "Loading..." : "Get Started"}
               <FaArrowRight className="w-3 h-3" />
             </button>
           </div>

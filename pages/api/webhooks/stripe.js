@@ -76,17 +76,15 @@ export default async function handler(req, res) {
       payload.email = session.customer_email;
     }
 
-    if (isInTrial) {
-      let message;
-      message = `🎉 New Trial Started!
+    let message;
+    message = `🎉 New Subscription Started!
 
 👤 Customer ID: ${subscription.customer}
 📧 Email: ${payload?.email}
 ⭐ Plan: ${payload?.variant_name}
 📝 Posts Available: ${payload?.post_available}
 👋 Customer Name: ${payload?.customer_name}`;
-      await sendTelegramNotification(message);
-    }
+    await sendTelegramNotification(message);
 
     console.log(payload, "payload in checkout.session.completed");
 

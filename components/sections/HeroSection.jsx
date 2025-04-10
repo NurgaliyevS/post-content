@@ -23,16 +23,16 @@ export default function HeroSection() {
       <p className="text-lg text-gray-600 mb-8">
         Turn Reddit into your traffic machine without the headache
       </p>
-      <div className="flex justify-center gap-4">
+      <div className="flex flex-col md:flex-row items-center justify-center gap-4">
         <button 
           onClick={handleDemoBooking}
-          className="btn btn-primary w-48"
+          className="btn btn-primary btn-wide md:w-48"
         >
           <FiCalendar className="w-4 h-4" /> Book a demo call
         </button>
         <button 
           onClick={openVideoModal} 
-          className="btn btn-secondary w-48"
+          className="btn btn-secondary btn-wide md:w-48"
         >
           <FiPlay className="w-4 h-4" /> Watch how it works
         </button>

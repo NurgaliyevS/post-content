@@ -96,7 +96,7 @@ export default function PricingSection() {
             <button
               onClick={() => handleSubscription("starter")}
               disabled={loading}
-              className="btn btn-outline mt-4 w-full"
+              className="btn btn-outline mt-4 btn-wide md:w-full"
             >
               {loading ? "Loading..." : "Get Started"}
               <FaArrowRight className="w-3 h-3" />
@@ -140,7 +140,7 @@ export default function PricingSection() {
             <button
               onClick={() => handleSubscription("growth")}
               disabled={loading}
-              className="btn btn-primary mt-4 w-full"
+              className="btn btn-primary mt-4 btn-wide md:w-full"
             >
               {loading ? "Loading..." : "Get Started"}
               <FaArrowRight className="w-3 h-3" />
@@ -184,7 +184,7 @@ export default function PricingSection() {
             <button
               onClick={() => handleSubscription("scale")}
               disabled={loading}
-              className="btn btn-outline mt-4 w-full"
+              className="btn btn-outline mt-4 btn-wide md:w-full"
             >
               {loading ? "Loading..." : "Get Started"}
               <FaArrowRight className="w-3 h-3" />

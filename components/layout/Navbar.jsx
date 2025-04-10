@@ -25,10 +25,10 @@ export default function Navbar() {
           height={32}
           className="rounded-lg"
         />
-        <span className="font-bold text-xl">RedditScheduler</span>
+        <span className="font-bold text-lg md:text-xl">RedditScheduler</span>
       </div>
       <div className="flex gap-4">
-        <Link href="#features" className="link link-hover">
+        <Link href="#features" className="link link-hover hidden md:inline">
           Features
         </Link>
         <Link href="#pricing" className="link link-hover">

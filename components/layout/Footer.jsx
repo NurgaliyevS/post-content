@@ -67,6 +67,36 @@ export default function Footer() {
             Terms of Service
           </Link>
         </div>
+
+        <div className="flex flex-col gap-3">
+          <span className="font-bold text-xs uppercase tracking-wider text-gray-500">
+            Links
+          </span>
+          <a
+            href="https://x.com/tech_nurgaliyev"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm hover:text-primary transition-colors"
+          >
+            X (Twitter)
+          </a>
+          <a
+            href="https://mvpagency.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm hover:text-primary transition-colors"
+          >
+            MVP Agency
+          </a>
+          <a
+            href="https://redditagency.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm hover:text-primary transition-colors"
+          >
+            Reddit Agency
+          </a>
+        </div>
       </div>
 
       <div className="border-t border-gray-200">

@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { FaArrowRight } from "react-icons/fa";
 
 export default function CTAButton({
-  text = "Dashboard",
+  text = "Schedule Now",
   dashboardPath = "/dashboard/onboarding",
   className = "btn btn-primary",
 }) {
@@ -20,8 +20,8 @@ export default function CTAButton({
 
   return (
     <button onClick={handleClick} className={className}>
-      {text}
       <FaArrowRight className='w-3 h-3' />
+      {text}
     </button>
   );
 }

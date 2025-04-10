@@ -98,8 +98,8 @@ export default function PricingSection() {
               disabled={loading}
               className="btn btn-outline mt-4 btn-wide md:w-full"
             >
-              {loading ? "Loading..." : "Get Started"}
               <FaArrowRight className="w-3 h-3" />
+              {loading ? "Loading..." : "Get Started"}
             </button>
           </div>
         </div>
@@ -142,8 +142,8 @@ export default function PricingSection() {
               disabled={loading}
               className="btn btn-primary mt-4 btn-wide md:w-full"
             >
-              {loading ? "Loading..." : "Get Started"}
               <FaArrowRight className="w-3 h-3" />
+              {loading ? "Loading..." : "Get Started"}
             </button>
           </div>
         </div>
@@ -186,8 +186,8 @@ export default function PricingSection() {
               disabled={loading}
               className="btn btn-outline mt-4 btn-wide md:w-full"
             >
-              {loading ? "Loading..." : "Get Started"}
               <FaArrowRight className="w-3 h-3" />
+              {loading ? "Loading..." : "Get Started"}
             </button>
           </div>
         </div>

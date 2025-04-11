@@ -25,6 +25,7 @@ export default async function handler(req, res) {
 
     const createLink = {
       mode: "subscription",
+      allow_promotion_codes: true,
       custom_fields: [
         {
           key: "reddit_username",

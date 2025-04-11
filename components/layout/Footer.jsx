@@ -48,29 +48,23 @@ export default function Footer() {
           >
             About
           </Link>
-        </div>
-
-        <div className="flex flex-col gap-3">
-          <span className="font-bold text-xs uppercase tracking-wider text-gray-500">
-            Legal
-          </span>
           <Link
             href="/privacy-policy"
             className="text-sm hover:text-primary transition-colors"
           >
-            Privacy Policy
+            Privacy
           </Link>
           <Link
             href="/terms"
             className="text-sm hover:text-primary transition-colors"
           >
-            Terms of Service
+            Terms
           </Link>
         </div>
 
         <div className="flex flex-col gap-3">
           <span className="font-bold text-xs uppercase tracking-wider text-gray-500">
-            Links
+            More
           </span>
           <a
             href="https://x.com/tech_nurgaliyev"
@@ -95,6 +89,14 @@ export default function Footer() {
             className="text-sm hover:text-primary transition-colors"
           >
             Reddit Agency
+          </a>
+          <a
+            href="https://github.com/NurgaliyevS/redditscheduler"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm hover:text-primary transition-colors"
+          >
+            GitHub
           </a>
         </div>
       </div>

@@ -15,7 +15,6 @@ Most Reddit scheduling tools are either **closed-source**, **expensive**, or **l
 - 🔒 **Privacy Focused** – Your posts, your data. No tracking, no selling, no middlemen.
 - ⚙️ **Easy to Use** – Simple and intuitive interface
 - 📊 **Analytics** – Track post performance and engagement
-- 🎯 **Subreddit Analysis** – Get insights on best posting times
 - 🚀 **Developer-Friendly** – Built with extensibility in mind
 
 ## Tech Stack

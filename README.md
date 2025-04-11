@@ -1,43 +1,101 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Reddit Scheduler
+
+An Open-Source Reddit Post Scheduler for Best Engagement
+
+## What is Reddit Scheduler?
+
+Reddit Scheduler is an open-source tool that helps Reddit users optimize their post timing for maximum engagement. Our goal is to help content creators and marketers reach their target audience at the most effective times.
+
+## Why Reddit Scheduler?
+
+Most Reddit scheduling tools are either **closed-source**, **expensive**, or **lack advanced features**. Reddit Scheduler is different:
+
+- ✅ **Open-Source** – Transparent and community-driven development
+- 🕒 **Smart Scheduling** - Best posting times
+- 🔒 **Privacy Focused** – Your posts, your data. No tracking, no selling, no middlemen.
+- ⚙️ **Easy to Use** – Simple and intuitive interface
+- 📊 **Analytics** – Track post performance and engagement
+- 🎯 **Subreddit Analysis** – Get insights on best posting times
+- 🚀 **Developer-Friendly** – Built with extensibility in mind
+
+## Tech Stack
+
+Reddit Scheduler is built with modern and reliable technologies:
+
+- **Frontend**: Next.js, React, Javascript, TailwindCSS, DaisyUI
+- **Backend**: Next.js API Routes
+- **Database**: MongoDB, Mongoose
+- **Authentication**: Reddit OAuth
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+**Required Versions:**
+- [Node.js](https://nodejs.org/en/download) (v18 or higher)
+- [NPM](https://www.npmjs.com/get-npm) (v10 or higher)
+
+### Setup
+
+1. **Clone and Install**
+   ```npm
+   # Clone the repository
+   git clone https://github.com/NurgaliyevS/redditscheduler
+   cd redditscheduler
+
+   # Install dependencies
+   npm install
+   ```
+
+2. **Set Up Environment**
+   - Copy `.env.example` to `.env`
+   - Configure your environment variables (see below)
+
+3. **Start the App**
+   ```npm
+   npm run dev
+   ```
+
+4. **Open in Browser**
+   Visit [http://localhost:3000](http://localhost:3000)
+
+### Environment Variables
+
+Create a `.env` file in the root directory with the following variables:
+
+```env
+# Reddit OAuth
+REDDIT_CLIENT_ID=your_client_id
+REDDIT_CLIENT_SECRET=your_client_secret
+REDDIT_REDIRECT_URI=http://localhost:3000/api/auth/callback/reddit
+
+# Database
+MONGODB_URI=mongodb://localhost:27017/redditscheduler
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Reddit OAuth Setup
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+1. Go to [Reddit App Preferences](https://www.reddit.com/prefs/apps)
+2. Create a new application
+3. Set the redirect URI to: `http://localhost:3000/api/auth/callback/reddit`
+4. Copy the client ID and client secret to your `.env` file
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+## Features
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+- **Smart Post Scheduling**: Schedule posts for optimal engagement times
+- **Post Performance Tracking**: Monitor your post engagement
+- **Cross-Posting**: Easily cross-post content to multiple subreddits
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Contributing
 
-## Learn More
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
-To learn more about Next.js, take a look at the following resources:
+## License
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Acknowledgments
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
-# nextjs-template
-# nextjs-template
-# redditscheduler
+- Inspired by [Later for Reddit](https://laterforreddit.com/)
+- Built with [Next.js](https://nextjs.org/)
+- Styled with [TailwindCSS](https://tailwindcss.com/) and [DaisyUI](https://daisyui.com/)

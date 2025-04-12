@@ -5,7 +5,7 @@ import HeroSection from "@/components/sections/HeroSection";
 import AlternativesSection from "@/components/sections/AlternativesSection";
 import FeaturesSection from "@/components/sections/FeaturesSection";
 import PricingSection from "@/components/sections/PricingSection";
-
+import VideoSection from "@/components/sections/VideoSection";
 export default function Home() {
   return (
     <>
@@ -17,6 +17,7 @@ export default function Home() {
           <AlternativesSection />
           <FeaturesSection />
           <PricingSection />
+          <VideoSection />
           <Footer />
         </div>
       </main>

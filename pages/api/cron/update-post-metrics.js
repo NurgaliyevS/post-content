@@ -23,8 +23,7 @@ export default async function handler(req, res) {
       status: 'published',
       publishedAt: { 
         $gte: currentTimeUTC.minus({ days: 2 }).toJSDate() 
-      },
-      userId: '67e41eeeca8b6cf686633b6f'
+      }
     }).limit(5);
     
     console.log(`Found ${publishedPosts.length} published posts to update metrics for`);

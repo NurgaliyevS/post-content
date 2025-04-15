@@ -268,7 +268,7 @@ async function weeklyEmail(user, metrics) {
               <table cellpadding="0" cellspacing="0" style="margin:0 auto;">
                 <tr>
                   <td style="text-align:center;">
-              <img alt="Post Content" src="https://post-content.com/logoAndName.png" style="display:block;width:auto;height:40px;margin:0 auto;" />
+              <img alt="Post Content" src="https://post-content.com/logoAndName2.png" style="display:block;width:auto;height:40px;margin:0 auto;" />
                   </td>
                 </tr>
               </table>
@@ -393,7 +393,7 @@ async function earlyEmail(user, metric) {
         <tbody>
           <tr>
             <td style="padding-bottom:20px;text-align:center">
-              <img alt="Post Content" src="https://post-content.com/logoAndName.png" style="display:block;width:auto;height:40px;margin:0 auto;" />
+              <img alt="Post Content" src="https://post-content.com/logoAndName2.png" style="display:block;width:auto;height:40px;margin:0 auto;" />
             </td>
           </tr>
           <tr>

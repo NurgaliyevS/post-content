@@ -42,8 +42,8 @@ export default async function handler(req, res) {
           price_data: {
             currency: "usd",
             product_data: {
-              name: `Reddit Scheduler - ${planDetails.name}`,
-              description: `Creator access to Reddit Scheduler. ${planDetails.post_available} posts to schedule per month. 30 days money back guarantee.`,
+              name: `Post Content - ${planDetails.name}`,
+              description: `Creator access to Post Content. ${planDetails.post_available} posts to schedule per month. 30 days money back guarantee.`,
               metadata: {
                 post_available: planDetails.post_available,
               },

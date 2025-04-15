@@ -5,8 +5,8 @@ export default function Terms() {
   return (
     <Layout>
       <Head>
-        <title>Terms of Service - Reddit Scheduler</title>
-        <meta name="description" content="Terms of Service for Reddit Scheduler" />
+        <title>Terms of Service - Post Content</title>
+        <meta name="description" content="Terms of Service for Post Content" />
       </Head>
 
       <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -17,12 +17,12 @@ export default function Terms() {
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">1. Acceptance of Terms</h2>
-            <p>By accessing and using Reddit Scheduler, you agree to be bound by these Terms of Service and all applicable laws and regulations.</p>
+            <p>By accessing and using Post Content, you agree to be bound by these Terms of Service and all applicable laws and regulations.</p>
           </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">2. Use License</h2>
-            <p>Permission is granted to temporarily use Reddit Scheduler for personal, non-commercial use only. This license does not include:</p>
+            <p>Permission is granted to temporarily use Post Content for personal, non-commercial use only. This license does not include:</p>
             <ul className="list-disc pl-6 mt-2">
               <li>Modifying or copying the materials</li>
               <li>Using the materials for any commercial purpose</li>
@@ -38,7 +38,7 @@ export default function Terms() {
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">4. Disclaimer</h2>
-            <p>The materials on Reddit Scheduler are provided on an 'as is' basis. We make no warranties, expressed or implied, and hereby disclaim and negate all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.</p>
+            <p>The materials on Post Content are provided on an 'as is' basis. We make no warranties, expressed or implied, and hereby disclaim and negate all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.</p>
           </section>
 
           <section className="mb-8">

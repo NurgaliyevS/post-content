@@ -5,8 +5,8 @@ export default function Privacy() {
   return (
     <Layout>
       <Head>
-        <title>Privacy Policy - Reddit Scheduler</title>
-        <meta name="description" content="Privacy Policy for Reddit Scheduler" />
+        <title>Privacy Policy - Post Content</title>
+        <meta name="description" content="Privacy Policy for Post Content" />
       </Head>
 
       <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -17,7 +17,7 @@ export default function Privacy() {
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">1. Information We Collect</h2>
-            <p>We collect information that you provide directly to us when using Reddit Scheduler:</p>
+            <p>We collect information that you provide directly to us when using Post Content:</p>
             <ul className="list-disc pl-6 mt-2">
               <li>Reddit account information (username, access tokens)</li>
               <li>Post scheduling data</li>

@@ -13,7 +13,7 @@ export default function Layout({ children }) {
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="text-xl font-bold flex items-center gap-2">
-              <Image src="/logo.svg" alt="Reddit Scheduler Logo" width={32} height={32} />
+              <Image src="/logo.svg" alt="Post Content Logo" width={32} height={32} />
               Post Content
             </Link>
             
@@ -112,7 +112,7 @@ export default function Layout({ children }) {
         <div className="container mx-auto px-4 py-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <h3 className="text-lg font-semibold mb-4">Reddit Scheduler</h3>
+              <h3 className="text-lg font-semibold mb-4">Post Content</h3>
               <p className="text-sm">Schedule and manage your Reddit posts efficiently.</p>
             </div>
             <div>
@@ -135,7 +135,7 @@ export default function Layout({ children }) {
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-base-300 text-center text-sm">
-            <p>&copy; {new Date().getFullYear()} Reddit Scheduler. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} Post Content. All rights reserved.</p>
           </div>
         </div>
       </footer>

@@ -5,17 +5,17 @@ export default function About() {
   return (
     <Layout>
       <Head>
-        <title>About - Reddit Scheduler</title>
-        <meta name="description" content="Learn more about Reddit Scheduler" />
+        <title>About - Post Content</title>
+        <meta name="description" content="Learn more about Post Content" />
       </Head>
 
       <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <h1 className="text-4xl font-bold mb-8">About Reddit Scheduler</h1>
+        <h1 className="text-4xl font-bold mb-8">About Post Content</h1>
         
         <div className="prose prose-lg">
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">Our Mission</h2>
-            <p>Reddit Scheduler is dedicated to helping Reddit users manage their content more efficiently. We believe in making social media management simple, effective, and accessible to everyone.</p>
+            <p>Post Content is dedicated to helping Reddit users manage their content more efficiently. We believe in making social media management simple, effective, and accessible to everyone.</p>
           </section>
 
           <section className="mb-8">

@@ -106,7 +106,7 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
                   height={20}
                 />
               </div>
-              <span className="text-lg font-bold">RedditScheduler</span>
+              <span className="text-lg font-bold">Post Content</span>
             </Link>
           </div>
         </div>

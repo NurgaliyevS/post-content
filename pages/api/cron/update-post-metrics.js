@@ -47,7 +47,7 @@ export default async function handler(req, res) {
         const redditResponse = await fetch(`https://oauth.reddit.com/api/info?id=t3_${post.redditPostId}`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
-            'User-Agent': 'RedditScheduler/1.0.0'
+            'User-Agent': 'Post Content/1.0.0'
           }
         });
         

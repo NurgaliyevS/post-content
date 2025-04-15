@@ -37,9 +37,9 @@ export default async function handler(req, res) {
       const lastMonday = startOfWeek(subDays(today, 7), { weekStartsOn: 1 }); // Last Monday
       const lastSunday = subDays(startOfWeek(today, { weekStartsOn: 1 }), 1); // Last Sunday
 
-      console.log('Weekly date range:', {
-        from: format(lastMonday, 'MMM dd'),
-        to: format(lastSunday, 'MMM dd'),
+      console.log("Weekly date range:", {
+        from: format(lastMonday, "MMM dd"),
+        to: format(lastSunday, "MMM dd"),
       });
 
       dateQuery = {
@@ -62,8 +62,8 @@ export default async function handler(req, res) {
       ...dateQuery,
       ...(isWeeklyReport ? {} : { isEarlyEmailSent: false }),
     })
-    .sort({ upvotes: -1 })
-    .limit(5);
+      .sort({ upvotes: -1 })
+      .limit(5);
 
     console.log("Found metrics:", {
       count: metrics.length,
@@ -257,7 +257,7 @@ async function weeklyEmail(user, metrics) {
 
   try {
     const { data, error } = await resend.emails.send({
-      from: "RedditScheduler <updates@redditscheduler.com>",
+      from: "Post Content <updates@redditscheduler.com>",
       to: user.email,
       subject: `Weekly Digest: Highlights from ${format(lastMonday, "MMM dd")} - ${format(today, "MMM dd, yyyy")}`,
       html: `
@@ -268,7 +268,7 @@ async function weeklyEmail(user, metrics) {
               <table cellpadding="0" cellspacing="0" style="margin:0 auto;">
                 <tr>
                   <td style="text-align:center;">
-              <img alt="RedditScheduler" src="https://redditscheduler.com/logoAndName.png" style="display:block;width:auto;height:40px;margin:0 auto;" />
+              <img alt="Post Content" src="https://post-content.com/logoAndName.png" style="display:block;width:auto;height:40px;margin:0 auto;" />
                   </td>
                 </tr>
               </table>
@@ -355,7 +355,7 @@ async function weeklyEmail(user, metrics) {
           <tr>
             <td style="padding-top:24px;border-top:1px solid #e5e7eb;">
               <p style="color:gray;font-size:12px;text-align:center;margin:0">
-                © ${new Date().getFullYear()} RedditScheduler, All rights reserved.
+                © ${new Date().getFullYear()} Post Content, All rights reserved.
               </p>
             </td>
           </tr>
@@ -393,7 +393,7 @@ async function earlyEmail(user, metric) {
         <tbody>
           <tr>
             <td style="padding-bottom:20px;text-align:center">
-              <img alt="RedditScheduler" src="https://redditscheduler.com/logoAndName.png" style="display:block;width:auto;height:40px;margin:0 auto;" />
+              <img alt="Post Content" src="https://post-content.com/logoAndName.png" style="display:block;width:auto;height:40px;margin:0 auto;" />
             </td>
           </tr>
           <tr>
@@ -482,7 +482,7 @@ async function earlyEmail(user, metric) {
             <td style="padding-top:40px">
               <hr style="background-color:#ececec;border:0;height:1px;margin:0">
               <p style="color:gray;font-size:12px;text-align:center;margin-top:20px">
-                © ${new Date().getFullYear()} RedditScheduler, All rights reserved.
+                © ${new Date().getFullYear()} Post Content, All rights reserved.
               </p>
             </td>
           </tr>

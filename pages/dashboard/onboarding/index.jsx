@@ -48,7 +48,7 @@ function Onboarding() {
           </div>
 
           <h1 className="text-2xl md:text-3xl font-bold mb-1">
-            Welcome to RedditScheduler
+            Welcome to Post Content
           </h1>
         </div>
 

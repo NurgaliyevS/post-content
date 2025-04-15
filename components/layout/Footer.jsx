@@ -14,7 +14,7 @@ export default function Footer() {
             className="rounded-lg"
           />
           <p className="text-sm text-gray-600">
-            RedditScheduler
+            Post Content
             <br />
             Turn Reddit into your traffic machine without the headache
           </p>
@@ -104,7 +104,7 @@ export default function Footer() {
       <div className="border-t border-gray-200">
         <div className="max-w-4xl mx-auto px-4 py-6">
           <p className="text-xs text-center text-gray-500">
-            © 2025 RedditScheduler. All rights reserved.
+            © 2025 Post Content. All rights reserved.
           </p>
         </div>
       </div>

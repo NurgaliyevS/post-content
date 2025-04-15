@@ -16,7 +16,7 @@ export default async function handler(req, res) {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'RedditScheduler/1.0.0'
+        'User-Agent': 'Post Content/1.0.0'
       },
       body: new URLSearchParams(body)
     });

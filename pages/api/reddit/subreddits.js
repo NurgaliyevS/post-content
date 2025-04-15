@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     const response = await fetch('https://oauth.reddit.com/subreddits/mine/subscriber?limit=100', {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
-        'User-Agent': 'RedditScheduler/1.0.0'
+        'User-Agent': 'Post Content/1.0.0'
       }
     });
 

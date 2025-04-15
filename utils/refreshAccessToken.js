@@ -18,7 +18,7 @@ export async function refreshAccessToken(refreshToken) {
         headers: {
           'Authorization': `Basic ${basicAuth}`,
           'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': 'RedditScheduler/1.0.0'
+          'User-Agent': 'Post Content/1.0.0'
         },
         body: new URLSearchParams({
           'grant_type': 'refresh_token',

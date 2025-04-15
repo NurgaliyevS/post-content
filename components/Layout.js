@@ -14,7 +14,7 @@ export default function Layout({ children }) {
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="text-xl font-bold flex items-center gap-2">
               <Image src="/logo.svg" alt="Reddit Scheduler Logo" width={32} height={32} />
-              RedditScheduler
+              Post Content
             </Link>
             
             <div className="hidden md:flex space-x-4">

@@ -27,7 +27,7 @@ export default function AlternativesSection() {
           </div>
           <div className="p-6 rounded-xl border border-green-200 bg-green-50">
             <div className="flex justify-between mb-2">
-              <span className="font-semibold">RedditScheduler</span>
+              <span className="font-semibold">Post Content</span>
               <span className="text-green-500">✓</span>
             </div>
             <p className="text-sm text-gray-600">

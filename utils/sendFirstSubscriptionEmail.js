@@ -8,9 +8,9 @@ async function sendFirstSubscriptionEmail(email, username) {
 
   try {
     const { data, error } = await resend.emails.send({
-      from: "Sabyr from RedditScheduler <sabyr@redditscheduler.com>",
+      from: "Sabyr from Post Content <sabyr@redditscheduler.com>",
       to: email,
-      subject: "Thank you, Reddit Scheduler",
+      subject: "Thank you, Post Content",
       replyTo: "nurgasab@gmail.com", // For receiving replies
       //   headers: {
       //     "List-Unsubscribe": `<${unsubscribeUrl}>`,

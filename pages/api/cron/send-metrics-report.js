@@ -385,7 +385,7 @@ async function earlyEmail(user, metric) {
 
   try {
     const { data, error } = await resend.emails.send({
-      from: "RedditScheduler <updates@redditscheduler.com>",
+      from: "Post Content <updates@redditscheduler.com>",
       to: user.email,
       subject: `Metrics Report - ${metric.title}`,
       html: `

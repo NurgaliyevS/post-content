@@ -8,6 +8,8 @@ export default function TestScheduling() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
+  console.log(bye, 'bye');
+
   const testData = {
     community: "r/test",
     title: "Let me cook",

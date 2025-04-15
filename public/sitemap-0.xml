@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-<url><loc>https://redditscheduler.com</loc><lastmod>2025-03-29T11:05:05.652Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://redditscheduler.com/about</loc><lastmod>2025-03-29T11:05:05.652Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://redditscheduler.com/dashboard/analytics</loc><lastmod>2025-03-29T11:05:05.652Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://redditscheduler.com/dashboard/billing</loc><lastmod>2025-03-29T11:05:05.652Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://redditscheduler.com/dashboard/cross-posting</loc><lastmod>2025-03-29T11:05:05.652Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://redditscheduler.com/dashboard/hook-generator</loc><lastmod>2025-03-29T11:05:05.652Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://redditscheduler.com/dashboard/onboarding</loc><lastmod>2025-03-29T11:05:05.652Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://redditscheduler.com/dashboard/scheduling</loc><lastmod>2025-03-29T11:05:05.652Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://redditscheduler.com/dashboard/scheduling/test</loc><lastmod>2025-03-29T11:05:05.652Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://redditscheduler.com/dashboard/settings</loc><lastmod>2025-03-29T11:05:05.652Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://redditscheduler.com/dashboard/support</loc><lastmod>2025-03-29T11:05:05.652Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://redditscheduler.com/privacy-policy</loc><lastmod>2025-03-29T11:05:05.652Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://redditscheduler.com/terms</loc><lastmod>2025-03-29T11:05:05.652Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://post-content.com</loc><lastmod>2025-04-15T09:55:24.850Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://post-content.com/about</loc><lastmod>2025-04-15T09:55:24.851Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://post-content.com/dashboard/cross-posting</loc><lastmod>2025-04-15T09:55:24.851Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://post-content.com/dashboard/onboarding</loc><lastmod>2025-04-15T09:55:24.851Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://post-content.com/dashboard/scheduling</loc><lastmod>2025-04-15T09:55:24.851Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://post-content.com/dashboard/scheduling/test</loc><lastmod>2025-04-15T09:55:24.851Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://post-content.com/privacy-policy</loc><lastmod>2025-04-15T09:55:24.851Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://post-content.com/rate-limit</loc><lastmod>2025-04-15T09:55:24.851Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://post-content.com/terms</loc><lastmod>2025-04-15T09:55:24.851Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
 </urlset>

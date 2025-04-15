@@ -29,8 +29,8 @@ export default function App({
       </SessionProvider>
       <script
         defer
-        data-website-id="67ef813a0b81ec16172676c2"
-        data-domain="www.post-content.com"
+        data-website-id="67fe2d2d76d3bb08964458c8"
+        data-domain="post-content.com"
         src="https://datafa.st/js/script.js"
       ></script>
     </SidebarProvider>

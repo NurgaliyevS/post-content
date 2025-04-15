@@ -30,7 +30,7 @@ export default function App({
       <script
         defer
         data-website-id="67ef813a0b81ec16172676c2"
-        data-domain="www.redditscheduler.com"
+        data-domain="www.post-content.com"
         src="https://datafa.st/js/script.js"
       ></script>
     </SidebarProvider>

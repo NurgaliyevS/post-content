@@ -11,7 +11,7 @@ User-agent: *
 Disallow: /api/
 
 # Host
-Host: https://redditscheduler.com
+Host: https://post-content.com
 
 # Sitemaps
-Sitemap: https://redditscheduler.com/sitemap.xml
+Sitemap: https://post-content.com/sitemap.xml

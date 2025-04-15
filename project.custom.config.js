@@ -5,7 +5,7 @@ export const customConfig = {
     theme: "winter",
     main: themes[`[data-theme=winter"]`],
   },
-  domainName: "redditscheduler.com",
+  domainName: "post-content.com",
   mailgun: {
     subdomain: "mg",
     fromNoReply: `RedditScheduler <noreply@mg.redditscheduler.com>`,
@@ -14,7 +14,7 @@ export const customConfig = {
     forwardRepliesTo: "nurgasab@gmail.com",
   },
   documentTitle: "RedditScheduler - Schedule Reddit posts that drive traffic to your website",
-  domainWithHttps: "https://redditscheduler.com",
+  domainWithHttps: "https://post-content.com",
   seo: {
     keywords:
       "reddit scheduler, reddit automation, reddit marketing, social media automation, reddit posts, schedule reddit posts, reddit traffic, subreddit targeting",
@@ -24,20 +24,20 @@ export const customConfig = {
     applicationName: "redditscheduler",
     og: {
       title: "RedditScheduler - Schedule Reddit posts that drive traffic to your website",
-      url: "https://redditscheduler.com",
-      image: "https://redditscheduler.com/company_related/og-image.jpg",
+      url: "https://post-content.com",
+      image: "https://post-content.com/company_related/og-image.jpg",
       imageAlt:
         "RedditScheduler - Automate your Reddit posts and drive traffic to your website. Schedule posts, analyze subreddits, and track performance - all in one platform.",
       content: "https://x.com/tech_nurgaliyev",
       twitterSite: "@tech_nurgaliyev",
-      twitterImage: "https://redditscheduler.com/company_related/og-image.jpg",
+      twitterImage: "https://post-content.com/company_related/og-image.jpg",
     },
   },
   blog: {
     title: "RedditScheduler Blog",
     description:
       "Learn about Reddit marketing, automation strategies, content creation, and how to drive traffic from Reddit to your website.",
-    canonical: "https://redditscheduler.com/blog",
+    canonical: "https://post-content.com/blog",
     author: {
       name: "Sabyr Nurgaliyev",
       description:

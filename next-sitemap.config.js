@@ -3,7 +3,7 @@ const fs = require('fs');
 
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-  siteUrl: "https://redditscheduler.com",
+  siteUrl: "https://post-content.com",
   generateRobotsTxt: true,
   robotsTxtOptions: {
     policies: [

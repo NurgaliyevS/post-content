@@ -4,7 +4,7 @@ module.exports = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'images.redditscheduler.com',
+        hostname: 'images.post-content.com',
         pathname: '/**',
       },
     ],

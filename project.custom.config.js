@@ -13,17 +13,17 @@ export const customConfig = {
     supportEmail: "nurgasab@gmail.com",
     forwardRepliesTo: "nurgasab@gmail.com",
   },
-  documentTitle: "Post Content - Schedule Reddit posts that drive traffic to your website",
+  documentTitle: "Post Content - Double Reddit Results While You Sleep",
   domainWithHttps: "https://post-content.com",
   seo: {
     keywords:
       "reddit scheduler, reddit automation, reddit marketing, social media automation, reddit posts, schedule reddit posts, reddit traffic, subreddit targeting",
     description:
-      "Post Content - Schedule Reddit posts that drive traffic to your website",
+      "Post Content - Double Reddit Results While You Sleep",
     themeColor: "#ffffff",
     applicationName: "redditscheduler",
     og: {
-      title: "Post Content - Schedule Reddit posts that drive traffic to your website",
+      title: "Post Content - Double Reddit Results While You Sleep",
       url: "https://post-content.com",
       image: "https://post-content.com/company_related/og-image.jpg",
       imageAlt:

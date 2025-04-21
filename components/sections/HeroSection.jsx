@@ -10,12 +10,12 @@ export default function HeroSection() {
   return (
     <div className="text-center px-4 py-16 mx-auto">
       <h1 className="text-4xl md:text-5xl font-bold mb-4">
-        Schedule Reddit posts that drive
+        Double Reddit Results 
         <br />
-        traffic to your website
+        While You Sleep
       </h1>
       <p className="text-lg text-gray-600 mb-8">
-        Turn Reddit into your traffic machine without the headache
+        Schedule Reddit posts that drive traffic to your website
       </p>
       <div className="flex flex-col md:flex-row items-center justify-center gap-4">
         <CTAButton className="btn btn-primary btn-wide md:w-48" />

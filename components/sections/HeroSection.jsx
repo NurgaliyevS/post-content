@@ -9,6 +9,21 @@ export default function HeroSection() {
 
   return (
     <div className="text-center px-4 py-16 mx-auto">
+      <div className="flex justify-center mb-6">
+        <a 
+          href="https://www.uneed.best/tool/post-content?tab=rewards"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group hover:opacity-90 transition-opacity"
+        >
+          <img 
+            src="/rewards/uneed-winner-daily-winner.png" 
+            alt="Uneed Daily Winner Badge" 
+            priority
+            className="w-32 md:w-40"
+          />
+        </a>
+      </div>
       <h1 className="text-4xl md:text-5xl font-bold mb-4">
         Double Reddit Results 
         <br />

@@ -8,7 +8,7 @@ export default function TestScheduling() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
-  console.log('bye');
+  console.log("bye");
 
   const testData = {
     community: "r/test",
@@ -16,8 +16,12 @@ export default function TestScheduling() {
     text: `**First bold line**,
     \n*Second italic line*,
     \n[Test link](https://example.com),\n`,
-    selectedDate: new Date().toISOString().split('T')[0], 
-    selectedTime: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+    selectedDate: new Date().toISOString().split("T")[0],
+    selectedTime: new Date().toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    }),
   };
 
   const handleTestSubmit = async () => {
@@ -31,16 +35,16 @@ export default function TestScheduling() {
     setResult(null);
 
     try {
-      const response = await fetch('/api/post/schedule-post', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(testData)
+      const response = await fetch("/api/post/schedule-post", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(testData),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to schedule post');
+        throw new Error(data.message || "Failed to schedule post");
       }
 
       setResult(data);
@@ -49,6 +53,12 @@ export default function TestScheduling() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const getAllPosts = async () => {
+    const response = await fetch("/api/post/get-all-posts");
+    const data = await response.json();
+    console.log(data);
   };
 
   return (
@@ -65,19 +75,16 @@ export default function TestScheduling() {
           </div>
 
           {!session ? (
-            <button 
-              onClick={() => signIn()}
-              className="btn btn-primary w-full"
-            >
+            <button onClick={() => signIn()} className="btn btn-primary w-full">
               Sign In to Test
             </button>
           ) : (
-            <button 
+            <button
               onClick={handleTestSubmit}
               disabled={loading}
               className="btn btn-primary w-full"
             >
-              {loading ? 'Testing...' : 'Test Submit'}
+              {loading ? "Testing..." : "Test Submit"}
             </button>
           )}
 
@@ -96,8 +103,11 @@ export default function TestScheduling() {
               </pre>
             </div>
           )}
+          <button onClick={getAllPosts} className="btn btn-primary mt-20">
+            Get All Posts
+          </button>
         </div>
       </div>
     </DashboardLayout>
   );
-} 
+}

@@ -17,7 +17,7 @@ export default async function handler(req, res) {
   const cleanSubreddit = subreddit.replace(/^r\//, '');
 
   async function fetchFlairs(accessToken) {
-    const response = await fetch(`https://oauth.reddit.com/r/${cleanSubreddit}/api/link_flair_v2.json?raw_json=1`, {
+    const response = await fetch(`https://oauth.reddit.com/r/${cleanSubreddit}/api/link_flair_v2`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${accessToken}`,

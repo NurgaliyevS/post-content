@@ -210,7 +210,8 @@ function Scheduling() {
       !formData.community ||
       !formData.title ||
       !formData.selectedDate ||
-      !formData.selectedTime
+      !formData.selectedTime ||
+      !formData.text
     ) {
       showNotification(
         "error",
@@ -226,8 +227,8 @@ function Scheduling() {
       return;
     }
 
-    // Require flair if more than two flairs are available
-    if (flairs?.length > 2 && !formData.flairId) {
+    // Require flair if more than two flairs or equal to 2 and no flair is selected
+    if (flairs?.length >= 2 && !formData.flairId) {
       setFlairRequiredError("Please select a flair for this subreddit.");
       return;
     } else {

@@ -31,6 +31,8 @@ export default async function handler(req, res) {
 
       console.log("Reddit API response status:", response.status);
 
+      const data = await response.json();
+
       if (response.status === 401) {
         throw new Error("UNAUTHORIZED");
       }
@@ -38,9 +40,9 @@ export default async function handler(req, res) {
       if (response?.status === 403) {
         return res.status(403).json({
           error:
-            "Reddit does not allow to submit posts to this subreddit. Please try a different subreddit.",
+            "Reddit didn't allow to fetch flairs for this subreddit. You can try to submit post. If you are not able to submit post, please try a different subreddit.",
           message:
-            "Reddit does not allow to submit posts to this subreddit. Please try a different subreddit.",
+            "Reddit didn't allow to fetch flairs for this subreddit. You can try to submit post. If you are not able to submit post, please try a different subreddit.",
         });
       }
 
@@ -50,9 +52,6 @@ export default async function handler(req, res) {
         console.log("Non-JSON response:", text);
         throw new Error(`Non-JSON response: ${text}`);
       }
-
-      const data = await response.json();
-      console.log(data, "data");
       // Process and return flairs
       const flairs = Array.isArray(data)
         ? data.map((flair) => ({

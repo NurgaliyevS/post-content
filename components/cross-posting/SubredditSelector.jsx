@@ -36,7 +36,7 @@ export default function SubredditSelector({
         ) : (
           subreddits.map((subreddit) => (
             <div
-              key={subreddit.id}
+              key={subreddit.subscribers}
               className="flex items-center p-2 hover:bg-gray-50 rounded"
             >
               <input

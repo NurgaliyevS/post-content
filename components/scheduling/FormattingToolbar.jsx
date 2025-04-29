@@ -45,7 +45,7 @@ const FormattingToolbar = ({ onFormat, formData, handleFlairChange, flairs, erro
         </div>
       )}
       {error && (
-        <div className="text-red-500 text-sm">{error}</div>
+        <div className="text-neutral-content text-sm">{error}</div>
       )}
     </div>
   );

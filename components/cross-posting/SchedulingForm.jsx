@@ -9,7 +9,12 @@ export default function SchedulingForm({
   isLoadingForm,
   onDateTimeChange,
   onIntervalChange,
-  onSchedulePost
+  onSchedulePost,
+  flairsBySubreddit = {},
+  flairsLoading = {},
+  flairSelections = {},
+  flairErrors = {},
+  onFlairChange = () => {},
 }) {
   return (
     <div className="border-t pt-4 mt-4">
@@ -40,6 +45,41 @@ export default function SchedulingForm({
           </div>
         </div>
       </div>
+
+      {/* Per-subreddit flair selectors */}
+      {selectedSubreddits.map((sub) => {
+        const subName = sub.display_name_prefixed;
+        const flairs = flairsBySubreddit[subName] || [];
+        const flairRequired = flairs.length >= 2;
+        const flairOptions = flairs.map((flair) => ({
+          value: flair.id,
+          label: flair.text,
+          flair,
+        }));
+        const selectedFlair = flairOptions.find(
+          (option) => option.value === flairSelections[subName]?.id
+        ) || null;
+        return (
+          <div key={subName} className="mb-4">
+            <label className="block text-sm font-medium mb-1">
+              Flair for <span className="font-semibold">{subName}</span>
+              {flairRequired && <span className="text-error ml-1">*</span>}
+            </label>
+            <Select
+              options={flairRequired ? flairOptions : [{ value: '', label: 'No Flair' }, ...flairOptions]}
+              value={selectedFlair || (flairRequired ? null : { value: '', label: 'No Flair' })}
+              onChange={(option) => onFlairChange(subName, option ? option.flair : null)}
+              placeholder={flairRequired ? "Select a flair (required)" : "No Flair"}
+              isLoading={!!flairsLoading[subName]}
+              className="w-full"
+              classNamePrefix="react-select"
+            />
+            {flairErrors[subName] && (
+              <div className="text-neutral-content text-sm font-medium mt-1">{flairErrors[subName]}</div>
+            )}
+          </div>
+        );
+      })}
 
       <div className="mb-4">
         <label className="text-sm font-medium mb-1 flex items-center gap-1">

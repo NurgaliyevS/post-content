@@ -29,6 +29,11 @@ function CrossPosting() {
   });
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  // Flair logic
+  const [flairsBySubreddit, setFlairsBySubreddit] = useState({});
+  const [flairsLoading, setFlairsLoading] = useState({});
+  const [flairSelections, setFlairSelections] = useState({});
+  const [flairErrors, setFlairErrors] = useState({});
 
   const router = useRouter();
   const { refreshData } = useSidebar();
@@ -159,6 +164,41 @@ function CrossPosting() {
     }
   };
 
+  // Fetch flairs for a subreddit if not already cached
+  const fetchFlairsForSubreddit = async (subreddit) => {
+    if (flairsBySubreddit[subreddit.display_name_prefixed]) return;
+    setFlairsLoading((prev) => ({ ...prev, [subreddit.display_name_prefixed]: true }));
+    try {
+      const response = await fetch(`/api/reddit/flairs?subreddit=${subreddit.display_name_prefixed}`);
+      const data = await response.json();
+      if (!response.ok) {
+        setFlairErrors((prev) => ({ ...prev, [subreddit.display_name_prefixed]: data?.error || "Error fetching flairs" }));
+        setFlairsBySubreddit((prev) => ({ ...prev, [subreddit.display_name_prefixed]: [] }));
+      }
+      const flairs = data.choices || [];
+      setFlairsBySubreddit((prev) => ({ ...prev, [subreddit.display_name_prefixed]: flairs }));
+    } catch (error) {
+      const errorData = await response.json();
+      console.error("Error fetching flairs for subreddit:", errorData);
+      setFlairsBySubreddit((prev) => ({ ...prev, [subreddit.display_name_prefixed]: [] }));
+    } finally {
+      setFlairsLoading((prev) => ({ ...prev, [subreddit.display_name_prefixed]: false }));
+    }
+  };
+
+  // When subreddits are selected, fetch their flairs if needed
+  useEffect(() => {
+    selectedSubreddits.forEach((sub) => {
+      fetchFlairsForSubreddit(sub);
+    });
+  }, [selectedSubreddits]);
+
+  // Handle flair selection for a subreddit
+  const handleFlairChange = (subredditName, flair) => {
+    setFlairSelections((prev) => ({ ...prev, [subredditName]: flair }));
+    setFlairErrors((prev) => ({ ...prev, [subredditName]: "" }));
+  };
+
   const schedulePost = async () => {
     if (
       !selectedPost ||
@@ -179,6 +219,20 @@ function CrossPosting() {
       );
       return;
     }
+
+    // Flair validation: require flair if 2 or more flairs for subreddit
+    let hasFlairError = false;
+    const newFlairErrors = {};
+    selectedSubreddits.forEach((sub) => {
+      const subName = sub.display_name_prefixed;
+      const flairs = flairsBySubreddit[subName] || [];
+      if (flairs.length >= 2 && !flairSelections[subName]) {
+        newFlairErrors[subName] = "Please select a flair for this subreddit.";
+        hasFlairError = true;
+      }
+    });
+    setFlairErrors(newFlairErrors);
+    if (hasFlairError) return;
 
     setIsLoadingForm(true);
     try {
@@ -211,9 +265,11 @@ function CrossPosting() {
           }
 
           const postTimeISO = format(postTime, "yyyy-MM-dd'T'HH:mm:ssxxx");
+          const subName = subreddit.display_name_prefixed;
+          const flair = flairSelections[subName];
 
           const response = await axios.post("/api/post/schedule-post", {
-            community: subreddit.display_name_prefixed,
+            community: subName,
             title: selectedPost.title,
             text: selectedPost.text,
             scheduledDateTime: postTimeISO,
@@ -221,10 +277,12 @@ function CrossPosting() {
             type: selectedPost.type,
             currentClientTime: currentTimeISO,
             isCrossPosting: true,
+            flairId: flair?.id || "",
+            flairText: flair?.text || "",
           });
           return {
             status: "fulfilled",
-            subreddit: subreddit.display_name_prefixed,
+            subreddit: subName,
             value: response,
           };
         } catch (error) {
@@ -274,6 +332,8 @@ function CrossPosting() {
         showNotification("success", postingResults, toast);
         setSelectedPost(null);
         setSelectedSubreddits([]);
+        setFlairSelections({});
+        setFlairErrors({});
       } else {
         showNotification("warning", postingResults, toast);
       }
@@ -329,6 +389,11 @@ function CrossPosting() {
               onDateTimeChange={handleDateTimeChange}
               onIntervalChange={handleIntervalChange}
               onSchedulePost={schedulePost}
+              flairsBySubreddit={flairsBySubreddit}
+              flairsLoading={flairsLoading}
+              flairSelections={flairSelections}
+              flairErrors={flairErrors}
+              onFlairChange={handleFlairChange}
             />
           </div>
         </div>

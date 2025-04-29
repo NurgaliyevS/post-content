@@ -36,6 +36,7 @@ function Scheduling() {
   const [flairsLoading, setFlairsLoading] = useState(false);
   const [flairsError, setFlairsError] = useState(null);
   const [flairCache, setFlairCache] = useState({});
+  const [flairRequiredError, setFlairRequiredError] = useState("");
   const router = useRouter();
   const { refreshData } = useSidebar();
 
@@ -83,6 +84,7 @@ function Scheduling() {
     // Fetch flairs when subreddit changes
     if (name === "community" && value) {
       fetchSubredditFlairs(value);
+      setFlairRequiredError("");
     }
   };
 
@@ -224,6 +226,14 @@ function Scheduling() {
       return;
     }
 
+    // Require flair if more than two flairs are available
+    if (flairs?.length > 2 && !formData.flairId) {
+      setFlairRequiredError("Please select a flair for this subreddit.");
+      return;
+    } else {
+      setFlairRequiredError("");
+    }
+
     setIsLoadingForm(true);
     try {
       await checkPostAvailability();
@@ -259,7 +269,8 @@ function Scheduling() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to schedule post");
+        const errorData = await response.json();
+        throw new Error(errorData?.error || errorData?.message || "Failed to schedule post");
       }
 
       setFormData({
@@ -346,6 +357,10 @@ function Scheduling() {
                 error={flairsError}
                 loading={flairsLoading}
               />
+
+              {flairRequiredError && (
+                <div className="text-error text-sm font-medium mb-2">{flairRequiredError}</div>
+              )}
 
               <textarea
                 className="textarea textarea-bordered w-full min-h-32"

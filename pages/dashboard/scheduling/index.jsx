@@ -25,14 +25,20 @@ function Scheduling() {
     selectedTime: format(new Date(), "HH:mm"),
     type: "text",
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    flairId: "",
+    flairText: "",
   });
   const [userTimezone, setUserTimezone] = useState("");
   const [initialized, setInitialized] = useState(false);
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [flairs, setFlairs] = useState([]);
+  const [flairsLoading, setFlairsLoading] = useState(false);
+  const [flairsError, setFlairsError] = useState(null);
+  const [flairCache, setFlairCache] = useState({});
   const router = useRouter();
   const { refreshData } = useSidebar();
-  
+
   if (status !== "loading" && !initialized) {
     setInitialized(true);
 
@@ -72,6 +78,49 @@ function Scheduling() {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
+    }));
+
+    // Fetch flairs when subreddit changes
+    if (name === "community" && value) {
+      fetchSubredditFlairs(value);
+    }
+  };
+
+  const fetchSubredditFlairs = async (subreddit) => {
+    // Check cache first
+    if (flairCache[subreddit]) {
+      setFlairs(flairCache[subreddit]);
+      return;
+    }
+    try {
+      setFlairsLoading(true);
+      setFlairsError(null);
+      const response = await fetch(`/api/reddit/flairs?subreddit=${subreddit}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        // If the API returns a 403 or any error, set the error message
+        setFlairsError(data?.error || "Error fetching flairs");
+        setFlairs([]);
+        return;
+      }
+
+      const flairs = data.choices || [];
+      setFlairs(flairs);
+      setFlairCache((prev) => ({ ...prev, [subreddit]: flairs }));
+    } catch (error) {
+      setFlairsError(error?.message || "Error fetching flairs");
+      setFlairs([]);
+    } finally {
+      setFlairsLoading(false);
+    }
+  };
+
+  const handleFlairChange = (selectedFlair) => {
+    setFormData((prev) => ({
+      ...prev,
+      flairId: selectedFlair?.id || "",
+      flairText: selectedFlair?.text || "",
     }));
   };
 
@@ -129,15 +178,15 @@ function Scheduling() {
   };
 
   const checkPostAvailability = async () => {
-    const accessResponse = await fetch('/api/user/check-access');
+    const accessResponse = await fetch("/api/user/check-access");
     if (!accessResponse.ok) {
-      throw new Error('Failed to check post availability');
+      throw new Error("Failed to check post availability");
     }
     const accessData = await accessResponse.json();
-    
+
     if (accessData.post_available <= 0) {
-      router.push('/#pricing');
-      throw new Error('No posts available. \nPlease upgrade your plan.');
+      router.push("/#pricing");
+      throw new Error("No posts available. \nPlease upgrade your plan.");
     }
 
     return true;
@@ -145,41 +194,48 @@ function Scheduling() {
 
   const updatePostAvailability = async () => {
     try {
-      await fetch('/api/user/update-post-available', {
-        method: 'POST',
+      await fetch("/api/user/update-post-available", {
+        method: "POST",
       });
       refreshData();
     } catch (updateError) {
-      console.error('Error updating post availability:', updateError);
+      console.error("Error updating post availability:", updateError);
     }
   };
 
   const schedulePost = async () => {
-    if (!formData.community || !formData.title || !formData.selectedDate || !formData.selectedTime) {
-      showNotification("error", {
-        successful: [],
-        failed: [{ subreddit: "All", reason: "Please fill in all required fields" }],
-        total: 1,
-      }, toast);
+    if (
+      !formData.community ||
+      !formData.title ||
+      !formData.selectedDate ||
+      !formData.selectedTime
+    ) {
+      showNotification(
+        "error",
+        {
+          successful: [],
+          failed: [
+            { subreddit: "All", reason: "Please fill in all required fields" },
+          ],
+          total: 1,
+        },
+        toast
+      );
       return;
     }
 
     setIsLoadingForm(true);
     try {
-      // Check post availability first
       await checkPostAvailability();
 
-      // Parse the date string
-      const scheduledDate = parse(formData.selectedDate, "yyyy-MM-dd", new Date());
-
-      // Parse the time string (now in 24-hour format)
+      const scheduledDate = parse(
+        formData.selectedDate,
+        "yyyy-MM-dd",
+        new Date()
+      );
       const [hours, minutes] = formData.selectedTime.split(":");
-
-      // Set hours and minutes on the scheduledDate
       let scheduledDateTime = setHours(scheduledDate, parseInt(hours, 10));
       scheduledDateTime = setMinutes(scheduledDateTime, parseInt(minutes, 10));
-
-      // Format as ISO string for API
       const scheduledDateTimeISO = format(
         scheduledDateTime,
         "yyyy-MM-dd'T'HH:mm:ssxxx"
@@ -197,6 +253,8 @@ function Scheduling() {
           timeZone: userTimezone,
           currentClientTime: currentTimeISO,
           type: formData.type,
+          flairId: formData.flairId,
+          flairText: formData.flairText,
         }),
       });
 
@@ -211,24 +269,42 @@ function Scheduling() {
         selectedDate: format(new Date(), "yyyy-MM-dd"),
         selectedTime: format(new Date(), "HH:mm"),
         type: "text",
+        flairId: "",
+        flairText: "",
       });
 
+      setFlairs([]);
+
       const data = await response.json();
-      showNotification("success", {
-        successful: [{ subreddit: formData.community }],
-        failed: [],
-        total: 1,
-      }, toast);
-      
+      showNotification(
+        "success",
+        {
+          successful: [{ subreddit: formData.community }],
+          failed: [],
+          total: 1,
+        },
+        toast
+      );
+
       setRefreshTrigger((prev) => prev + 1);
       updatePostAvailability();
     } catch (error) {
       console.error("Error scheduling post:", error);
-      showNotification("error", {
-        successful: [],
-        failed: [{ subreddit: formData.community, reason: error.message || "Error scheduling post. Please try again." }],
-        total: 1,
-      }, toast);
+      showNotification(
+        "error",
+        {
+          successful: [],
+          failed: [
+            {
+              subreddit: formData.community,
+              reason:
+                error.message || "Error scheduling post. Please try again.",
+            },
+          ],
+          total: 1,
+        },
+        toast
+      );
     } finally {
       setIsLoadingForm(false);
     }
@@ -252,13 +328,6 @@ function Scheduling() {
               onRetry={fetchUserSubreddits}
             />
 
-            <PostTypeTabs
-              type={formData.type}
-              onTypeChange={(type) =>
-                setFormData((prev) => ({ ...prev, type }))
-              }
-            />
-
             <div className="space-y-4">
               <input
                 type="text"
@@ -269,7 +338,14 @@ function Scheduling() {
                 className="input input-bordered w-full"
               />
 
-              <FormattingToolbar onFormat={handleFormatting} />
+              <FormattingToolbar
+                onFormat={handleFormatting}
+                formData={formData}
+                handleFlairChange={handleFlairChange}
+                flairs={flairs}
+                error={flairsError}
+                loading={flairsLoading}
+              />
 
               <textarea
                 className="textarea textarea-bordered w-full min-h-32"

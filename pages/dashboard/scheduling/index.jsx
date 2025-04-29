@@ -119,6 +119,7 @@ function Scheduling() {
   };
 
   const handleFlairChange = (selectedFlair) => {
+    setFlairRequiredError("");
     setFormData((prev) => ({
       ...prev,
       flairId: selectedFlair?.id || "",

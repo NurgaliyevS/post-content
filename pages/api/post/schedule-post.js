@@ -52,7 +52,9 @@ export default async function handler(req, res) {
       timeZone, 
       currentClientTime, // ISO formatted current client time
       type = "text",
-      isCrossPosting = false
+      isCrossPosting = false,
+      flairId,
+      flairText
     } = req.body;
 
     console.log(req.body, 'req.body');
@@ -99,14 +101,25 @@ export default async function handler(req, res) {
     if (shouldPostImmediately) {
       console.log('Posting to Reddit immediately...');
       
+      // Remove r/ prefix if it exists
+      const cleanCommunity = community.replace(/^r\//, '');
+      
       const postBody = {
-        'sr': community.replace('r/', ''),
+        'sr': cleanCommunity,
         'kind': 'self',
         'title': title,
         'text': text,
         'api_type': 'json',
         'resubmit': 'true'
       };
+
+      // Add flair if provided
+      if (flairId) {
+        postBody.flair_id = flairId;
+        if (flairText) {
+          postBody.flair_text = flairText;
+        }
+      }
 
       let redditData;
       try {
@@ -137,7 +150,7 @@ export default async function handler(req, res) {
       
       const postedPost = new ScheduledPost({
         userId: session.user.id,
-        community: community.replace('r/', ''),
+        community: cleanCommunity,
         title,
         text,
         type,
@@ -150,7 +163,9 @@ export default async function handler(req, res) {
         redditRefreshToken: session.refreshToken,
         postedAt: currentClientTime,
         redditPostUrl: redditData?.json?.data?.url || null,
-        isCrossPosting: isCrossPosting
+        isCrossPosting: isCrossPosting,
+        flairId,
+        flairText
       });
       
       const savedPost = await postedPost.save();
@@ -179,9 +194,11 @@ export default async function handler(req, res) {
       console.log("scheduling post...")
 
       // Create a new scheduled post
+      const cleanCommunity = community.replace(/^r\//, '');
+      
       const scheduledPost = new ScheduledPost({
         userId: session.user.id,
-        community: community.replace('r/', ''), // Remove 'r/' prefix if present
+        community: cleanCommunity,
         title,
         text,
         type,
@@ -190,7 +207,9 @@ export default async function handler(req, res) {
         status: 'scheduled',
         redditAccessToken: session.accessToken,
         redditRefreshToken: session.refreshToken,
-        isCrossPosting: isCrossPosting
+        isCrossPosting: isCrossPosting,
+        flairId,
+        flairText
       });
       
       const savedPost = await scheduledPost.save();

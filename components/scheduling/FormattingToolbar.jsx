@@ -3,7 +3,7 @@ import Select from "react-select";
 
 const FORMATTING_BUTTONS = [{ label: "Link", value: "link" }];
 
-const FormattingToolbar = ({ onFormat, formData, handleFlairChange, flairs }) => {
+const FormattingToolbar = ({ onFormat, formData, handleFlairChange, flairs, error, loading }) => {
   // Transform flairs to react-select format
   const flairOptions = flairs?.map((flair) => ({
     value: flair.id,
@@ -20,11 +20,11 @@ const FormattingToolbar = ({ onFormat, formData, handleFlairChange, flairs }) =>
   };
 
   return (
-    <div className="flex flex-wrap gap-2 mb-2 items-center">
+    <div className="flex flex-wrap gap-4 mb-2 items-center">
       {FORMATTING_BUTTONS.map((button) => (
         <button
           key={button.value}
-          className="btn btn-sm h-10 min-h-[40px] px-4"
+          className="btn btn-sm min-h-[40px] px-4 badge badge-neutral hover:bg-primary hover:text-white"
           onClick={() => onFormat(button.value)}
         >
           {button.label}
@@ -40,8 +40,12 @@ const FormattingToolbar = ({ onFormat, formData, handleFlairChange, flairs }) =>
             placeholder="Select a flair"
             className="w-full"
             classNamePrefix="react-select"
+            isLoading={loading}
           />
         </div>
+      )}
+      {error && (
+        <div className="text-red-500 text-sm">{error}</div>
       )}
     </div>
   );

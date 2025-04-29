@@ -65,6 +65,12 @@ const ScheduledPostSchema = new mongoose.Schema({
   isCrossPosting: {
     type: Boolean,
     default: false
+  },
+  flairId: {
+    type: String
+  },
+  flairText: {
+    type: String
   }
 });
 

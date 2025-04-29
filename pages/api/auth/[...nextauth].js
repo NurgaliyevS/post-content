@@ -12,7 +12,7 @@ export const authOptions = {
       authorization: {
         params: {
           duration: "permanent", // Request a refresh token for permanent access
-          scope: "identity mysubreddits submit read" // Add required scopes for posting
+          scope: "identity mysubreddits submit read flair" // Add required scopes for posting and flairs
         },
       },
     }),

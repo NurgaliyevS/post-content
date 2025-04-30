@@ -15,6 +15,7 @@ import { useSidebar } from "@/context/SidebarContext";
 
 function CrossPosting() {
   const { data: session } = useSession();
+  const [loadingPosts, setLoadingPosts] = useState(false);
   const [posts, setPosts] = useState([]);
   const [subreddits, setSubreddits] = useState([]);
   const [subredditsLoading, setSubredditsLoading] = useState(false);
@@ -89,6 +90,7 @@ function CrossPosting() {
   };
 
   const fetchPosts = async () => {
+    setLoadingPosts(true);
     try {
       const response = await axios.get("/api/post/get-post");
       if (response?.status === 200 && response?.data?.scheduledPosts) {
@@ -96,6 +98,8 @@ function CrossPosting() {
       }
     } catch (error) {
       console.error("Error fetching posts:", error);
+    } finally {
+      setLoadingPosts(false);
     }
   };
 
@@ -368,6 +372,7 @@ function CrossPosting() {
             posts={posts}
             selectedPost={selectedPost}
             onPostSelect={handlePostSelect}
+            loadingPosts={loadingPosts}
           />
 
           <div className="bg-white rounded-lg shadow-sm p-6">
@@ -398,7 +403,7 @@ function CrossPosting() {
           </div>
         </div>
 
-        <CrossPostingHistory posts={posts} />
+        <CrossPostingHistory posts={posts} loadingPosts={loadingPosts} />
       </div>
     </DashboardLayout>
   );

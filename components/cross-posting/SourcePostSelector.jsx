@@ -1,16 +1,31 @@
 import { format } from "date-fns";
 import { FaUsers, FaCheckCircle, FaSpinner, FaCalendar } from "react-icons/fa";
+import NoPostsFound from "@/components/ui/NoPostsFound";
+import { useSidebar } from "@/context/SidebarContext";
+import Spinner from "@/components/ui/Spinner";
 
-export default function SourcePostSelector({ posts, selectedPost, onPostSelect }) {
+export default function SourcePostSelector({
+  posts,
+  selectedPost,
+  onPostSelect,
+  loadingPosts,
+}) {
+  const { hasScheduledPosts } = useSidebar();
+
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col">
       <h2 className="text-lg font-semibold">Source Post</h2>
 
       <div className="space-y-3 mt-4 flex-grow overflow-y-auto h-[510px]">
-        {posts.map((post) => (
-          <div
-            key={post._id}
-            className={`border rounded-lg p-3 cursor-pointer hover:bg-gray-50 ${
+        {loadingPosts ? (
+          <div className="flex items-center justify-center h-full">
+            <Spinner />
+          </div>
+        ) : (
+          posts.map((post) => (
+            <div
+              key={post._id}
+              className={`border rounded-lg p-3 cursor-pointer hover:bg-gray-50 ${
               selectedPost?._id === post._id ? "bg-blue-50 border-blue-200" : ""
             }`}
             onClick={() => onPostSelect(post)}
@@ -55,9 +70,12 @@ export default function SourcePostSelector({ posts, selectedPost, onPostSelect }
                 </a>
               )}
             </div>
-          </div>
-        ))}
+            </div>
+          ))
+        )}
+
+        {loadingPosts === false && hasScheduledPosts === false && <NoPostsFound />}
       </div>
     </div>
   );
-} 
+}

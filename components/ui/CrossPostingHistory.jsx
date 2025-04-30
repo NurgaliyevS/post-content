@@ -1,10 +1,15 @@
 import { FiCalendar, FiCheck } from "react-icons/fi";
 import { format } from "date-fns";
 import { FaCalendar, FaCheckCircle, FaSpinner } from "react-icons/fa";
+import Spinner from "@/components/ui/Spinner";
+import { useSidebar } from "@/context/SidebarContext";
+import NoPostsFound from "@/components/ui/NoPostsFound";
 
-function CrossPostingHistory({ posts }) {
+function CrossPostingHistory({ posts, loadingPosts }) {
   // Filter posts where isCrossPosting is true
   const crossPosts = posts.filter((post) => post.isCrossPosting);
+
+  const { hasScheduledPosts } = useSidebar();
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
@@ -13,6 +18,11 @@ function CrossPostingHistory({ posts }) {
       </div>
 
       <div className="overflow-x-auto">
+        {loadingPosts ? (
+          <div className="flex items-center justify-center h-full">
+            <Spinner />
+          </div>
+        ) : (
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
@@ -85,6 +95,8 @@ function CrossPostingHistory({ posts }) {
             ))}
           </tbody>
         </table>
+        )}
+        {loadingPosts === false && hasScheduledPosts === false && <NoPostsFound />}
       </div>
     </div>
   );

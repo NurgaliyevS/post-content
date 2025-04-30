@@ -17,7 +17,7 @@ function CrossPostingHistory({ posts, loadingPosts }) {
         <h2 className="text-lg font-semibold">Cross-Posting History</h2>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto min-h-[300px]">
         {loadingPosts ? (
           <div className="flex items-center justify-center h-full">
             <Spinner />

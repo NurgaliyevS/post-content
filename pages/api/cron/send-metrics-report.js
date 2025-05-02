@@ -260,6 +260,7 @@ async function weeklyEmail(user, metrics) {
       from: "Post Content <updates@redditscheduler.com>",
       to: user.email,
       subject: `Weekly Digest: Highlights from ${format(lastMonday, "MMM dd")} - ${format(today, "MMM dd, yyyy")}`,
+      replyTo: "nurgasab@gmail.com",
       html: `
       <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="border:1px solid #ececec;border-radius:10px;padding:24px;max-width:600px" width="100%">
         <tbody>
@@ -388,6 +389,7 @@ async function earlyEmail(user, metric) {
       from: "Post Content <updates@redditscheduler.com>",
       to: user.email,
       subject: `Metrics Report - ${metric.title}`,
+      replyTo: "nurgasab@gmail.com",
       html: `
       <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="border:1px solid #ececec;border-radius:10px;padding:24px;max-width:540px" width="100%">
         <tbody>

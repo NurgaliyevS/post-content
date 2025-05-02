@@ -15,6 +15,10 @@
     {
       "path": "/api/cron/send-metrics-report?type=weekly",
       "schedule": "0 9 * * 1"
+    },
+    {
+      "path": "/api/webhooks/subscription-reminder",
+      "schedule": "0 0 * * *"
     }
   ]
 }

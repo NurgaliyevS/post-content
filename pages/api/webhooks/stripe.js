@@ -146,6 +146,7 @@ export default async function handler(req, res) {
     };
 
     console.log(invoice.billing_reason, "invoice.billing_reason");
+    console.log(user, 'user');
 
     // Check if this payment marks the end of a trial period
     if (invoice.billing_reason === "subscription_cycle") {
@@ -169,6 +170,11 @@ export default async function handler(req, res) {
         { customer_id: invoice.customer },
         { $set: payload }
       );
+
+      console.log(invoice?.billing_reason, 'invoice?.billing_reason');
+      console.log(user?.has_received_first_subscription_email, 'user?.has_received_first_subscription_email');
+      console.log(invoice?.billing_reason === "subscription_create", 'invoice?.billing_reason === "subscription_create"');
+      console.log(!user?.has_received_first_subscription_email, '!user?.has_received_first_subscription_email');
 
       // Check if this is the first subscription payment and email hasn't been sent
       if (

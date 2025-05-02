@@ -7,9 +7,9 @@ async function sendFirstSubscriptionEmail(email, username) {
     console.error('Missing required parameters for email:', { email, username });
     return false;
   }
+  console.log('Attempting to send email to person:', email);
 
   try {
-    console.log('Attempting to send email to:', email);
     const { data, error } = await resend.emails.send({
       from: "Sabyr from Post Content <sabyr@redditscheduler.com>",
       to: email,

@@ -42,7 +42,7 @@ export default async function handler(req, res) {
           const daysSinceLastReminder = differenceInDays(user.lastReminderRenewalSent, now);
           console.log(daysSinceLastReminder, "daysSinceLastReminder");
           
-          if (daysSinceLastReminder < 30) {
+          if (daysSinceLastReminder < 25) {
             console.log(`Skipping ${customer.email} - reminder sent ${daysSinceLastReminder} days ago`);
             continue;
           }

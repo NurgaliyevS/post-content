@@ -33,7 +33,6 @@ export default function HeroSection() {
           <img
             src="/rewards/uneed-winner-daily-winner.png"
             alt="Uneed Daily Winner Badge"
-            priority
             className="w-32 md:w-40"
           />
         </a>

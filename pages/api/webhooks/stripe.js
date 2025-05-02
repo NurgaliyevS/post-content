@@ -172,8 +172,6 @@ export default async function handler(req, res) {
       );
 
       console.log(invoice?.billing_reason, 'invoice?.billing_reason');
-      console.log(user?.has_received_first_subscription_email, 'user?.has_received_first_subscription_email');
-      console.log(invoice?.billing_reason === "subscription_create", 'invoice?.billing_reason === "subscription_create"');
       console.log(!user?.has_received_first_subscription_email, '!user?.has_received_first_subscription_email');
 
       // Check if this is the first subscription payment and email hasn't been sent
@@ -181,12 +179,6 @@ export default async function handler(req, res) {
         invoice?.billing_reason === "subscription_create" &&
         !user?.has_received_first_subscription_email
       ) {
-        console.log('Attempting to send first subscription email...');
-        console.log('User email:', user?.email);
-        console.log('User name:', user?.customer_name);
-        console.log('Invoice customer email:', invoice?.customer_email);
-        console.log('Invoice customer name:', invoice?.customer_name);
-
         if (user?.email && user?.customer_name) {
           console.log('Sending email using user data...');
           const emailSent = await sendFirstSubscriptionEmail(user.email, user.customer_name);

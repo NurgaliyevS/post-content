@@ -1,10 +1,13 @@
 import axios from "axios";
 
 // Add this function to send Telegram notifications
-async function sendTelegramNotification(message) {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
-
+async function sendTelegramNotification({ 
+  message, 
+  chatId = process.env.TELEGRAM_CHAT_ID, 
+  botToken = process.env.TELEGRAM_BOT_TOKEN 
+}) {
+  console.log(message, "message");
+  console.log(botToken, "botToken");
   try {
     await axios.post(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       chat_id: chatId,

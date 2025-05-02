@@ -29,8 +29,15 @@ Environment: ${payload?.target || "Unknown"}
 Error: ${payload.error?.message || "Unknown error"}
 `;
 
+    const chatId = process.env.TELEGRAM_CHAT_ID_CRISP;
+    const botToken = process.env.TELEGRAM_BOT_TOKEN_CRIP;
+
     // Send notification to Telegram
-    await sendTelegramNotification(message);
+    await sendTelegramNotification({ 
+      message, 
+      chatId, 
+      botToken 
+    });
 
     res.status(200).json({ success: true });
   } catch (error) {

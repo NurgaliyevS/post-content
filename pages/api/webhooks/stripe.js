@@ -84,7 +84,7 @@ export default async function handler(req, res) {
 ⭐ Plan: ${payload?.variant_name}
 📝 Posts Available: ${payload?.post_available}
 👋 Customer Name: ${payload?.customer_name}`;
-    await sendTelegramNotification(message);
+    await sendTelegramNotification({ message });
 
     console.log(payload, "payload in checkout.session.completed");
 

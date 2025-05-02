@@ -90,22 +90,24 @@ export default function Footer() {
           >
             Reddit Agency
           </a>
-          <a
-            href="https://github.com/NurgaliyevS/redditscheduler"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm hover:text-primary transition-colors"
-          >
-            GitHub
-          </a>
         </div>
       </div>
 
       <div className="border-t border-gray-200">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <p className="text-xs text-center text-gray-500">
+        <div className="max-w-4xl mx-auto px-4 py-6 flex flex-col-reverse md:flex-row items-center gap-2 sm:gap-8">
+          <div className="text-xs text-gray-500 md:text-left text-center">
             © 2025 Post Content. All rights reserved.
-          </p>
+          </div>
+          <div className="text-xs">
+            <a
+              href="https://github.com/NurgaliyevS/redditscheduler"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs hover:text-primary text-gray-500"
+            >
+              Proudly open-source ❤️
+            </a>
+          </div>
         </div>
       </div>
     </section>

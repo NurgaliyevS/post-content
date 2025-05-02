@@ -181,8 +181,16 @@ export default async function handler(req, res) {
         invoice?.billing_reason === "subscription_create" &&
         !user?.has_received_first_subscription_email
       ) {
+        console.log('Attempting to send first subscription email...');
+        console.log('User email:', user?.email);
+        console.log('User name:', user?.customer_name);
+        console.log('Invoice customer email:', invoice?.customer_email);
+        console.log('Invoice customer name:', invoice?.customer_name);
+
         if (user?.email && user?.customer_name) {
-          await sendFirstSubscriptionEmail(user.email, user.customer_name);
+          console.log('Sending email using user data...');
+          const emailSent = await sendFirstSubscriptionEmail(user.email, user.customer_name);
+          console.log('Email sent result:', emailSent);
           // Update user to mark that the email has been sent
           await User.findOneAndUpdate(
             { customer_id: invoice.customer },
@@ -194,15 +202,19 @@ export default async function handler(req, res) {
           invoice?.customer_email &&
           invoice?.customer_name
         ) {
-          await sendFirstSubscriptionEmail(
+          console.log('Sending email using invoice data...');
+          const emailSent = await sendFirstSubscriptionEmail(
             invoice.customer_email,
             invoice.customer_name
           );
+          console.log('Email sent result:', emailSent);
           // Update user to mark that the email has been sent
           await User.findOneAndUpdate(
             { customer_id: invoice.customer },
             { $set: { has_received_first_subscription_email: true } }
           );
+        } else {
+          console.log('No valid email data found to send email');
         }
       }
     }

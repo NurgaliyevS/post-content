@@ -3,19 +3,18 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 async function sendFirstSubscriptionEmail(email, username) {
-  // Create an unsubscribe URL that points to your application
-  //   const unsubscribeUrl = `https://redditscheduler.com/unsubscribe?email=${encodeURIComponent(email)}`;
+  if (!email || !username) {
+    console.error('Missing required parameters for email:', { email, username });
+    return false;
+  }
 
   try {
+    console.log('Attempting to send email to:', email);
     const { data, error } = await resend.emails.send({
       from: "Sabyr from Post Content <sabyr@redditscheduler.com>",
       to: email,
       subject: "Thank you, Post Content",
-      replyTo: "nurgasab@gmail.com", // For receiving replies
-      //   headers: {
-      //     "List-Unsubscribe": `<${unsubscribeUrl}>`,
-      //     "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-      //   },
+      replyTo: "nurgasab@gmail.com",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; line-height: 1.6;">
         <p>Hi ${username},</p>
@@ -39,8 +38,18 @@ async function sendFirstSubscriptionEmail(email, username) {
       `,
     });
 
-    console.log(`First subscription email sent to ${email}`);
-    return true;
+    if (error) {
+      console.error('Resend API error:', error);
+      return false;
+    }
+
+    if (data) {
+      console.log('Email sent successfully:', data);
+      return true;
+    }
+
+    console.log('No data or error returned from Resend API');
+    return false;
   } catch (error) {
     console.error("Error sending welcome email:", error);
     return false;

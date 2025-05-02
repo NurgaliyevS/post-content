@@ -21,7 +21,7 @@ export const customConfig = {
     description:
       "Post Content - Double Reddit Results While You Sleep",
     themeColor: "#ffffff",
-    applicationName: "redditscheduler",
+    applicationName: "postcontent",
     og: {
       title: "Post Content - Double Reddit Results While You Sleep",
       url: "https://post-content.com",

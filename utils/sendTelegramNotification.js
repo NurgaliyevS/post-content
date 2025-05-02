@@ -6,6 +6,9 @@ async function sendTelegramNotification({
   chatId = process.env.TELEGRAM_CHAT_ID, 
   botToken = process.env.TELEGRAM_BOT_TOKEN 
 }) {
+  console.log(message, "message");
+  console.log(chatId, "chatId");
+  console.log(botToken, "botToken");
   try {
     await axios.post(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       chat_id: chatId,

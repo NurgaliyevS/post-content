@@ -31,7 +31,7 @@ export default function HeroSection() {
           title="Uneed Daily Winner"
         >
           <img
-            src="/rewards/uneed-winner-daily-winner.png"
+            src="/rewards/uneed-winner-monthly-winner.png"
             alt="Uneed Daily Winner Badge"
             className="w-32 md:w-40"
           />

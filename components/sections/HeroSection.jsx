@@ -37,13 +37,15 @@ export default function HeroSection() {
           />
         </a>
       </div>
-      <h1 className="text-4xl md:text-5xl font-bold mb-4">
-        Double Reddit Results
-        <br />
-        While You Sleep
+      <span className="badge badge-neutral text-white text-xs md:text-sm mb-4 px-4 py-4">
+        Perfect for top creators, founders, and media managers.
+      </span>
+      <h1 className="text-3xl md:text-5xl font-bold mb-4">
+        Schedule Reddit posts for increased views, upvotes, and traffic to your
+        website
       </h1>
-      <p className="text-lg text-gray-600 mb-8">
-        Schedule Reddit posts that drive traffic to your website
+      <p className="text-base md:text-lg text-gray-600 mb-8">
+        Double Reddit Results While You Sleep
       </p>
       <div className="flex flex-col md:flex-row items-center justify-center gap-4">
         <CTAButton className="btn btn-primary btn-wide md:w-48" />

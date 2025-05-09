@@ -98,81 +98,51 @@ export default async function handler(req, res) {
           body: requestBody
         });
         
-        let redditData;
         try {
-          const responseText = await redditResponse.text();
-          redditData = JSON.parse(responseText);
-        } catch (parseError) {
-          console.error('Error parsing Reddit API response:', parseError);
-          throw new Error(`Invalid response from Reddit API: ${parseError.message}`);
-        }
-        
-        // Check for errors in the Reddit API response
-        if (!redditResponse?.ok) {
-          if (redditResponse?.status === 401) {
-            // Token is invalid, try refreshing it
-            console.log(`Token expired for post ${post._id}, attempting to refresh...`);
-            const refreshResult = await refreshAccessToken(post.redditRefreshToken);
-            accessToken = refreshResult.access_token;
-            
-            // Update the token in the database
-            post.redditAccessToken = accessToken;
-            if (refreshResult.refresh_token) {
-              post.redditRefreshToken = refreshResult.refresh_token;
-            }
+          const redditData = await redditResponse.json();
+
+          console.log('Reddit API Response:', redditData);
+
+          // Check for errors in the Reddit API response
+          if (redditResponse.ok && redditData?.json?.data?.url) {
+            // Update the post status
+            post.status = 'published';
+            post.publishedAt = currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss");
+            post.redditPostUrl = redditData.json.data.url;
+            post.redditPostId = redditData.json.data.id;
             await post.save();
             
-            // Retry the post with new token
-            const retryResponse = await fetch(redditApiUrl, {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'User-Agent': 'Post Content/1.0.0'
-              },
-              body: requestBody
+            results.push({
+              id: post._id,
+              status: 'published',
+              redditPostUrl: redditData.json.data.url
             });
             
-            const retryText = await retryResponse.text();
-            redditData = JSON.parse(retryText);
-            
-            if (!retryResponse.ok) {
-              throw new Error(`Failed to post after token refresh: ${redditData?.json?.errors?.join(', ') || 'Unknown error'}`);
-            }
+            console.log(`Successfully published post ${post._id} to Reddit`);
           } else {
-            throw new Error(`Reddit API error: ${redditData?.json?.errors?.join(', ') || 'Unknown error'}`);
+            // Handle failed publish
+            post.status = 'failed';
+            post.failedAt = currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss");
+            post.failureReason = redditData.json?.errors?.join(', ') || 'Unknown error';
+            await post.save();
+            
+            results.push({
+              id: post._id,
+              status: 'failed',
+              error: redditData.json?.errors || 'Failed to publish post'
+            });
+            
+            console.error(`Failed to publish post ${post._id}:`, redditData.json?.errors);
           }
-        }
-        
-        if (redditData?.json?.data?.url) {
-          // Update the post status
-          post.status = 'published';
-          post.publishedAt = currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss");
-          post.redditPostUrl = redditData.json.data.url;
-          post.redditPostId = redditData.json.data.id;
-          await post.save();
-          
-          results.push({
-            id: post._id,
-            status: 'published',
-            redditPostUrl: redditData.json.data.url
-          });
-          
-          console.log(`Successfully published post ${post._id} to Reddit`);
-        } else {
-          // Handle failed publish
-          post.status = 'failed';
-          post.failedAt = currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss");
-          post.failureReason = redditData.json?.errors?.join(', ') || 'Unknown error';
-          await post.save();
-          
-          results.push({
-            id: post._id,
-            status: 'failed',
-            error: redditData.json?.errors || 'Failed to publish post'
-          });
-          
-          console.error(`Failed to publish post ${post._id}:`, redditData.json?.errors);
+        } catch (error) {
+          // add more logging here
+          console.log('Error publishing post:', post._id)
+          console.log('Error:', error);
+          console.log('Reddit API Response:', redditResponse);
+          console.log(error?.message, 'error message');
+          // if the error is a 401, log the error message
+          if (error?.message === 'UNAUTHORIZED') {
+          }
         }
       } catch (error) {
         console.error(`Error publishing post ${post._id}:`, error);

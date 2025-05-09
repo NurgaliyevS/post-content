@@ -98,10 +98,53 @@ export default async function handler(req, res) {
           body: requestBody
         });
         
-        const redditData = await redditResponse.json();
+        let redditData;
+        try {
+          const responseText = await redditResponse.text();
+          redditData = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error('Error parsing Reddit API response:', parseError);
+          throw new Error(`Invalid response from Reddit API: ${parseError.message}`);
+        }
         
         // Check for errors in the Reddit API response
-        if (redditResponse.ok && redditData?.json?.data?.url) {
+        if (!redditResponse?.ok) {
+          if (redditResponse?.status === 401) {
+            // Token is invalid, try refreshing it
+            console.log(`Token expired for post ${post._id}, attempting to refresh...`);
+            const refreshResult = await refreshAccessToken(post.redditRefreshToken);
+            accessToken = refreshResult.access_token;
+            
+            // Update the token in the database
+            post.redditAccessToken = accessToken;
+            if (refreshResult.refresh_token) {
+              post.redditRefreshToken = refreshResult.refresh_token;
+            }
+            await post.save();
+            
+            // Retry the post with new token
+            const retryResponse = await fetch(redditApiUrl, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'User-Agent': 'Post Content/1.0.0'
+              },
+              body: requestBody
+            });
+            
+            const retryText = await retryResponse.text();
+            redditData = JSON.parse(retryText);
+            
+            if (!retryResponse.ok) {
+              throw new Error(`Failed to post after token refresh: ${redditData?.json?.errors?.join(', ') || 'Unknown error'}`);
+            }
+          } else {
+            throw new Error(`Reddit API error: ${redditData?.json?.errors?.join(', ') || 'Unknown error'}`);
+          }
+        }
+        
+        if (redditData?.json?.data?.url) {
           // Update the post status
           post.status = 'published';
           post.publishedAt = currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss");
@@ -133,6 +176,8 @@ export default async function handler(req, res) {
         }
       } catch (error) {
         console.error(`Error publishing post ${post._id}:`, error);
+        const userTimeZone = post.userTimeZone || 'UTC';
+        const currentTimeInUserTZ = currentTimeUTC.setZone(userTimeZone);
         
         // Update the post with error info
         post.status = 'failed';

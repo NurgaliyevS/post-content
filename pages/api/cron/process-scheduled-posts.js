@@ -54,28 +54,28 @@ export default async function handler(req, res) {
         // The access token might have expired, refresh it
         let accessToken = post.redditAccessToken;
         
-        // Check if token needs refresh (tokens last 1 hour)
-        const oneHourAgo = currentTimeUTC.minus({ hours: 1 });
-        if (DateTime.fromJSDate(post.createdAt) < oneHourAgo) {
-          console.log(`Refreshing token for post ${post._id}`);
-          try {
-            const refreshResult = await refreshAccessToken(post.redditRefreshToken);
-            accessToken = refreshResult.access_token;
-            
-            // Update the token in the database
-            post.redditAccessToken = accessToken;
-            if (refreshResult.refresh_token) {
-              post.redditRefreshToken = refreshResult.refresh_token;
-            }
-            await post.save();
-          } catch (refreshError) {
-            console.error(`Failed to refresh token for post ${post._id}:`, refreshError);
-            post.status = 'failed';
-            post.failedAt = currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss");
-            post.failureReason = 'Failed to refresh Reddit access token';
-            await post.save();
-            continue;
+        // Always refresh token before posting to ensure it's valid
+        console.log(`Refreshing token for post ${post._id}`);
+        try {
+          const refreshResult = await refreshAccessToken(post.redditRefreshToken);
+          console.log('Refresh result:', refreshResult);
+          console.log('Access token:', accessToken);
+          accessToken = refreshResult.access_token;
+          console.log('New access token:', accessToken);
+          
+          // Update the token in the database
+          post.redditAccessToken = accessToken;
+          if (refreshResult.refresh_token) {
+            post.redditRefreshToken = refreshResult.refresh_token;
           }
+          await post.save();
+        } catch (refreshError) {
+          console.error(`Failed to refresh token for post ${post._id}:`, refreshError);
+          post.status = 'failed';
+          post.failedAt = currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss");
+          post.failureReason = 'Failed to refresh Reddit access token';
+          await post.save();
+          continue;
         }
         
         // Make the API call to Reddit

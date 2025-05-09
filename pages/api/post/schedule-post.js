@@ -121,33 +121,56 @@ export default async function handler(req, res) {
         }
       }
 
+      console.log('Preparing to post to Reddit. Post body:', postBody);
+      console.log('Using access token:', session.accessToken && session.accessToken.substring(0, 8) + '...');
       let redditData;
       try {
         // First attempt with current token
         redditData = await makeRedditRequest(session.accessToken, postBody);
+        console.log('Reddit API response (first attempt):', JSON.stringify(redditData));
       } catch (error) {
         if (error.message === 'UNAUTHORIZED' && session.refreshToken) {
           console.log('Token expired, attempting refresh...');
           // Try refreshing the token
           const refreshedTokens = await refreshAccessToken(session.refreshToken);
-          
+          console.log('Token refreshed. New access token:', refreshedTokens.access_token && refreshedTokens.access_token.substring(0, 8) + '...');
           // Retry with new token
           redditData = await makeRedditRequest(refreshedTokens.access_token, postBody);
-          
+          console.log('Reddit API response (after refresh):', JSON.stringify(redditData));
           // Update session token for future requests
           session.accessToken = refreshedTokens.access_token;
         } else {
+          console.error('Error posting to Reddit:', error);
           throw error;
         }
       }
 
       if (!redditData?.json?.data) {
+        console.error('Invalid response from Reddit API:', JSON.stringify(redditData));
         throw new Error('Invalid response from Reddit API');
       }
 
       // Connect to MongoDB
       await connectMongoDB();
-      
+      console.log('Saving post to MongoDB. Data:', {
+        userId: session.user.id,
+        community: cleanCommunity,
+        title,
+        text,
+        type,
+        scheduledFor: scheduledDateTime,
+        userTimeZone: timeZone,
+        status: 'published',
+        redditPostId: redditData?.json?.data?.id || null,
+        redditFullname: redditData?.json?.data?.name || null,
+        redditAccessToken: session.accessToken,
+        redditRefreshToken: session.refreshToken,
+        postedAt: currentClientTime,
+        redditPostUrl: redditData?.json?.data?.url || null,
+        isCrossPosting: isCrossPosting,
+        flairId,
+        flairText
+      });
       const postedPost = new ScheduledPost({
         userId: session.user.id,
         community: cleanCommunity,
@@ -167,8 +190,8 @@ export default async function handler(req, res) {
         flairId,
         flairText
       });
-      
       const savedPost = await postedPost.save();
+      console.log('Post saved to MongoDB. Saved post:', savedPost);
 
       return res.status(200).json({
         message: 'Post submitted to Reddit immediately',

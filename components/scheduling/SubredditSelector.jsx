@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useCallback } from "react";
 import Select from 'react-select';
+import AsyncSelect from 'react-select/async';
 
 const SubredditSelector = ({
   subreddits,
@@ -33,23 +34,48 @@ const SubredditSelector = ({
     return 'Select a subreddit';
   };
 
+  // Async load options for subreddit search
+  const loadOptions = useCallback(async (inputValue, callback) => {
+    if (!inputValue) {
+      // Show user's subreddits if no input
+      callback(subredditOptions);
+      return;
+    }
+    try {
+      const response = await fetch(`/api/reddit/search-subreddits?q=${encodeURIComponent(inputValue)}`);
+      if (!response.ok) {
+        callback([]);
+        return;
+      }
+      const data = await response.json();
+      const options = (data.subreddits || []).map((subreddit) => ({
+        value: subreddit.display_name_prefixed,
+        label: subreddit.display_name_prefixed,
+        key: subreddit.id,
+      }));
+      callback(options);
+    } catch (error) {
+      callback([]);
+    }
+  }, [subredditOptions]);
+
   return (
     <div className="mb-4">
-      <Select
-        options={subredditOptions}
+      <AsyncSelect
+        cacheOptions
+        defaultOptions={subredditOptions}
+        loadOptions={loadOptions}
         value={
-          selectedCommunity 
-            ? { value: selectedCommunity, label: selectedCommunity } 
+          selectedCommunity
+            ? { value: selectedCommunity, label: selectedCommunity }
             : null
         }
         onChange={handleChange}
         isLoading={subredditsLoading}
         placeholder={getPlaceholder()}
         noOptionsMessage={() => "No subreddits found"}
-        filterOption={(option, inputValue) => 
-          option.label.toLowerCase().includes(inputValue.toLowerCase()) ||
-          option.label.toLowerCase().replace('r/', '').includes(inputValue.toLowerCase())
-        }
+        filterOption={null} // Let async handle filtering
+        classNamePrefix="react-select"
       />
 
       {subredditsError && (

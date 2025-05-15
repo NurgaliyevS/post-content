@@ -2,6 +2,12 @@ import React, { useCallback } from "react";
 import Select from 'react-select';
 import AsyncSelect from 'react-select/async';
 
+const formatNumber = (num) => {
+  if (num >= 1e6) return (num / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+  if (num >= 1e3) return (num / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
+  return num;
+};
+
 const SubredditSelector = ({
   subreddits,
   subredditsLoading,
@@ -15,6 +21,7 @@ const SubredditSelector = ({
     value: subreddit.display_name_prefixed,
     label: subreddit.display_name_prefixed,
     key: subreddit.id,
+    subscribers: subreddit.subscribers,
   }));
 
   // Handle change for react-select
@@ -66,6 +73,7 @@ const SubredditSelector = ({
           value: subreddit.display_name_prefixed,
           label: subreddit.display_name_prefixed,
           key: subreddit.id,
+          subscribers: subreddit.subscribers,
         }));
         callback(options);
       } catch (error) {
@@ -75,23 +83,35 @@ const SubredditSelector = ({
     [subredditOptions]
   );
 
+  // Custom rendering for options and selected value (name + members)
+  const formatOptionLabel = (option) => (
+    <div>
+      <div className="font-medium">{option.label}</div>
+      {option.subscribers !== undefined && (
+        <div className="text-xs text-gray-400">{formatNumber(option.subscribers)} members</div>
+      )}
+    </div>
+  );
+
+  // Find the selected option object for correct rendering
+  const selectedOption = selectedCommunity
+    ? subredditOptions.find(opt => opt.value === selectedCommunity) || { value: selectedCommunity, label: selectedCommunity }
+    : null;
+
   return (
     <div className="mb-4">
       <AsyncSelect
         cacheOptions
         defaultOptions={subredditOptions}
         loadOptions={loadOptions}
-        value={
-          selectedCommunity
-            ? { value: selectedCommunity, label: selectedCommunity }
-            : null
-        }
+        value={selectedOption}
         onChange={handleChange}
         isLoading={subredditsLoading}
         placeholder={getPlaceholder()}
         noOptionsMessage={() => "No subreddits found"}
         filterOption={null} // Let async handle filtering
         classNamePrefix="react-select"
+        formatOptionLabel={formatOptionLabel}
       />
 
       {subredditsError && (

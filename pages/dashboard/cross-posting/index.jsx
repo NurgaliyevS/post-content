@@ -35,6 +35,7 @@ function CrossPosting() {
   const [flairsLoading, setFlairsLoading] = useState({});
   const [flairSelections, setFlairSelections] = useState({});
   const [flairErrors, setFlairErrors] = useState({});
+  const [customScheduling, setCustomScheduling] = useState(false);
 
   const router = useRouter();
   const { refreshData } = useSidebar();
@@ -103,12 +104,23 @@ function CrossPosting() {
     }
   };
 
-  const handleDateTimeChange = (e) => {
+  const handleCustomSchedulingToggle = () => {
+    setCustomScheduling((prev) => !prev);
+  };
+
+  const handleDateTimeChange = (e, subredditName) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    if (customScheduling && subredditName) {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const handleIntervalChange = (selectedOption) => {
@@ -243,33 +255,33 @@ function CrossPosting() {
       // Check if user has enough posts available for all selected subreddits
       await checkPostAvailability(selectedSubreddits.length);
 
-      const scheduledDate = parse(
-        formData.selectedDate,
-        "yyyy-MM-dd",
-        new Date()
-      );
-      const [hours, minutes] = formData.selectedTime.split(":");
-
-      let scheduledDateTime = setHours(scheduledDate, parseInt(hours, 10));
-      scheduledDateTime = setMinutes(scheduledDateTime, parseInt(minutes, 10));
-
-      const scheduledDateTimeISO = format(
-        scheduledDateTime,
-        "yyyy-MM-dd'T'HH:mm:ssxxx"
-      );
       const currentTimeISO = format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx");
 
       const promises = selectedSubreddits.map(async (subreddit, index) => {
         try {
-          let postTime = new Date(scheduledDateTime);
-          if (formData.postingInterval.value > 0) {
-            postTime.setMinutes(
-              postTime.getMinutes() + index * formData.postingInterval.value
-            );
-          }
-
-          const postTimeISO = format(postTime, "yyyy-MM-dd'T'HH:mm:ssxxx");
           const subName = subreddit.display_name_prefixed;
+          let postTimeISO;
+          if (customScheduling) {
+            const postDate = formData[`${subName}-date`] || formData.selectedDate;
+            const postTime = formData[`${subName}-time`] || formData.selectedTime;
+            const scheduledDate = parse(postDate, "yyyy-MM-dd", new Date());
+            const [hours, minutes] = postTime.split(":");
+            let scheduledDateTime = setHours(scheduledDate, parseInt(hours, 10));
+            scheduledDateTime = setMinutes(scheduledDateTime, parseInt(minutes, 10));
+            postTimeISO = format(scheduledDateTime, "yyyy-MM-dd'T'HH:mm:ssxxx");
+          } else {
+            const scheduledDate = parse(formData.selectedDate, "yyyy-MM-dd", new Date());
+            const [hours, minutes] = formData.selectedTime.split(":");
+            let scheduledDateTime = setHours(scheduledDate, parseInt(hours, 10));
+            scheduledDateTime = setMinutes(scheduledDateTime, parseInt(minutes, 10));
+            let postTime = new Date(scheduledDateTime);
+            if (formData.postingInterval.value > 0) {
+              postTime.setMinutes(
+                postTime.getMinutes() + index * formData.postingInterval.value
+              );
+            }
+            postTimeISO = format(postTime, "yyyy-MM-dd'T'HH:mm:ssxxx");
+          }
           const flair = flairSelections[subName];
 
           const response = await axios.post("/api/post/schedule-post", {
@@ -399,6 +411,8 @@ function CrossPosting() {
               flairSelections={flairSelections}
               flairErrors={flairErrors}
               onFlairChange={handleFlairChange}
+              customScheduling={customScheduling}
+              onCustomSchedulingToggle={handleCustomSchedulingToggle}
             />
           </div>
         </div>

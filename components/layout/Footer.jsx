@@ -36,6 +36,15 @@ export default function Footer() {
           >
             Pricing
           </Link>
+          {/* DOMINATE ON REDDIT */}
+          <Link
+            href="https://docs.google.com/document/d/e/2PACX-1vST8ZGrXlWxZR17MRGOgfAJj2lHhRqb3__-WxOZNSezEfA-i9TgBkqAWvoYFqrtU1oC4RKaU9L6mJZM/pub"
+            className="text-sm hover:text-primary transition-colors"
+            title="Free Guide: How to Dominate on Reddit"
+            target="_blank"
+          >
+            How to Dominate on Reddit
+          </Link>
         </div>
 
         <div className="flex flex-col gap-3">

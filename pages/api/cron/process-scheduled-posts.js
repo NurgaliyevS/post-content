@@ -54,12 +54,14 @@ export default async function handler(req, res) {
         // The access token might have expired, refresh it
         let accessToken = post.redditAccessToken;
         
-        // Check if token needs refresh (tokens last 1 hour)
-        const oneHourAgo = currentTimeUTC.minus({ hours: 1 });
-        if (DateTime.fromJSDate(post.createdAt) < oneHourAgo) {
-          console.log(`Refreshing token for post ${post._id}`);
+        // Always refresh token before posting to ensure it's valid
+        console.log(`Refreshing token for post ${post._id}`);
+        try {
           const refreshResult = await refreshAccessToken(post.redditRefreshToken);
+          console.log('Refresh result:', refreshResult);
+          console.log('Access token:', accessToken);
           accessToken = refreshResult.access_token;
+          console.log('New access token:', accessToken);
           
           // Update the token in the database
           post.redditAccessToken = accessToken;
@@ -67,6 +69,13 @@ export default async function handler(req, res) {
             post.redditRefreshToken = refreshResult.refresh_token;
           }
           await post.save();
+        } catch (refreshError) {
+          console.error(`Failed to refresh token for post ${post._id}:`, refreshError);
+          post.status = 'failed';
+          post.failedAt = currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss");
+          post.failureReason = 'Failed to refresh Reddit access token';
+          await post.save();
+          continue;
         }
         
         // Make the API call to Reddit
@@ -98,8 +107,64 @@ export default async function handler(req, res) {
           body: requestBody
         });
         
+        // Handle non-JSON responses
+        const contentType = redditResponse.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          console.error(`Unexpected response type: ${contentType}`);
+          post.status = 'failed';
+          post.failedAt = currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss");
+          post.failureReason = `Reddit API returned non-JSON response (${redditResponse.status})`;
+          await post.save();
+          continue;
+        }
+
         const redditData = await redditResponse.json();
-        
+        console.log('Reddit API Response:', redditData);
+
+        if (redditResponse.status === 401) {
+          console.log(`Token expired for post ${post._id}, attempting refresh`);
+          try {
+            const refreshResult = await refreshAccessToken(post.redditRefreshToken);
+            accessToken = refreshResult.access_token;
+            post.redditAccessToken = accessToken;
+            if (refreshResult.refresh_token) {
+              post.redditRefreshToken = refreshResult.refresh_token;
+            }
+            await post.save();
+            
+            // Retry the post with new token
+            const retryResponse = await fetch(redditApiUrl, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'User-Agent': 'Post Content/1.0.0'
+              },
+              body: requestBody
+            });
+            
+            const retryData = await retryResponse.json();
+            if (retryResponse.ok && retryData?.json?.data?.url) {
+              post.status = 'published';
+              post.publishedAt = currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss");
+              post.redditPostUrl = retryData.json.data.url;
+              post.redditPostId = retryData.json.data.id;
+              await post.save();
+              
+              results.push({
+                id: post._id,
+                status: 'published',
+                redditPostUrl: retryData.json.data.url
+              });
+              
+              console.log(`Successfully published post ${post._id} to Reddit after token refresh`);
+              continue;
+            }
+          } catch (retryError) {
+            console.error(`Failed to retry post ${post._id} after token refresh:`, retryError);
+          }
+        }
+
         // Check for errors in the Reddit API response
         if (redditResponse.ok && redditData?.json?.data?.url) {
           // Update the post status
@@ -133,6 +198,8 @@ export default async function handler(req, res) {
         }
       } catch (error) {
         console.error(`Error publishing post ${post._id}:`, error);
+        const userTimeZone = post.userTimeZone || 'UTC';
+        const currentTimeInUserTZ = currentTimeUTC.setZone(userTimeZone);
         
         // Update the post with error info
         post.status = 'failed';

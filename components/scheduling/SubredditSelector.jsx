@@ -34,30 +34,46 @@ const SubredditSelector = ({
     return 'Select a subreddit';
   };
 
-  // Async load options for subreddit search
-  const loadOptions = useCallback(async (inputValue, callback) => {
-    if (!inputValue) {
-      // Show user's subreddits if no input
-      callback(subredditOptions);
-      return;
-    }
-    try {
-      const response = await fetch(`/api/reddit/search-subreddits?q=${encodeURIComponent(inputValue)}`);
-      if (!response.ok) {
-        callback([]);
+  // Debounce function
+  const debounce = (func, wait) => {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  };
+
+  // Async load options for subreddit search with debouncing
+  const loadOptions = useCallback(
+    debounce(async (inputValue, callback) => {
+      if (!inputValue) {
+        // Show user's subreddits if no input
+        callback(subredditOptions);
         return;
       }
-      const data = await response.json();
-      const options = (data.subreddits || []).map((subreddit) => ({
-        value: subreddit.display_name_prefixed,
-        label: subreddit.display_name_prefixed,
-        key: subreddit.id,
-      }));
-      callback(options);
-    } catch (error) {
-      callback([]);
-    }
-  }, [subredditOptions]);
+      try {
+        const response = await fetch(`/api/reddit/search-subreddits?q=${encodeURIComponent(inputValue)}`);
+        if (!response.ok) {
+          callback([]);
+          return;
+        }
+        const data = await response.json();
+        const options = (data.subreddits || []).map((subreddit) => ({
+          value: subreddit.display_name_prefixed,
+          label: subreddit.display_name_prefixed,
+          key: subreddit.id,
+        }));
+        callback(options);
+      } catch (error) {
+        callback([]);
+      }
+    }, 500), // 500ms delay
+    [subredditOptions]
+  );
 
   return (
     <div className="mb-4">

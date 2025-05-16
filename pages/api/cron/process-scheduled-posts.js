@@ -47,10 +47,11 @@ export default async function handler(req, res) {
 
         // Compare times in the same timezone (user's timezone)
         if (scheduledDateTime > currentTimeInUserTZ) {
-          console.log(`Skipping post ${post._id} - scheduled for future in user's timezone`);
+          console.log(`Skipped post ${post._id} - scheduled for future in user's timezone (scheduled for: ${scheduledDateTime.toISO()}, now: ${currentTimeInUserTZ.toISO()})`);
           continue;
         }
 
+        console.log(`Processing post ${post._id} - ready to submit (scheduled for: ${scheduledDateTime.toISO()}, now: ${currentTimeInUserTZ.toISO()})`);
         // The access token might have expired, refresh it
         let accessToken = post.redditAccessToken;
         
@@ -95,7 +96,7 @@ export default async function handler(req, res) {
           requestBody.append('url', post.url);
         }
         
-        console.log(`Posting to r/${post.community}: ${post.title}`);
+        console.log(`Attempting to submit post ${post._id} to Reddit (community: r/${post.community}, type: ${post.type})`);
         
         const redditResponse = await fetch(redditApiUrl, {
           method: 'POST',
@@ -110,7 +111,7 @@ export default async function handler(req, res) {
         // Handle non-JSON responses
         const contentType = redditResponse.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
-          console.error(`Unexpected response type: ${contentType}`);
+          console.error(`Post ${post._id} failed: Reddit API returned non-JSON response (${redditResponse.status})`);
           post.status = 'failed';
           post.failedAt = currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss");
           post.failureReason = `Reddit API returned non-JSON response (${redditResponse.status})`;
@@ -122,7 +123,7 @@ export default async function handler(req, res) {
         console.log('Reddit API Response:', redditData);
 
         if (redditResponse.status === 401) {
-          console.log(`Token expired for post ${post._id}, attempting refresh`);
+          console.log(`Token expired for post ${post._id}, attempting refresh and retry`);
           try {
             const refreshResult = await refreshAccessToken(post.redditRefreshToken);
             accessToken = refreshResult.access_token;
@@ -183,6 +184,7 @@ export default async function handler(req, res) {
           console.log(`Successfully published post ${post._id} to Reddit`);
         } else {
           // Handle failed publish
+          console.error(`Post ${post._id} failed to publish, setting status to failed. Reddit API errors:`, redditData.json?.errors);
           post.status = 'failed';
           post.failedAt = currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss");
           post.failureReason = redditData.json?.errors?.join(', ') || 'Unknown error';
@@ -197,7 +199,7 @@ export default async function handler(req, res) {
           console.error(`Failed to publish post ${post._id}:`, redditData.json?.errors);
         }
       } catch (error) {
-        console.error(`Error publishing post ${post._id}:`, error);
+        console.error(`Error publishing post ${post._id}, setting status to failed:`, error);
         const userTimeZone = post.userTimeZone || 'UTC';
         const currentTimeInUserTZ = currentTimeUTC.setZone(userTimeZone);
         

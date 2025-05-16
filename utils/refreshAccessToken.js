@@ -29,7 +29,9 @@ export async function refreshAccessToken(refreshToken) {
       const data = await response.json();
   
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to refresh token');
+        // Log the full Reddit error response for debugging
+        console.error('Reddit token refresh failed:', data);
+        throw new Error(data?.error_description || data?.error || 'Failed to refresh token');
       }
   
       return {
@@ -38,6 +40,7 @@ export async function refreshAccessToken(refreshToken) {
         expires_at: Date.now() + (data.expires_in * 1000)
       };
     } catch (error) {
+      // Log the error and rethrow
       console.error('Error refreshing Reddit token:', error);
       throw error;
     }

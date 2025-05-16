@@ -1,7 +1,9 @@
 import connectMongoDB from "@/backend/mongodb";
 import ScheduledPost from "@/backend/ScheduledPostSchema";
 import { refreshAccessToken } from "@/utils/refreshAccessToken";
+import sendTelegramNotification from "@/utils/sendTelegramNotification";
 import { DateTime } from "luxon";
+import User from "@/backend/user";
 
 // This endpoint will be called by Vercel Cron to retry failed posts
 export default async function handler(req, res) {
@@ -27,6 +29,17 @@ export default async function handler(req, res) {
         const scheduledDateTime = DateTime.fromJSDate(post.scheduledFor).setZone(userTimeZone);
 
         console.log(`Retrying failed post ${post._id} (scheduled for: ${scheduledDateTime.toISO()}, now: ${currentTimeInUserTZ.toISO()})`);
+
+        const user = await User.findOne({ userId: post.redditId });
+
+        // write with data: email, userName, reason
+        const message = `Failed post, immediately send email to user with apology and increase post available by 10
+        Email: ${user.email}
+        UserName: ${user.name}
+        Reason: ${post.failureReason}
+        Post: ${post.title}
+        `
+        await sendTelegramNotification({ message });
 
         // Always refresh token before posting to ensure it's valid
         let accessToken = post.redditAccessToken;

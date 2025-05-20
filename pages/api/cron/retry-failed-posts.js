@@ -4,12 +4,15 @@ import { refreshAccessToken } from "@/utils/refreshAccessToken";
 import sendTelegramNotification from "@/utils/sendTelegramNotification";
 import { DateTime } from "luxon";
 import User from "@/backend/user";
+import { Resend } from "resend";
 
 // This endpoint will be called by Vercel Cron to retry failed posts
 export default async function handler(req, res) {
   if (req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
   try {
     await connectMongoDB();
@@ -41,6 +44,35 @@ export default async function handler(req, res) {
         `
         await sendTelegramNotification({ message });
 
+        // update user post_available by 10
+        user.post_available += 10;
+        await user.save();
+        // send email to user with post_available
+        const email = await resend.emails.send({
+          from: 'Post Content <sabyr@redditscheduler.com>',
+          to: user.email,
+          subject: 'Post Content - Failed Post',
+          html: `
+          <p>Hi ${user.name},</p>
+
+          <p>Your post "${post.title}" failed to publish.</p>
+
+          <p>Reason: ${post.failureReason}</p>
+
+          <p>Our apologies for the inconvenience. We increased your post credits by 10.</p>
+
+          <p>We will retry the post again.</p>
+
+          <p>Thank you for your understanding.</p>
+
+          <p>Bye,</p>
+
+          <p>Sabyr</p>
+          `
+        });
+
+        console.log(email, "sendEmail to ", user.email);
+
         // Always refresh token before posting to ensure it's valid
         let accessToken = post.redditAccessToken;
         try {
@@ -53,11 +85,11 @@ export default async function handler(req, res) {
           await post.save();
         } catch (refreshError) {
           console.error(`Failed to refresh token for post ${post._id}:`, refreshError);
-          post.status = 'failed';
+          post.status = 'cancelled';
           post.failedAt = currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss");
           post.failureReason = 'Failed to refresh Reddit access token: ' + (refreshError.message || 'Unknown error');
           await post.save();
-          results.push({ id: post._id, status: 'failed', error: refreshError.message });
+          results.push({ id: post._id, status: 'cancelled', error: refreshError.message });
           continue;
         }
 
@@ -87,11 +119,11 @@ export default async function handler(req, res) {
         const contentType = redditResponse.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
           console.error(`Post ${post._id} failed: Reddit API returned non-JSON response (${redditResponse.status})`);
-          post.status = 'failed';
+          post.status = 'cancelled';
           post.failedAt = currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss");
           post.failureReason = `Reddit API returned non-JSON response (${redditResponse.status})`;
           await post.save();
-          results.push({ id: post._id, status: 'failed', error: 'Reddit API returned non-JSON response' });
+          results.push({ id: post._id, status: 'cancelled', error: 'Reddit API returned non-JSON response' });
           continue;
         }
         const redditData = await redditResponse.json();
@@ -104,22 +136,22 @@ export default async function handler(req, res) {
           results.push({ id: post._id, status: 'published', redditPostUrl: redditData.json.data.url });
           console.log(`Successfully published post ${post._id} to Reddit`);
         } else {
-          post.status = 'failed';
+          post.status = 'cancelled';
           post.failedAt = currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss");
           post.failureReason = redditData.json?.errors?.join(', ') || 'Unknown error';
           await post.save();
-          results.push({ id: post._id, status: 'failed', error: redditData.json?.errors || 'Failed to publish post' });
+          results.push({ id: post._id, status: 'cancelled', error: redditData.json?.errors || 'Failed to publish post' });
           console.error(`Failed to publish post ${post._id}:`, redditData.json?.errors);
         }
       } catch (error) {
         console.error(`Error retrying post ${post._id}:`, error);
         const userTimeZone = post.userTimeZone || 'UTC';
         const currentTimeInUserTZ = currentTimeUTC.setZone(userTimeZone);
-        post.status = 'failed';
+        post.status = 'cancelled';
         post.failedAt = currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss");
         post.failureReason = error.message;
         await post.save();
-        results.push({ id: post._id, status: 'failed', error: error.message });
+        results.push({ id: post._id, status: 'cancelled', error: error.message });
       }
     }
     return res.status(200).json({ message: `Retried ${failedPosts.length} failed posts`, results });

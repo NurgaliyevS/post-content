@@ -16,7 +16,7 @@ export default function SourcePostSelector({
     <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col">
       <h2 className="text-lg font-semibold">Source Post</h2>
 
-      <div className="space-y-3 mt-4 flex-grow overflow-y-auto h-[510px]">
+      <div className="space-y-3 mt-4 flex-grow overflow-y-auto h-[210px]">
         {loadingPosts ? (
           <div className="flex items-center justify-center h-full">
             <Spinner />

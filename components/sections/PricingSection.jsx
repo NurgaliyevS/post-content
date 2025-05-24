@@ -31,18 +31,13 @@ export default function PricingSection() {
 
   const getPlanDetails = (plan) => {
     const details = {
-      starter: {
-        name: "Starter",
-        post_available: 10,
-        price: 900, // in cents
-      },
       growth: {
         name: "Growth",
         post_available: 50,
         price: 1800, // in cents
       },
-      scale: {
-        name: "Scale",
+      hypergrowth: {
+        name: "Hypergrowth",
         post_available: 150,
         price: 2700, // in cents
       },
@@ -59,57 +54,14 @@ export default function PricingSection() {
           <span className="font-semibold">30-Day Money-Back Guarantee</span>
         </div>
       </div>
-      <div className="grid md:grid-cols-3 gap-8 mx-auto">
-        {/* Starter Plan */}
-        <div className="card bg-base-100 border">
-          <div className="card-body">
-            <h3 className="card-title">Starter</h3>
-            <div className="text-3xl font-bold mb-4">
-              $9<span className="text-sm text-gray-500">/month</span>
-            </div>
-            <ul className="space-y-2">
-              <li className="flex items-center gap-2">
-                <span>✓</span> 10 posts per month
-              </li>
-              <li className="flex items-center gap-2">
-                <span>✓</span> Schedule posts
-              </li>
-              <li className="flex items-center gap-2">
-                <span>✓</span> Cross-posting
-              </li>
-              <li className="flex items-center gap-2 relative">
-                <span>✓</span> Growth consulting{" "}
-                <button 
-                  className="inline-flex"
-                  onMouseEnter={() => setActiveTooltip("starter")}
-                  onMouseLeave={() => setActiveTooltip(null)}
-                >
-                  <FaInfoCircle className="text-gray-400" />
-                </button>
-                {activeTooltip === "starter" && (
-                  <div className="absolute left-0 bottom-full mb-2 p-3 bg-gray-800 text-white text-sm rounded w-64 z-10">
-                    Direct communication to help you grow on Reddit (from 1M+ impressions)
-                  </div>
-                )}
-              </li>
-            </ul>
-            <button
-              onClick={() => handleSubscription("starter")}
-              disabled={loading}
-              className="btn btn-outline mt-4 btn-wide md:w-full"
-            >
-              <FaArrowRight className="w-3 h-3" />
-              {loading ? "Loading..." : "Get Started"}
-            </button>
-          </div>
-        </div>
+      <div className="grid md:grid-cols-2 gap-8 mx-auto">
 
         {/* Growth Plan */}
-        <div className="card bg-base-100 border border-primary">
+        <div className="card bg-base-100 border">
           <div className="card-body relative">
             <h3 className="card-title">Growth</h3>
             <div className="text-3xl font-bold mb-4">
-              $18<span className="text-sm text-gray-500">/month</span>
+              $25<span className="text-sm text-gray-500">/month</span>
             </div>
             <ul className="space-y-2">
               <li className="flex items-center gap-2">
@@ -132,7 +84,8 @@ export default function PricingSection() {
                 </button>
                 {activeTooltip === "growth" && (
                   <div className="absolute left-0 bottom-full mb-2 p-3 bg-gray-800 text-white text-sm rounded w-64 z-10">
-                    Direct communication to help you grow on Reddit (from 1M+ impressions)
+                    After bying this plan, you will get automatically email with a link to schedule a call with us.
+                    Where we discuss how you can grow on Reddit based on your business goals and give real time advice.
                   </div>
                 )}
               </li>
@@ -140,7 +93,7 @@ export default function PricingSection() {
             <button
               onClick={() => handleSubscription("growth")}
               disabled={loading}
-              className="btn btn-primary mt-4 btn-wide md:w-full"
+              className="btn btn-outline mt-4 btn-wide md:w-full"
             >
               <FaArrowRight className="w-3 h-3" />
               {loading ? "Loading..." : "Get Started"}
@@ -148,12 +101,12 @@ export default function PricingSection() {
           </div>
         </div>
 
-        {/* Scale Plan */}
-        <div className="card bg-base-100 border">
+        {/* Hypergrowth Plan */}
+        <div className="card bg-base-100 border border-primary">
           <div className="card-body">
-            <h3 className="card-title">Scale</h3>
+            <h3 className="card-title">Hypergrowth</h3>
             <div className="text-3xl font-bold mb-4">
-              $27<span className="text-sm text-gray-500">/month</span>
+              $35<span className="text-sm text-gray-500">/month</span>
             </div>
             <ul className="space-y-2">
               <li className="flex items-center gap-2">
@@ -166,25 +119,40 @@ export default function PricingSection() {
                 <span>✓</span> Cross-posting
               </li>
               <li className="flex items-center gap-2 relative">
-                <span>✓</span> Growth consulting{" "}
+                <span>✓</span> Hypergrowth consulting{" "}
                 <button 
                   className="inline-flex"
-                  onMouseEnter={() => setActiveTooltip("scale")}
+                  onMouseEnter={() => setActiveTooltip("hypergrowth")}
                   onMouseLeave={() => setActiveTooltip(null)}
                 >
                   <FaInfoCircle className="text-gray-400" />
                 </button>
-                {activeTooltip === "scale" && (
+                {activeTooltip === "hypergrowth" && (
                   <div className="absolute left-0 bottom-full mb-2 p-3 bg-gray-800 text-white text-sm rounded w-64 z-10">
-                    Direct communication to help you grow on Reddit (from 1M+ impressions)
+                    After bying this plan, you will get automatically email with a link to schedule a call with us.
+                    But it does not stop here, we will help you with:
+                    <ul>
+                      <li>
+                        <span>✓</span> Content creation
+                      </li>
+                      <li>
+                        <span>✓</span> Outreach to customers
+                      </li>
+                      <li>
+                        <span>✓</span> Optimizing your Reddit profile
+                      </li>
+                      <li>
+                        <span>✓</span> Driving leads to your website
+                      </li>
+                    </ul>
                   </div>
                 )}
               </li>
             </ul>
             <button
-              onClick={() => handleSubscription("scale")}
+              onClick={() => handleSubscription("hypergrowth")}
               disabled={loading}
-              className="btn btn-outline mt-4 btn-wide md:w-full"
+              className="btn btn-primary mt-4 btn-wide md:w-full"
             >
               <FaArrowRight className="w-3 h-3" />
               {loading ? "Loading..." : "Get Started"}

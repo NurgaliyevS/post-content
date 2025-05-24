@@ -62,7 +62,7 @@ export default function SchedulingForm({
           </div>
 
           {selectedSubreddits.map((sub) => {
-            const subName = sub.display_name_prefixed;
+            const subName = sub.value;
             const flairs = flairsBySubreddit[subName] || [];
             const flairRequired = flairs.length >= 2;
             const flairOptions = flairs.map((flair) => ({
@@ -149,7 +149,7 @@ export default function SchedulingForm({
       {customScheduling && (
         <>
           {selectedSubreddits.map((sub) => {
-            const subName = sub.display_name_prefixed;
+            const subName = sub.value;
             const flairs = flairsBySubreddit[subName] || [];
             const flairRequired = flairs.length >= 2;
             const flairOptions = flairs.map((flair) => ({

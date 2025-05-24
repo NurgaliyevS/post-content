@@ -178,15 +178,20 @@ function CrossPosting() {
 
   // Fetch flairs for a subreddit if not already cached
   const fetchFlairsForSubreddit = async (subreddit) => {
+    console.log(subreddit, "subreddit");
+    console.log(flairsBySubreddit, "flairsBySubreddit");
+    console.log(flairsBySubreddit[subreddit.value], "flairsBySubreddit[subreddit.value]");
     if (flairsBySubreddit[subreddit.value]) return;
     setFlairsLoading((prev) => ({ ...prev, [subreddit.value]: true }));
     try {
       const response = await fetch(`/api/reddit/flairs?subreddit=${subreddit.value}`);
       const data = await response.json();
+      console.log(data, "data");
       if (!response.ok) {
         setFlairErrors((prev) => ({ ...prev, [subreddit.value]: data?.error || "Error fetching flairs" }));
         setFlairsBySubreddit((prev) => ({ ...prev, [subreddit.value]: [] }));
       }
+      console.log(data.choices, "data.choices");
       const flairs = data.choices || [];
       setFlairsBySubreddit((prev) => ({ ...prev, [subreddit.value]: flairs }));
     } catch (error) {

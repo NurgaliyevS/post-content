@@ -47,9 +47,6 @@ function CrossPostingHistory({ posts, loadingPosts }) {
                   {post?.redditPostUrl ? (
                     <a href={post.redditPostUrl} target="_blank" rel="noopener noreferrer" className="hover:text-blue-600">
                       <div className="font-medium">{post.title}</div>
-                      <div className="text-sm text-gray-500">
-                        r/{post.community}
-                      </div>
                     </a>
                   ) : (
                     <>

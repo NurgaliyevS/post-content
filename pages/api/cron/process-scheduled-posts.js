@@ -95,6 +95,10 @@ export default async function handler(req, res) {
         if (post.type === 'link' && post.url) {
           requestBody.append('url', post.url);
         }
+
+        if (post?.flairId) {
+          requestBody.append('flair_id', post.flairId);
+        }
         
         console.log(`Attempting to submit post ${post._id} to Reddit (community: r/${post.community}, type: ${post.type})`);
         

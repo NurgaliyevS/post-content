@@ -33,7 +33,11 @@ export default async function handler(req, res) {
 
         console.log(`Retrying failed post ${post._id} (scheduled for: ${scheduledDateTime.toISO()}, now: ${currentTimeInUserTZ.toISO()})`);
 
-        const user = await User.findOne({ userId: post.redditId });
+        const user = await User.findOne({ _id: post.userId });
+
+        console.log(post.title, "post title");
+        console.log(user?.name, "user name");
+        console.log(user?.email, "user email");
 
         // write with data: email, userName, reason
         const message = `Failed post, immediately send email to user with apology and increase post available by 10

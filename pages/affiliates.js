@@ -29,8 +29,7 @@ export default function Affiliates() {
           </h1>
           <p className="text-xl mb-16">
             And you would help <span className="font-bold">{referrals}</span>{" "}
-            developers
-            quit their 9-5 and build their dreams
+            creators turn their side projects into full-time businesses
           </p>
           <div className="flex items-center gap-4 mt-12 md:mt-20">
             <input

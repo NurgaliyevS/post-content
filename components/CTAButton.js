@@ -14,6 +14,9 @@ export default function CTAButton({
     if (status === "authenticated") {
       router.push(dashboardPath);
     } else {
+      if (session?.user?.name && typeof window !== "undefined") {
+        window.Affonso.signup(session?.user?.name);
+      }
       signIn("reddit", { callbackUrl: "/dashboard/onboarding" });
     }
   };

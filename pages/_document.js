@@ -1,5 +1,6 @@
 import { customConfig } from "@/project.custom.config";
 import { Html, Head, Main, NextScript } from "next/document";
+import Script from "next/script";
 
 export default function Document() {
   return (
@@ -26,7 +27,6 @@ export default function Document() {
         />
 
         <link rel="icon" href="/logo.svg" />
-        
         {/* Favicon links */}
         {/* <link
           rel="icon"
@@ -62,6 +62,12 @@ export default function Document() {
           sizes="60x60"
           href="/company_related/apple-icon-60x60.png"
         /> */}
+        <Script
+          src="https://affonso.io/js/pixel.min.js"
+          strategy="afterInteractive"
+          data-affonso="cmb6dzg6m002hwwazhsxp8va4"
+          data-cookie_duration="30"
+        />
       </Head>
       <body>
         <Main />

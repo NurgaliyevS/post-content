@@ -17,6 +17,7 @@ export default async function handler(req, res) {
 
   console.log("visitorId", visitorId);
   console.log("sessionId", sessionId);
+  console.log(req.body.affonso_referral, "affonso_referral")
   await connectMongoDB();
   try {
     const session = await getServerSession(req, res, authOptions);
@@ -65,6 +66,10 @@ export default async function handler(req, res) {
         sessionId,
       },
     };
+
+    if (req?.body?.affonso_referral) {
+      createLink.metadata.affonso_referral = req.body.affonso_referral;
+    }
 
     if (session?.user?.name) {
       const user = await User.find({ name: session.user.name });

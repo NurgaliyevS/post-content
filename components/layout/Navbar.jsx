@@ -11,6 +11,9 @@ export default function Navbar() {
     if (session) {
       router.push("/dashboard/onboarding");
     } else {
+      if (session?.user?.name && typeof window !== "undefined") {
+        window.Affonso.signup(session?.user?.name);
+      }
       signIn("reddit", { callbackUrl: "/dashboard/onboarding" });
     }
   };

@@ -28,7 +28,8 @@ export default function Affiliates() {
             today
           </h1>
           <p className="text-xl mb-16">
-            And you would help <span className="font-bold">1</span> developers
+            And you would help <span className="font-bold">{referrals}</span>{" "}
+            developers
             quit their 9-5 and build their dreams
           </p>
           <div className="flex items-center gap-4 mt-12 md:mt-20">
@@ -38,7 +39,7 @@ export default function Affiliates() {
               max="100"
               value={referrals || 0}
               onChange={(e) => setReferrals(Number(e.target.value))}
-              className="range w-full"
+              className="range w-full range-secondary"
             />
             <span class="text-lg">
               <span class="font-bold">{referrals}</span> referrals

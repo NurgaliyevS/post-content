@@ -31,10 +31,10 @@ export default function Navbar() {
         <span className="font-bold text-lg md:text-xl">Post Content</span>
       </div>
       <div className="flex gap-4">
-        <Link href="#features" className="link link-hover hidden md:inline">
+        <Link href="/#features" className="link link-hover hidden md:inline">
           Features
         </Link>
-        <Link href="#pricing" className="link link-hover">
+        <Link href="/#pricing" className="link link-hover">
           Pricing
         </Link>
         <button onClick={handleClick} className="link link-hover">

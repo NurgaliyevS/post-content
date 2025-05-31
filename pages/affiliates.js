@@ -5,10 +5,12 @@ import { FaArrowRight } from "react-icons/fa";
 
 export default function Affiliates() {
   const [referrals, setReferrals] = useState(10);
+  const [plan, setPlan] = useState("growth");
 
   // Calculate earnings based on referrals
   const effectiveReferrals = referrals || 1;
-  const earnings = effectiveReferrals * 17.5;
+  const commission = plan === "growth" ? 12.5 : 17.5;
+  const earnings = effectiveReferrals * commission;
 
   const handleBecomeAnAffiliate = () => {
     window.open("https://post-content.affonso.io", "_blank");
@@ -42,6 +44,33 @@ export default function Affiliates() {
           </div>
         </section>
         <section className="w-full max-w-3xl text-center">
+          {/* Plan Toggle */}
+          <div className="flex justify-center mb-8 gap-4">
+            <div className="form-control">
+              <label className="label cursor-pointer gap-2">
+                <input
+                  type="radio"
+                  name="plan"
+                  className="radio checked:bg-primary"
+                  checked={plan === "growth"}
+                  onChange={() => setPlan("growth")}
+                />
+                <span className="label-text font-semibold">Growth ($25)</span>
+              </label>
+            </div>
+            <div className="form-control">
+              <label className="label cursor-pointer gap-2">
+                <input
+                  type="radio"
+                  name="plan"
+                  className="radio checked:bg-primary"
+                  checked={plan === "hypergrowth"}
+                  onChange={() => setPlan("hypergrowth")}
+                />
+                <span className="label-text font-semibold">Hypergrowth ($35)</span>
+              </label>
+            </div>
+          </div>
           <h2 className="text-2xl md:text-4xl font-extrabold mb-6">
             You can make{" "}
             <span className="bg-black text-white px-4 py-1 rounded-md">

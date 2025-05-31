@@ -25,16 +25,22 @@ export default function Footer() {
             Product
           </span>
           <Link
-            href="#features"
+            href="/#features"
             className="text-sm hover:text-primary transition-colors"
           >
             Features
           </Link>
           <Link
-            href="#pricing"
+            href="/#pricing"
             className="text-sm hover:text-primary transition-colors"
           >
             Pricing
+          </Link>
+          <Link
+            href="/affiliates"
+            className="text-sm hover:text-primary transition-colors"
+          >
+            Affiliates
           </Link>
           {/* DOMINATE ON REDDIT */}
           <Link

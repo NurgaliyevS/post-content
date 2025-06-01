@@ -34,12 +34,12 @@ export default function PricingSection() {
       growth: {
         name: "Growth",
         post_available: 50,
-        price: 1800, // in cents
+        price: 2500, // in cents
       },
       hypergrowth: {
         name: "Hypergrowth",
         post_available: 150,
-        price: 2700, // in cents
+        price: 3500, // in cents
       },
     };
     return details[plan];

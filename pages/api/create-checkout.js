@@ -44,7 +44,7 @@ export default async function handler(req, res) {
             currency: "usd",
             product_data: {
               name: `Post Content - ${planDetails.name}`,
-              description: `Creator access to Post Content. ${planDetails.post_available} posts to schedule per month. 30 days money back guarantee.`,
+              // description: `Creator access to Post Content. ${planDetails.post_available} posts to schedule per month. 30 days money back guarantee.`,
               metadata: {
                 post_available: planDetails.post_available,
               },
@@ -66,6 +66,12 @@ export default async function handler(req, res) {
         sessionId,
       },
     };
+
+    if (planDetails.name === "Reddit Partner") {
+      createLink.line_items[0].price_data.product_data.description = "For busy founders who want to grow on Reddit but don't have the time to do it themselves. 2 updates per week. 100% personal-to-you content strategy. No contracts, cancel anytime. Limited spots.";
+    } else {
+      createLink.line_items[0].price_data.product_data.description = `Creator access to Post Content. ${planDetails.post_available} posts to schedule per month. 30 days money back guarantee.`;
+    }
 
     if (req?.body?.affonso_referral) {
       createLink.metadata.affonso_referral = req.body.affonso_referral;

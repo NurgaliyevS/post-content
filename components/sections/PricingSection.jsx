@@ -31,14 +31,13 @@ export default function PricingSection() {
 
   const getPlanDetails = (plan) => {
     const details = {
-      growth: {
-        name: "Growth",
-        post_available: 50,
-        price: 2500, // in cents
+      redditPartner: {
+        name: "Reddit Partner",
+        price: 100000, // in cents
       },
       hypergrowth: {
         name: "Hypergrowth",
-        post_available: 150,
+        post_available: 100,
         price: 3500, // in cents
       },
     };
@@ -48,69 +47,21 @@ export default function PricingSection() {
   return (
     <section id="pricing" className="py-16 px-4 mx-auto">
       <h2 className="text-3xl font-bold text-center mb-12">Pricing</h2>
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-6 py-3 rounded-full">
-          <FaShieldAlt className="text-xl" />
-          <span className="font-semibold">30-Day Money-Back Guarantee</span>
-        </div>
-      </div>
       <div className="grid md:grid-cols-2 gap-8 mx-auto">
 
-        {/* Growth Plan */}
-        <div className="card bg-base-100 border">
-          <div className="card-body relative">
-            <h3 className="card-title">Growth</h3>
-            <div className="text-3xl font-bold mb-4">
-              $25<span className="text-sm text-gray-500">/month</span>
-            </div>
-            <ul className="space-y-2">
-              <li className="flex items-center gap-2">
-                <span>✓</span> 50 posts per month
-              </li>
-              <li className="flex items-center gap-2">
-                <span>✓</span> Schedule posts
-              </li>
-              <li className="flex items-center gap-2">
-                <span>✓</span> Cross-posting
-              </li>
-              <li className="flex items-center gap-2 relative">
-                <span>✓</span> Growth consulting{" "}
-                <button 
-                  className="inline-flex"
-                  onMouseEnter={() => setActiveTooltip("growth")}
-                  onMouseLeave={() => setActiveTooltip(null)}
-                >
-                  <FaInfoCircle className="text-gray-400" />
-                </button>
-                {activeTooltip === "growth" && (
-                  <div className="absolute left-0 bottom-full mb-2 p-3 bg-gray-800 text-white text-sm rounded w-64 z-10">
-                    After bying this plan, you will get automatically email with a link to schedule a call with us.
-                    Where we discuss how you can grow on Reddit based on your business goals and give real time advice.
-                  </div>
-                )}
-              </li>
-            </ul>
-            <button
-              onClick={() => handleSubscription("growth")}
-              disabled={loading}
-              className="btn btn-outline mt-4 btn-wide md:w-full"
-            >
-              <FaArrowRight className="w-3 h-3" />
-              {loading ? "Loading..." : "Get Started"}
-            </button>
-          </div>
-        </div>
-
         {/* Hypergrowth Plan */}
-        <div className="card bg-base-100 border border-primary">
+        <div className="card bg-base-100 border">
           <div className="card-body">
             <h3 className="card-title">Hypergrowth</h3>
-            <div className="text-3xl font-bold mb-4">
+            <div className="text-3xl font-bold mb-2">
               $35<span className="text-sm text-gray-500">/month</span>
             </div>
+            <span className="text-sm text-gray-500 mb-4">
+              For founders who want to grow on Reddit and have the time to do it themselves.
+            </span>
             <ul className="space-y-2">
               <li className="flex items-center gap-2">
-                <span>✓</span> 150 posts per month
+                <span>✓</span> 100 posts per month
               </li>
               <li className="flex items-center gap-2">
                 <span>✓</span> Schedule posts
@@ -151,6 +102,41 @@ export default function PricingSection() {
             </ul>
             <button
               onClick={() => handleSubscription("hypergrowth")}
+              disabled={loading}
+              className="btn btn-outline mt-4 btn-wide md:w-full"
+            >
+              <FaArrowRight className="w-3 h-3" />
+              {loading ? "Loading..." : "Get Started"}
+            </button>
+          </div>
+        </div>
+
+
+        <div className="card bg-base-100 border border-primary">
+          <div className="card-body relative">
+            <h3 className="card-title">Reddit Partner</h3>
+            <div className="text-3xl font-bold mb-2">
+              $1000<span className="text-sm text-gray-500">/month</span>
+            </div>
+            <span className="text-sm text-gray-500 mb-4">
+              For busy founders who want to grow on Reddit but don't have the time to do it themselves.
+            </span>
+            <ul className="space-y-2">
+              <li className="flex items-center gap-2">
+                <span>✓</span> 2 updates per week
+              </li>
+              <li className="flex items-center gap-2">
+                <span>✓</span> 100% personal-to-you content strategy
+              </li>
+              <li className="flex items-center gap-2">
+                <span>✓</span> No contracts, cancel anytime
+              </li>
+              <li className="flex items-center gap-2">
+                <span>✓</span> Limited spots
+              </li>
+            </ul>
+            <button
+              onClick={() => handleSubscription("redditPartner")}
               disabled={loading}
               className="btn btn-primary mt-4 btn-wide md:w-full"
             >

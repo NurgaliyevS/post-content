@@ -11,7 +11,7 @@ export default function HeroSection() {
     <div className="text-center px-4 py-16 mx-auto">
       <div className="flex justify-center mb-6 gap-4">
         <a
-          href="https://www.tinystartups.com/startups/post-content"
+          href="https://www.tinystartups.com/launch/reddit-scheduler"
           target="_blank"
           rel="noopener noreferrer"
           className="group hover:opacity-90 transition-opacity"

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import withAuth from "@/components/withAuth";
-import PostTypeTabs from "@/components/scheduling/PostTypeTabs";
 import FormattingToolbar from "@/components/scheduling/FormattingToolbar";
 import SubredditSelector from "@/components/scheduling/SubredditSelector";
 import { format, parse, setHours, setMinutes, add, sub } from "date-fns";
@@ -11,6 +10,7 @@ import { toast } from "react-toastify";
 import { showNotification } from "@/components/cross-posting/ToastNotifications";
 import { useRouter } from "next/router";
 import { useSidebar } from "@/context/SidebarContext";
+import Tips from "@/components/scheduling/Tips";
 
 function Scheduling() {
   const { data: session, status } = useSession();
@@ -272,7 +272,9 @@ function Scheduling() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData?.error || errorData?.message || "Failed to schedule post");
+        throw new Error(
+          errorData?.error || errorData?.message || "Failed to schedule post"
+        );
       }
 
       setFormData({
@@ -326,95 +328,101 @@ function Scheduling() {
   return (
     <DashboardLayout>
       <div className="mb-10 min-h-screen">
-        <div className="max-w-4xl">
+        <div>
           <h1 className="text-2xl md:text-3xl font-bold mb-6">
             Schedule Reddit Posts
           </h1>
-
-          <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-            <SubredditSelector
-              subreddits={subreddits}
-              subredditsLoading={subredditsLoading}
-              subredditsError={subredditsError}
-              selectedCommunity={formData.community}
-              onCommunityChange={handleInputChange}
-              onRetry={fetchUserSubreddits}
-            />
-
-            <div className="space-y-4">
-              <input
-                type="text"
-                placeholder="Title"
-                name="title"
-                value={formData.title}
-                onChange={handleInputChange}
-                className="input input-bordered w-full"
+          <div className="flex flex-col md:flex-row gap-4 w-full">
+            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm self-start w-full md:w-3/4 mb-4 md:mb-0">
+              <SubredditSelector
+                subreddits={subreddits}
+                subredditsLoading={subredditsLoading}
+                subredditsError={subredditsError}
+                selectedCommunity={formData.community}
+                onCommunityChange={handleInputChange}
+                onRetry={fetchUserSubreddits}
               />
 
-              <FormattingToolbar
-                onFormat={handleFormatting}
-                formData={formData}
-                handleFlairChange={handleFlairChange}
-                flairs={flairs}
-                error={flairsError}
-                loading={flairsLoading}
-              />
-
-              {flairRequiredError && (
-                <div className="text-error text-sm font-medium mb-2">{flairRequiredError}</div>
-              )}
-
-              <textarea
-                className="textarea textarea-bordered w-full min-h-32"
-                placeholder="Text"
-                name="text"
-                value={formData.text}
-                onChange={(e) => {
-                  // Reset height to auto
-                  e.target.style.height = "auto";
-
-                  // Set height based on scroll height
-                  e.target.style.height = `${e.target.scrollHeight}px`;
-
-                  handleInputChange(e);
-                }}
-              ></textarea>
-
-              <div className="flex gap-4 mt-4">
+              <div className="space-y-4">
                 <input
-                  type="date"
-                  name="selectedDate"
-                  value={formData.selectedDate}
-                  onChange={handleDateTimeChange}
-                  min={format(new Date(), "yyyy-MM-dd")}
-                  className="input input-bordered"
+                  type="text"
+                  placeholder="Title"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleInputChange}
+                  className="input input-bordered w-full"
                 />
 
-                <input
-                  type="time"
-                  name="selectedTime"
-                  value={formData.selectedTime}
-                  onChange={handleDateTimeChange}
-                  className="input input-bordered"
-                  format="HH:mm"
+                <FormattingToolbar
+                  onFormat={handleFormatting}
+                  formData={formData}
+                  handleFlairChange={handleFlairChange}
+                  flairs={flairs}
+                  error={flairsError}
+                  loading={flairsLoading}
                 />
-              </div>
 
-              <div className="flex justify-end mt-6">
-                <button
-                  className="btn btn-primary"
-                  disabled={
-                    !formData.selectedDate ||
-                    !formData.selectedTime ||
-                    !formData.title ||
-                    !formData.community ||
-                    isLoadingForm
-                  }
-                  onClick={schedulePost}
-                >
-                  {isLoadingForm ? "Scheduling..." : "Schedule Post"}
-                </button>
+                {flairRequiredError && (
+                  <div className="text-error text-sm font-medium mb-2">
+                    {flairRequiredError}
+                  </div>
+                )}
+
+                <textarea
+                  className="textarea textarea-bordered w-full min-h-32"
+                  placeholder="Text"
+                  name="text"
+                  value={formData.text}
+                  onChange={(e) => {
+                    // Reset height to auto
+                    e.target.style.height = "auto";
+
+                    // Set height based on scroll height
+                    e.target.style.height = `${e.target.scrollHeight}px`;
+
+                    handleInputChange(e);
+                  }}
+                ></textarea>
+
+                <div className="flex gap-4 mt-4">
+                  <input
+                    type="date"
+                    name="selectedDate"
+                    value={formData.selectedDate}
+                    onChange={handleDateTimeChange}
+                    min={format(new Date(), "yyyy-MM-dd")}
+                    className="input input-bordered"
+                  />
+
+                  <input
+                    type="time"
+                    name="selectedTime"
+                    value={formData.selectedTime}
+                    onChange={handleDateTimeChange}
+                    className="input input-bordered"
+                    format="HH:mm"
+                  />
+                </div>
+
+                <div className="flex justify-end mt-6">
+                  <button
+                    className="btn btn-primary"
+                    disabled={
+                      !formData.selectedDate ||
+                      !formData.selectedTime ||
+                      !formData.title ||
+                      !formData.community ||
+                      isLoadingForm
+                    }
+                    onClick={schedulePost}
+                  >
+                    {isLoadingForm ? "Scheduling..." : "Schedule Post"}
+                  </button>
+                </div>
               </div>
+            </div>
+            <div className="w-full md:w-1/4">
+              <Tips subreddit={formData.community} />
             </div>
           </div>
         </div>

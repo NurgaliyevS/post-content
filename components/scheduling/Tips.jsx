@@ -57,7 +57,6 @@ function Tips({ subreddit }) {
   const [topPosts, setTopPosts] = useState([]);
   const [contentIdeas, setContentIdeas] = useState([]);
   const [tab, setTab] = useState('tips');
-  const [openAccordion, setOpenAccordion] = useState('tips');
 
   useEffect(() => {
     if (!subreddit) return;

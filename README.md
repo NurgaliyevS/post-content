@@ -1,14 +1,14 @@
-# Reddit Scheduler
+# Post Content
 
 An Open-Source Reddit Post Scheduler for Best Engagement
 
-## What is Reddit Scheduler?
+## What is Post Content?
 
-Reddit Scheduler is an open-source tool that helps Reddit users optimize their post timing for maximum engagement. Our goal is to help content creators and marketers reach their target audience at the most effective times.
+Post Content is an open-source tool that helps Reddit users optimize their post timing for maximum engagement. Our goal is to help content creators and marketers reach their target audience at the most effective times.
 
-## Why Reddit Scheduler?
+## Why Post Content?
 
-Most Reddit scheduling tools are either **closed-source**, **expensive**, or **lack advanced features**. Reddit Scheduler is different:
+Most Reddit scheduling tools are either **closed-source**, **expensive**, or **lack advanced features**. Post Content is different:
 
 - ✅ **Open-Source** – Transparent and community-driven development
 - 🕒 **Smart Scheduling** - Best posting times
@@ -19,7 +19,7 @@ Most Reddit scheduling tools are either **closed-source**, **expensive**, or **l
 
 ## Tech Stack
 
-Reddit Scheduler is built with modern and reliable technologies:
+Post Content is built with modern and reliable technologies:
 
 - **Frontend**: Next.js, React, Javascript, TailwindCSS, DaisyUI
 - **Backend**: Next.js API Routes

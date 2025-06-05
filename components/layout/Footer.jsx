@@ -115,7 +115,7 @@ export default function Footer() {
           </div>
           <div className="text-xs">
             <a
-              href="https://github.com/NurgaliyevS/redditscheduler"
+              href="https://github.com/NurgaliyevS/post-content"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs hover:text-primary text-gray-500"

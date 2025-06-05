@@ -1,10 +1,10 @@
-# Contributing to Reddit Scheduler
+# Contributing to Post Content
 
-Thank you for your interest in contributing to Reddit Scheduler! We're excited to have you join our mission to create an open-source Reddit post scheduling solution that helps users optimize their content engagement.
+Thank you for your interest in contributing to Post Content! We're excited to have you join our mission to create an open-source Reddit post scheduling solution that helps users optimize their content engagement.
 
 ## Table of Contents
 
-- [Contributing to Reddit Scheduler](#contributing-to-reddit-scheduler)
+- [Contributing to Post Content](#contributing-to-reddit-scheduler)
   - [Table of Contents](#table-of-contents)
   - [Getting Started](#getting-started)
   - [Development Workflow](#development-workflow)
@@ -100,7 +100,7 @@ Thank you for your interest in contributing to Reddit Scheduler! We're excited t
 
 ## Database Management
 
-Reddit Scheduler uses MongoDB with Mongoose. Here's how to work with it:
+Post Content uses MongoDB with Mongoose. Here's how to work with it:
 
 1. **Database Structure**
 
@@ -190,7 +190,7 @@ If you have questions or need help, you can:
 
 ---
 
-Thank you for contributing to Reddit Scheduler! Your actions help make Reddit content management more efficient and effective. 
+Thank you for contributing to Post Content! Your actions help make Reddit content management more efficient and effective. 
 
 If you have any questions or need help, please feel free to ask in the issues section.
 

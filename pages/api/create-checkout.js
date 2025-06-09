@@ -22,7 +22,7 @@ export default async function handler(req, res) {
   try {
     const session = await getServerSession(req, res, authOptions);
 
-    const { plan, planDetails } = req.body;
+    const { plan, planDetails, affonso_referral } = req.body;
 
     const createLink = {
       mode: "subscription",
@@ -64,6 +64,7 @@ export default async function handler(req, res) {
         post_available: planDetails.post_available,
         visitorId,
         sessionId,
+        affonso_referral,
       },
     };
 
@@ -71,10 +72,6 @@ export default async function handler(req, res) {
       createLink.line_items[0].price_data.product_data.description = "For busy founders who want to grow on Reddit but don't have the time to do it themselves. 2 updates per week. 100% personal-to-you content strategy. No contracts, cancel anytime. Limited spots.";
     } else {
       createLink.line_items[0].price_data.product_data.description = `Creator access to Post Content. ${planDetails.post_available} posts to schedule per month. 30 days money back guarantee.`;
-    }
-
-    if (req?.body?.affonso_referral) {
-      createLink.metadata.affonso_referral = req.body.affonso_referral;
     }
 
     if (session?.user?.name) {

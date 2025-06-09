@@ -5,8 +5,13 @@ export default function PricingSection() {
   const [loading, setLoading] = useState(false);
   const [activeTooltip, setActiveTooltip] = useState(null);
 
+  const referralId = typeof window !== "undefined" ? window.affonso_referral : null;
+
   const handleSubscription = async (plan) => {
     try {
+      // VISIT WEBSITE WITH REFERRAL ID
+      console.log("referralId", referralId);
+      
       setLoading(true);
       const response = await fetch("/api/create-checkout", {
         method: "POST",
@@ -16,6 +21,7 @@ export default function PricingSection() {
         body: JSON.stringify({
           plan,
           planDetails: getPlanDetails(plan),
+          affonso_referral: referralId,
         }),
       });
 

@@ -95,6 +95,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-- Inspired by [Later for Reddit](https://laterforreddit.com/)
 - Built with [Next.js](https://nextjs.org/)
 - Styled with [TailwindCSS](https://tailwindcss.com/) and [DaisyUI](https://daisyui.com/)

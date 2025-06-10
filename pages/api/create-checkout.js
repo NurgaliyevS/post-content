@@ -22,7 +22,7 @@ export default async function handler(req, res) {
   try {
     const session = await getServerSession(req, res, authOptions);
 
-    const { plan, planDetails, affonso_referral } = req.body;
+    const { plan, planDetails, billingCycle, affonso_referral } = req.body;
 
     const createLink = {
       mode: "subscription",
@@ -51,7 +51,7 @@ export default async function handler(req, res) {
             },
             unit_amount: planDetails.price,
             recurring: {
-              interval: "month",
+              interval: billingCycle === "yearly" ? "year" : "month",
             },
           },
           quantity: 1,
@@ -62,6 +62,7 @@ export default async function handler(req, res) {
       metadata: {
         plan,
         post_available: planDetails.post_available,
+        billingCycle,
         visitorId,
         sessionId,
         affonso_referral,
@@ -71,7 +72,9 @@ export default async function handler(req, res) {
     if (planDetails.name === "Reddit Partner") {
       createLink.line_items[0].price_data.product_data.description = "For busy founders who want to grow on Reddit but don't have the time to do it themselves. 2 updates per week. 100% personal-to-you content strategy. No contracts, cancel anytime. Limited spots.";
     } else {
-      createLink.line_items[0].price_data.product_data.description = `Creator access to Post Content. ${planDetails.post_available} posts to schedule per month. 30 days money back guarantee.`;
+      const billingText = billingCycle === "yearly" ? "year" : "month";
+      const guaranteeText = billingCycle === "yearly" ? "30 days money back guarantee" : "30 days money back guarantee";
+      createLink.line_items[0].price_data.product_data.description = `Creator access to Post Content. ${planDetails.post_available} posts to schedule per ${billingText === "year" ? "month" : "month"}. ${guaranteeText}.`;
     }
 
     if (session?.user?.name) {

@@ -4,6 +4,7 @@ import { FaArrowRight, FaInfoCircle, FaShieldAlt } from "react-icons/fa";
 export default function PricingSection() {
   const [loading, setLoading] = useState(false);
   const [activeTooltip, setActiveTooltip] = useState(null);
+  const [billingCycle, setBillingCycle] = useState("monthly"); // monthly or yearly
 
   const referralId =
     typeof window !== "undefined" ? window.affonso_referral : null;
@@ -22,6 +23,7 @@ export default function PricingSection() {
         body: JSON.stringify({
           plan,
           planDetails: getPlanDetails(plan),
+          billingCycle,
           affonso_referral: referralId,
         }),
       });
@@ -37,28 +39,94 @@ export default function PricingSection() {
   };
 
   const getPlanDetails = (plan) => {
-    const details = {
+    const monthlyDetails = {
       redditPartner: {
         name: "Reddit Partner",
         price: 100000, // in cents
+        originalPrice: 150000,
       },
       hypergrowth: {
         name: "Hypergrowth",
         post_available: 100,
         price: 3500, // in cents
+        originalPrice: 5000,
       },
       growth: {
         name: "Growth",
         post_available: 50,
         price: 2500, // in cents
+        originalPrice: 3500,
       },
     };
-    return details[plan];
+
+    const yearlyDetails = {
+      redditPartner: {
+        name: "Reddit Partner",
+        price: 900000, // $900/year (3 months free from $1200)
+        originalPrice: 1800000, // $1800/year (from original $1500/month)
+      },
+      hypergrowth: {
+        name: "Hypergrowth",
+        post_available: 100,
+        price: 31500, // $315/year (3 months free from $420)
+        originalPrice: 60000, // $600/year (from original $50/month)
+      },
+      growth: {
+        name: "Growth",
+        post_available: 50,
+        price: 22500, // $225/year (3 months free from $300)
+        originalPrice: 42000, // $420/year (from original $35/month)
+      },
+    };
+
+    return billingCycle === "yearly" ? yearlyDetails[plan] : monthlyDetails[plan];
+  };
+
+  const formatPrice = (price) => {
+    return billingCycle === "yearly" ? (price / 100).toFixed(0) : (price / 100).toFixed(0);
+  };
+
+  const formatOriginalPrice = (price) => {
+    return billingCycle === "yearly" ? (price / 100).toFixed(0) : (price / 100).toFixed(0);
+  };
+
+  const getMonthlyEquivalent = (yearlyPrice) => {
+    return (yearlyPrice / 100 / 12).toFixed(0);
   };
 
   return (
     <section id="pricing" className="py-16 px-4 mx-auto">
-      <h2 className="text-3xl font-bold text-center mb-12">Pricing</h2>
+      <h2 className="text-3xl font-bold text-center mb-8">Pricing</h2>
+      
+      {/* Billing Toggle */}
+      <div className="flex justify-center mb-12">
+        <div className="bg-gray-100 p-1 rounded-full join border border-gray-300">
+          <button
+            onClick={() => setBillingCycle("monthly")}
+            className={`px-6 py-2 rounded-full transition-all ${
+              billingCycle === "monthly"
+                ? "bg-primary text-primary-content"
+                : "text-base-content hover:bg-base-300"
+            }`}
+          >
+            Monthly
+          </button>
+          <button
+            onClick={() => setBillingCycle("yearly")}
+            className={`px-6 py-2 rounded-full transition-all relative ${
+              billingCycle === "yearly"
+                ? "bg-primary text-primary-content"
+                : "text-base-content hover:bg-base-300"
+            }`}
+          >
+            Yearly
+            <span className="absolute -top-4 -right-10 bg-red-500 text-white text-xs px-2 py-1 rounded-full text-nowrap animate-bounce">
+              3 MONTHS FREE
+            </span>
+          </button>
+        </div>
+      </div>
+
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mx-auto">
         {/* Growth Plan */}
         <div className="card bg-base-100 border">
@@ -66,12 +134,39 @@ export default function PricingSection() {
             <h3 className="card-title">Growth</h3>
             <div className="mb-2">
               <div className="text-lg text-gray-400 line-through">
-                $35<span className="text-sm">/month</span>
+                {billingCycle === "yearly" ? (
+                  <>
+                    ${getMonthlyEquivalent(getPlanDetails("growth").originalPrice)}
+                    <span className="text-sm">/month</span>
+                  </>
+                ) : (
+                  <>
+                    ${formatOriginalPrice(getPlanDetails("growth").originalPrice)}
+                    <span className="text-sm">/month</span>
+                  </>
+                )}
               </div>
               <div className="text-3xl font-bold text-primary">
-                $25<span className="text-sm text-gray-500">/month</span>
+                {billingCycle === "yearly" ? (
+                  <>
+                    ${getMonthlyEquivalent(getPlanDetails("growth").price)}
+                    <span className="text-sm text-gray-500">/month</span>
+                  </>
+                ) : (
+                  <>
+                    ${formatPrice(getPlanDetails("growth").price)}
+                    <span className="text-sm text-gray-500">/month</span>
+                  </>
+                )}
               </div>
-              <div className="badge badge-success badge-sm">Save $10/month</div>
+              {billingCycle === "yearly" && (
+                <div className="text-sm text-gray-500 mb-1">
+                  ${formatPrice(getPlanDetails("growth").price)} billed annually
+                </div>
+              )}
+              <div className="badge badge-success badge-sm">
+                {billingCycle === "yearly" ? "Save $195 with yearly pricing" : "Save $10/month"}
+              </div>
             </div>
             <span className="text-sm text-gray-500 mb-4">
               Perfect for solopreneurs ready to learn Reddit marketing and
@@ -131,12 +226,39 @@ export default function PricingSection() {
             <h3 className="card-title">Hypergrowth</h3>
             <div className="mb-2">
               <div className="text-lg text-gray-400 line-through">
-                $50<span className="text-sm">/month</span>
+                {billingCycle === "yearly" ? (
+                  <>
+                    ${getMonthlyEquivalent(getPlanDetails("hypergrowth").originalPrice)}
+                    <span className="text-sm">/month</span>
+                  </>
+                ) : (
+                  <>
+                    ${formatOriginalPrice(getPlanDetails("hypergrowth").originalPrice)}
+                    <span className="text-sm">/month</span>
+                  </>
+                )}
               </div>
               <div className="text-3xl font-bold text-primary">
-                $35<span className="text-sm text-gray-500">/month</span>
+                {billingCycle === "yearly" ? (
+                  <>
+                    ${getMonthlyEquivalent(getPlanDetails("hypergrowth").price)}
+                    <span className="text-sm text-gray-500">/month</span>
+                  </>
+                ) : (
+                  <>
+                    ${formatPrice(getPlanDetails("hypergrowth").price)}
+                    <span className="text-sm text-gray-500">/month</span>
+                  </>
+                )}
               </div>
-              <div className="badge badge-success badge-sm">Save $15/month</div>
+              {billingCycle === "yearly" && (
+                <div className="text-sm text-gray-500 mb-1">
+                  ${formatPrice(getPlanDetails("hypergrowth").price)} billed annually
+                </div>
+              )}
+              <div className="badge badge-success badge-sm">
+                {billingCycle === "yearly" ? "Save $285 with yearly pricing" : "Save $15/month"}
+              </div>
             </div>
             <span className="text-sm text-gray-500 mb-4">
               For ambitious founders who want to grow on Reddit while building business.
@@ -203,12 +325,39 @@ export default function PricingSection() {
             <h3 className="card-title">Reddit Partner</h3>
             <div className="mb-2">
               <div className="text-lg text-gray-400 line-through">
-                $1500<span className="text-sm">/month</span>
+                {billingCycle === "yearly" ? (
+                  <>
+                    ${getMonthlyEquivalent(getPlanDetails("redditPartner").originalPrice)}
+                    <span className="text-sm">/month</span>
+                  </>
+                ) : (
+                  <>
+                    ${formatOriginalPrice(getPlanDetails("redditPartner").originalPrice)}
+                    <span className="text-sm">/month</span>
+                  </>
+                )}
               </div>
               <div className="text-3xl font-bold text-primary">
-                $1000<span className="text-sm text-gray-500">/month</span>
+                {billingCycle === "yearly" ? (
+                  <>
+                    ${getMonthlyEquivalent(getPlanDetails("redditPartner").price)}
+                    <span className="text-sm text-gray-500">/month</span>
+                  </>
+                ) : (
+                  <>
+                    ${formatPrice(getPlanDetails("redditPartner").price)}
+                    <span className="text-sm text-gray-500">/month</span>
+                  </>
+                )}
               </div>
-              <div className="badge badge-success badge-sm">Save $500/month</div>
+              {billingCycle === "yearly" && (
+                <div className="text-sm text-gray-500 mb-1">
+                  ${formatPrice(getPlanDetails("redditPartner").price)} billed annually
+                </div>
+              )}
+              <div className="badge badge-success badge-sm">
+                {billingCycle === "yearly" ? "Save $2700 with yearly pricing" : "Save $500/month"}
+              </div>
             </div>
             <span className="text-sm text-gray-500 mb-4">
               For busy founders who want to dominate on Reddit but don't have the time.

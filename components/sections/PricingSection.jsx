@@ -64,8 +64,14 @@ export default function PricingSection() {
         <div className="card bg-base-100 border">
           <div className="card-body relative">
             <h3 className="card-title">Growth</h3>
-            <div className="text-3xl font-bold mb-2">
-              $25<span className="text-sm text-gray-500">/month</span>
+            <div className="mb-2">
+              <div className="text-lg text-gray-400 line-through">
+                $35<span className="text-sm">/month</span>
+              </div>
+              <div className="text-3xl font-bold text-primary">
+                $25<span className="text-sm text-gray-500">/month</span>
+              </div>
+              <div className="badge badge-success badge-sm">Save $10/month</div>
             </div>
             <span className="text-sm text-gray-500 mb-4">
               Perfect for solopreneurs ready to learn Reddit marketing and
@@ -123,8 +129,14 @@ export default function PricingSection() {
         <div className="card bg-base-100 border border-primary">
           <div className="card-body relative">
             <h3 className="card-title">Hypergrowth</h3>
-            <div className="text-3xl font-bold mb-2">
-              $35<span className="text-sm text-gray-500">/month</span>
+            <div className="mb-2">
+              <div className="text-lg text-gray-400 line-through">
+                $50<span className="text-sm">/month</span>
+              </div>
+              <div className="text-3xl font-bold text-primary">
+                $35<span className="text-sm text-gray-500">/month</span>
+              </div>
+              <div className="badge badge-success badge-sm">Save $15/month</div>
             </div>
             <span className="text-sm text-gray-500 mb-4">
               For ambitious founders who want to grow on Reddit while building business.
@@ -189,8 +201,14 @@ export default function PricingSection() {
         <div className="card bg-base-100 border">
           <div className="card-body relative">
             <h3 className="card-title">Reddit Partner</h3>
-            <div className="text-3xl font-bold mb-2">
-              $1000<span className="text-sm text-gray-500">/month</span>
+            <div className="mb-2">
+              <div className="text-lg text-gray-400 line-through">
+                $1500<span className="text-sm">/month</span>
+              </div>
+              <div className="text-3xl font-bold text-primary">
+                $1000<span className="text-sm text-gray-500">/month</span>
+              </div>
+              <div className="badge badge-success badge-sm">Save $500/month</div>
             </div>
             <span className="text-sm text-gray-500 mb-4">
               For busy founders who want to dominate on Reddit but don't have the time.

@@ -13,7 +13,7 @@ module.exports = {
       },
       button: {
         base: 'py-3 px-6 font-medium rounded-pill flex items-center transition-colors duration-200',
-        primary: 'bg-blue-500 hover:bg-blue-600 text-white',
+        primary: 'bg-orange-500 hover:bg-orange-600 text-white',
         secondary: 'bg-white hover:bg-gray-100 text-gray-800 shadow-sm',
       }
     }
@@ -32,11 +32,11 @@ module.exports = {
           textAlign: 'center',
         },
         '.btn-primary': {
-          backgroundColor: '#4285F4',
+          backgroundColor: '#FF5722',
           color: 'white',
           border: 'none',
           '&:hover': {
-            backgroundColor: '#3367D6',
+            backgroundColor: '#E64A19',
           },
         },
         '.btn-secondary': {

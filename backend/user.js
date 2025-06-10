@@ -20,6 +20,19 @@ const UserSchema = new mongoose.Schema(
     lastReminderRenewalSent: {
       type: Date,
       default: null
+    },
+    setup_completed: { type: Boolean, default: false },
+    setup_data: {
+      productLink: String,
+      needs: String,
+      goals: [String],
+      recommendedSubreddits: [{
+        name: String,
+        members: String,
+        description: String,
+        relevanceScore: Number
+      }],
+      completedAt: Date
     }
   },
   { timestamps: true }

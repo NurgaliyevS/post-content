@@ -8,6 +8,7 @@ import OnboardingChecklist from "@/components/ui/OnboardingChecklist";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import Link from "next/link";
 import withAuth from "@/components/withAuth";
+import withSetupCheck from "@/components/withSetupCheck";
 
 function Onboarding() {
   const { data: session, status } = useSession();
@@ -69,4 +70,4 @@ function Onboarding() {
   );
 }
 
-export default withAuth(Onboarding);
+export default withAuth(withSetupCheck(Onboarding));

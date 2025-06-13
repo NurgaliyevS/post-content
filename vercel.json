@@ -22,7 +22,7 @@
     },
     {
       "path": "/api/cron/retry-failed-posts",
-      "schedule": "*/30 * * * *"
+      "schedule": "* * * * *"
     }
   ]
 }

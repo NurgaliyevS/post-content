@@ -48,35 +48,6 @@ export default async function handler(req, res) {
         `
         await sendTelegramNotification({ message });
 
-        // update user post_available by 10
-        user.post_available += 10;
-        await user.save();
-        // send email to user with post_available
-        const email = await resend.emails.send({
-          from: 'Post Content <sabyr@redditscheduler.com>',
-          to: user.email,
-          subject: 'Post Content - Failed Post',
-          html: `
-          <p>Hi ${user.name},</p>
-
-          <p>Your post "${post.title}" failed to publish.</p>
-
-          <p>Reason: ${post.failureReason}</p>
-
-          <p>Our apologies for the inconvenience. We increased your post credits by 10.</p>
-
-          <p>We will retry the post again.</p>
-
-          <p>Thank you for your understanding.</p>
-
-          <p>Bye,</p>
-
-          <p>Sabyr</p>
-          `
-        });
-
-        console.log(email, "sendEmail to ", user.email);
-
         // Always refresh token before posting to ensure it's valid
         let accessToken = post.redditAccessToken;
         try {
@@ -93,6 +64,33 @@ export default async function handler(req, res) {
           post.failedAt = currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss");
           post.failureReason = 'Failed to refresh Reddit access token: ' + (refreshError.message || 'Unknown error');
           await post.save();
+
+          // Update user post_available and send email only when cancelled
+          user.post_available += 10;
+          await user.save();
+
+          const email = await resend.emails.send({
+            from: 'Post Content <sabyr@redditscheduler.com>',
+            to: user.email,
+            subject: 'Post Content - Failed Post',
+            html: `
+            <p>Hi ${user.name},</p>
+
+            <p>Your post "${post.title}" failed to publish.</p>
+
+            <p>Reason: ${post.failureReason}</p>
+
+            <p>Our apologies for the inconvenience. We increased your post credits by 10.</p>
+
+            <p>Thank you for your understanding.</p>
+
+            <p>Bye,</p>
+
+            <p>Sabyr</p>
+            `
+          });
+
+          console.log(email, "sendEmail to ", user.email);
           results.push({ id: post._id, status: 'cancelled', error: refreshError.message });
           continue;
         }
@@ -130,6 +128,33 @@ export default async function handler(req, res) {
           post.failedAt = currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss");
           post.failureReason = `Reddit API returned non-JSON response (${redditResponse.status})`;
           await post.save();
+
+          // Update user post_available and send email only when cancelled
+          user.post_available += 10;
+          await user.save();
+
+          const email = await resend.emails.send({
+            from: 'Post Content <sabyr@redditscheduler.com>',
+            to: user.email,
+            subject: 'Post Content - Failed Post',
+            html: `
+            <p>Hi ${user.name},</p>
+
+            <p>Your post "${post.title}" failed to publish.</p>
+
+            <p>Reason: ${post.failureReason}</p>
+
+            <p>Our apologies for the inconvenience. We increased your post credits by 10.</p>
+
+            <p>Thank you for your understanding.</p>
+
+            <p>Bye,</p>
+
+            <p>Sabyr</p>
+            `
+          });
+
+          console.log(email, "sendEmail to ", user.email);
           results.push({ id: post._id, status: 'cancelled', error: 'Reddit API returned non-JSON response' });
           continue;
         }
@@ -147,6 +172,33 @@ export default async function handler(req, res) {
           post.failedAt = currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss");
           post.failureReason = redditData.json?.errors?.join(', ') || 'Unknown error';
           await post.save();
+
+          // Update user post_available and send email only when cancelled
+          user.post_available += 10;
+          await user.save();
+
+          const email = await resend.emails.send({
+            from: 'Post Content <sabyr@redditscheduler.com>',
+            to: user.email,
+            subject: 'Post Content - Failed Post',
+            html: `
+            <p>Hi ${user.name},</p>
+
+            <p>Your post "${post.title}" failed to publish.</p>
+
+            <p>Reason: ${post.failureReason}</p>
+
+            <p>Our apologies for the inconvenience. We increased your post credits by 10.</p>
+
+            <p>Thank you for your understanding.</p>
+
+            <p>Bye,</p>
+
+            <p>Sabyr</p>
+            `
+          });
+
+          console.log(email, "sendEmail to ", user.email);
           results.push({ id: post._id, status: 'cancelled', error: redditData.json?.errors || 'Failed to publish post' });
           console.error(`Failed to publish post ${post._id}:`, redditData.json?.errors);
         }
@@ -158,6 +210,34 @@ export default async function handler(req, res) {
         post.failedAt = currentTimeInUserTZ.toFormat("yyyy-MM-dd HH:mm:ss");
         post.failureReason = error.message;
         await post.save();
+
+        // Update user post_available and send email only when cancelled
+        const user = await User.findOne({ _id: post.userId });
+        user.post_available += 10;
+        await user.save();
+
+        const email = await resend.emails.send({
+          from: 'Post Content <sabyr@redditscheduler.com>',
+          to: user.email,
+          subject: 'Post Content - Failed Post',
+          html: `
+          <p>Hi ${user.name},</p>
+
+          <p>Your post "${post.title}" failed to publish.</p>
+
+          <p>Reason: ${post.failureReason}</p>
+
+          <p>Our apologies for the inconvenience. We increased your post credits by 10.</p>
+
+          <p>Thank you for your understanding.</p>
+
+          <p>Bye,</p>
+
+          <p>Sabyr</p>
+          `
+        });
+
+        console.log(email, "sendEmail to ", user.email);
         results.push({ id: post._id, status: 'cancelled', error: error.message });
       }
     }

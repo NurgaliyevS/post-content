@@ -169,8 +169,7 @@ export default function PricingSection() {
               </div>
             </div>
             <span className="text-sm text-gray-500 mb-4">
-              Perfect for solopreneurs ready to learn Reddit marketing and
-              build their first audience.
+              Perfect for content creators on Reddit who want to grow their audience.
             </span>
             <ul className="space-y-2">
               <li className="flex items-center gap-2">
@@ -261,7 +260,7 @@ export default function PricingSection() {
               </div>
             </div>
             <span className="text-sm text-gray-500 mb-4">
-              For ambitious founders who want to grow on Reddit while building business.
+              Perfect for community creators who are already growing on Reddit.
             </span>
             <ul className="space-y-2">
               <li className="flex items-center gap-2">
